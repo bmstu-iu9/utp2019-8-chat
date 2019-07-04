@@ -4,6 +4,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");  
 const fs = require("fs");
+const process = require("process");
 
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
@@ -44,4 +45,11 @@ app.get("/", (request, response) =>
 app.get("*", (request, response) => 
     response.send(fs.readFileSync("./client/404.html").toString("utf-8")));
 
-app.listen(3000); //Needs admin privileges to launch. Else - change port 80 to port 3000 (for example) 
+if (process.argv.length > 2) {
+    app.listen(process.argv[2]);
+    console.log(`Server started on ${process.argv[2]} port`)
+}
+else {
+    app.listen(3000);
+    console.log(`Server started on 3000 port`)
+}
