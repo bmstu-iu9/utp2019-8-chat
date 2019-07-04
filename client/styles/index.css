@@ -16,11 +16,11 @@
     padding: 5px;
 }
 
-#chat_input #input {
+#chat_input #input_msg {
     width: 89%;
 }
 
-#chat_input #send {
+#chat_input #send_btn {
     width: 8%;
     margin-left: auto; 
     margin-right: 5px; 
