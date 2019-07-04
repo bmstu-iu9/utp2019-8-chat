@@ -15,8 +15,12 @@ app.get("*.(html|css|js)", (request, response) => {
         response.send(fs.readFileSync(`./client/404.html`).toString("utf-8"))
         return;
     }
-    response.set("Content-Type", "text/html") //Change this for each type of file (text/css and text/js)?
-    response.send(file);
+    if (request.path.endsWith(".html"))
+        response.set("Content-Type", "text/html").send(file);
+    else if (request.path.endsWith(".css"))
+        response.set("Content-Type", "text/css").send(file);
+    else if (request.path.endsWith(".js"))
+        response.set("Content-Type", "text/javascript").send(file);
 });
 
 
@@ -32,4 +36,4 @@ app.get("/", (request, response) => response.redirect("/index.html"));
 app.get("*", (request, response) => 
     response.send(fs.readFileSync("./client/404.html").toString("utf-8")));
 
-app.listen(80); //Needs admin privileges to launch. Else - change port 80 to port 1000 (for example) 
+app.listen(3000); //Needs admin privileges to launch. Else - change port 80 to port 3000 (for example) 
