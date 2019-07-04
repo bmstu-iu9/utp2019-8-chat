@@ -2,11 +2,11 @@
 'use strict'
 
 const express = require("express");
-const bodyParser = require("body-parser");  
 const fs = require("fs");
 
+const chatModule = require("./modules/chat")
+
 const app = express();
-const urlencodedParser = bodyParser.urlencoded({extended: false});
 
 //Next function returns requested file, if it has html, css or js extension
 app.get("*.(html|css|js)", (request, response) => {
@@ -30,67 +30,8 @@ app.get("*.(html|css|js)", (request, response) => {
 //  Here will be API methods
 //
 
-var msgCounter = 0;
 
-class message { 
-    constructor(author_name, message) {
-        this.author_name = author_name;
-        this.message = message;
-        this.id = msgCounter++;
-    }
-}
-
-var messages = []; //Now we accepts only one channel
-var subscribers = [new message("Hottabych", "You know")]; //One message, that considers "Readed" by all users 
-
-const checkSubscribers = () => {
-    for (let i = 0; i < subscribers.length; i++) {
-        if (messages.length != 0 && subscribers[i].last_msg < messages[messages.length - 1].id) {
-            let t = messages.length - 1;
-            while (t >= 0 && messages[t].id != subscribers[i].last_msg)
-                t--;
-            t++;
-            subscribers[i].response.status(200).send(JSON.stringify({
-                id: messages[t].id, //Its id of change. Now it equal to id of message
-                message: {
-                    message_id: messages[t].id,
-                    author_id: 0, //FIX THIS!!!!!!!
-                    author_name: messages[t].author_name,
-                    message: messages[t].message
-                }
-            }));
-            subscribers[i].response.end();
-            subscribers[i].del = true;
-        }
-    }
-    let temp = [];
-    subscribers.forEach((e) => {
-        if (!e.del)
-            temp.push(e);
-    })
-    subscribers = temp;
-}
-
-app.post("/api/listen", urlencodedParser, (request, response) => {
-    subscribers.push({
-        response: response,
-        last_msg: request.body.last_msg
-    });
-    checkSubscribers();
-});
-
-app.post("/api/send_message", urlencodedParser, (request, response) => {
-    let msg = new message(request.body.author_name, request.body.message);
-    messages.push(msg);
-    response.status(200).send(JSON.stringify({result:true}));
-    checkSubscribers();
-    console.log(
-        `Author: ${msg.author}\n` + 
-        `Message: ${msg.message}\n` + 
-        `ID: ${msg.id}\n` + 
-        `===========================================`);
-});
-
+chatModule.start(app); //Enable API methods for chats work
 
 //Redirect to index page if request is empty
 app.get("/", (request, response) => 
