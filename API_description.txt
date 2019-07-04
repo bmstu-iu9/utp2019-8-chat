@@ -84,6 +84,7 @@ GET и POST запросы. В ответ приходит JSON.
     messages        object[]    Массив объектов сообщений
 Объект сообщения: 
 {
+    message_id      int         ID сообщения
     author_id       int         ID автора сообщения
     author_name     string      Имя автора сообщения
     message         string      Текст сообщения
