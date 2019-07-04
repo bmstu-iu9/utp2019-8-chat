@@ -2,9 +2,11 @@
 'use strict'
 
 const express = require("express");
+const bodyParser = require("body-parser");  
 const fs = require("fs");
 
 const app = express();
+const urlencodedParser = bodyParser.urlencoded({extended: false});
 
 //Next function returns requested file, if it has html, css or js extension
 app.get("*.(html|css|js)", (request, response) => {
@@ -28,9 +30,15 @@ app.get("*.(html|css|js)", (request, response) => {
 //  Here will be API methods
 //
 
+app.post("/api/send_message", urlencodedParser, (request, response) => {
+    console.log(request.body.message);
+    response.status(200).send(JSON.stringify({result:true}))
+});
+
 
 //Redirect to index page if request is empty
-app.get("/", (request, response) => response.redirect("/index.html"));
+app.get("/", (request, response) => 
+    response.redirect("/index.html"));
 
 //If page is not found
 app.get("*", (request, response) => 
