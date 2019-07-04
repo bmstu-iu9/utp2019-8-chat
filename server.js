@@ -41,13 +41,13 @@ class message {
 }
 
 var messages = []; //Now we accepts only one channel
-var subscribers = [];
+var subscribers = [new message("Hottabych", "You know")]; //One message, that considers "Readed" by all users 
 
 const checkSubscribers = () => {
     for (let i = 0; i < subscribers.length; i++) {
         if (messages.length != 0 && subscribers[i].last_msg < messages[messages.length - 1].id) {
             let t = messages.length - 1;
-            while (messages[t].id != subscribers[i].last_msg)
+            while (t >= 0 && messages[t].id != subscribers[i].last_msg)
                 t--;
             t++;
             subscribers[i].response.status(200).send(JSON.stringify({
