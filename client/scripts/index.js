@@ -37,13 +37,6 @@ const sendMessage = () => {
     }
 }
 
-//Example
-addMessage("Alice", "Meaningful message");
-addMessage("Bob", "Strange message");
-addMessage("Alice", "Funny message");
-//End example
-
-
 document.getElementById("send_btn").addEventListener("click", (sender) => sendMessage());
 msgTextbox.addEventListener("keyup", (sender) => {
     if (sender.key == "Enter")
