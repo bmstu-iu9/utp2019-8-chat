@@ -1,6 +1,14 @@
 const msgTextbox = document.getElementById("input_msg");
 const chatFlow = document.getElementById("chat_flow");
 
+// TEMPORARY
+var _username = "Alice";
+document.getElementById("_TEMP_btn").addEventListener("click", (sender) => {
+    let t = document.getElementById("_TEMP_login").value;
+    _username = t === "" ? "Toster" : t;
+});
+// END TEMPORARY
+
 const addMessage = (author, text) => { //Add message to chat-flow zone
     chatFlow.innerHTML +=
         `<div class="msg_box">\n` + 
@@ -34,7 +42,7 @@ const sendMessage = () => {
     }
     xhr.open('POST', '/api/send_message', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.send(`channel_id=1&message=${msg}`);
+    xhr.send(`channel_id=1&author_name=${_username}&message=${msg}`); // INJECTION!!!!!!!!!!!!!!!!
     msgTextbox.value = "";
 }
 
