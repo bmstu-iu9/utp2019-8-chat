@@ -58,7 +58,7 @@ module.exports.start = (app) => {
         response.status(200).send(JSON.stringify({result:true}));
         checkSubscribers();
         console.log(
-            `Author: ${msg.author}\n` + 
+            `Author: ${msg.author_name}\n` + 
             `Message: ${msg.message}\n` + 
             `ID: ${msg.id}\n` + 
             `===========================================`);

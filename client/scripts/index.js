@@ -15,6 +15,7 @@ const addMessage = (author, text) => { //Add message to chat-flow zone
         `    <div class="name">${author}</div>\n` + 
         `    <div class="msg">${text}</div>\n` + 
         `</div>`;
+    document.getElementById("chat_flow").scrollTop = 9999;
 }
 
 const sendMessage = () => {
@@ -26,9 +27,6 @@ const sendMessage = () => {
         if (xhr.readyState != 4) 
             return;
         if (xhr.status == 200) { //Ok
-            //addMessage("You", msg);
-            console.log(xhr.responseText);
-            document.getElementById("chat_flow").scrollTop = 9999;
         }
         else if (xhr.status == 401) { //Unauthorized
             alert("Unauthorized");
