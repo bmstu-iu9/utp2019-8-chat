@@ -30,6 +30,11 @@ app.get("*.(html|css|js)", (request, response) => {
 //  Here will be API methods
 //
 
+app.post("/api/send_message", urlencodedParser, (request, response) => {
+    console.log(request.body.message);
+    response.status(200).send(JSON.stringify({result:true}))
+});
+
 
 class message {
     static _counter = 0;

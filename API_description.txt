@@ -84,6 +84,7 @@ GET и POST запросы. В ответ приходит JSON.
     messages        object[]    Массив объектов сообщений
 Объект сообщения: 
 {
+    message_id      int         ID сообщения
     author_id       int         ID автора сообщения
     author_name     string      Имя автора сообщения
     message         string      Текст сообщения
@@ -98,3 +99,18 @@ GET и POST запросы. В ответ приходит JSON.
     message         string      Текст сообщения
 Результат:
     Нет
+    
+    
+10. listen - long poll запрос, возвращающий новые сообщения
+Метод - POST
+Параметры:
+    session_key     string      Ключ сессии
+    channel_id      int         ID канала
+    last_msg        int         ID последнего принятого изменения
+Результат:
+    change          object      Объект изменения
+Объект изменения:
+{
+    id              id          ID
+    message         object      Объект нового сообщения (см описание выше)
+}
