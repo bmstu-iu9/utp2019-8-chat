@@ -30,12 +30,13 @@ app.get("*.(html|css|js)", (request, response) => {
 //  Here will be API methods
 //
 
-class message {
-    static _counter = 0;
+var msgCounter = 0;
+
+class message { 
     constructor(author_name, message) {
         this.author_name = author_name;
         this.message = message;
-        this.id = _counter++;
+        this.id = msgCounter++;
     }
 }
 
@@ -49,7 +50,7 @@ const checkSubscribers = () => {
             while (messages[t].id != subscribers[i].last_msg)
                 t--;
             t++;
-            subscribers[i].response.send(JSON.stringify({
+            subscribers[i].response.status(200).send(JSON.stringify({
                 id: messages[t].id, //Its id of change. Now it equal to id of message
                 message: {
                     message_id: messages[t].id,
@@ -83,12 +84,11 @@ app.post("/api/send_message", urlencodedParser, (request, response) => {
     messages.push(msg);
     response.status(200).send(JSON.stringify({result:true}));
     checkSubscribers();
-    console.log(`
-        Author: ${msg.author}
-        Message: ${msg.message}
-        ID: ${msg.id}
-        ===========================================
-        `);
+    console.log(
+        `Author: ${msg.author}\n` + 
+        `Message: ${msg.message}\n` + 
+        `ID: ${msg.id}\n` + 
+        `===========================================`);
 });
 
 
