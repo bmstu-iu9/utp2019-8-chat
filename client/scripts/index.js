@@ -2,11 +2,11 @@ const msgTextbox = document.getElementById("input_msg");
 const chatFlow = document.getElementById("chat_flow");
 
 // TEMPORARY
-var _username = "Alice";
-document.getElementById("_TEMP_btn").addEventListener("click", (sender) => {
-    let t = document.getElementById("_TEMP_login").value;
-    _username = t === "" ? "Toster" : t;
-});
+var _username = prompt("Enter nickname");
+if (!_username) {
+    let _names = ["Alice", "Bob", "Charlie", "Jack", "Jacob", "Mike"];
+    _username = _names[Math.floor(Math.random() * (_names.length - 1))];
+}
 // END TEMPORARY
 
 const addMessage = (author, text) => { //Add message to chat-flow zone
