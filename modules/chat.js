@@ -3,8 +3,6 @@
 const bodyParser = require("body-parser");  
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
-let msgCounter = 0;
-
 class message { 
     constructor(author_name, message) {
         this.author_name = author_name;
@@ -13,10 +11,13 @@ class message {
     }
 }
 
-var messages = []; //Now we accepts only one channel
-var subscribers = [new message("Hottabych", "You know")]; //One message, that considers "Readed" by all users (its bugfix)
+var msgCounter = 1; //For messages ids
 
-const checkSubscribers = () => {
+var messages = []; //Now we accepts only one channel
+var subscribers = []; //Connected clients, waiting for new message
+
+const checkSubscribers = () => { //Check all connected clients
+    let temp = []; //This contains clients that didnt get response in this check, another clients must reconnect
     for (let i = 0; i < subscribers.length; i++) {
         if (messages.length != 0 && subscribers[i].last_msg < messages[messages.length - 1].id) {
             let t = messages.length - 1;
@@ -33,17 +34,15 @@ const checkSubscribers = () => {
                 }
             }));
             subscribers[i].response.end();
-            subscribers[i].del = true;
+        }
+        else {
+            temp.push(subscribers[i]);
         }
     }
-    let temp = [];
-    subscribers.forEach((e) => {
-        if (!e.del)
-            temp.push(e);
-    });
     subscribers = temp;
 }
 
+//Init chat module
 module.exports.start = (app) => {
     
     app.post("/api/listen", urlencodedParser, (request, response) => {

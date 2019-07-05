@@ -27,12 +27,8 @@ app.get("*.(html|css|js)", (request, response) => {
 });
 
 
-//
-//  Here will be API methods
-//
-
-
 chatModule.start(app); //Enable API methods for chats work
+
 
 //Redirect to index page if request is empty
 app.get("/", (request, response) => 
@@ -41,6 +37,7 @@ app.get("/", (request, response) =>
 //If page is not found
 app.get("*", (request, response) => 
     response.send(fs.readFileSync("./client/404.html").toString("utf-8")));
+
 
 if (process.argv.length > 2) {
     app.listen(process.argv[2]);
