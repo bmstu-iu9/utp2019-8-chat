@@ -2,12 +2,12 @@
 'use strict'
 
 const express = require("express");
-const bodyParser = require("body-parser");  
 const fs = require("fs");
 const process = require("process");
 
+const chatModule = require("./modules/chat")
+
 const app = express();
-const urlencodedParser = bodyParser.urlencoded({extended: false});
 
 //Next function returns requested file, if it has html, css or js extension
 app.get("*.(html|css|js)", (request, response) => {
@@ -27,14 +27,7 @@ app.get("*.(html|css|js)", (request, response) => {
 });
 
 
-//
-//  Here will be API methods
-//
-
-app.post("/api/send_message", urlencodedParser, (request, response) => {
-    console.log(request.body.message);
-    response.status(200).send(JSON.stringify({result:true}))
-});
+chatModule.start(app); //Enable API methods for chats work
 
 
 //Redirect to index page if request is empty
@@ -44,6 +37,7 @@ app.get("/", (request, response) =>
 //If page is not found
 app.get("*", (request, response) => 
     response.send(fs.readFileSync("./client/404.html").toString("utf-8")));
+
 
 if (process.argv.length > 2) {
     app.listen(process.argv[2]);
