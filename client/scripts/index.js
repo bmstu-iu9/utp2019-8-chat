@@ -14,6 +14,7 @@ if (!_username) {
 const addMessage = (author, text) => { //Add message to chat-flow zone
     chatFlow.innerHTML +=
         `<div class="msg_box">` + 
+            `<div class="msg_icon"></div>` + 
             `<div class="name">${author}</div>` + 
             `<div class="msg">${text}</div>` + 
         `</div>`;
