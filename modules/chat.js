@@ -1,9 +1,9 @@
 'use strict'
 
-const bodyParser = require("body-parser");
+const bodyParser = require("body-parser");  
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
-class message {
+class message { 
     constructor(author_name, message) {
         this.author_name = author_name;
         this.message = message;
@@ -44,7 +44,7 @@ const checkSubscribers = () => { //Check all connected clients
 
 //Init chat module
 module.exports.start = (app) => {
-
+    
     app.post("/api/listen", urlencodedParser, (request, response) => {
         subscribers.push({
             response: response,
@@ -59,9 +59,9 @@ module.exports.start = (app) => {
         response.status(200).send(JSON.stringify({result:true}));
         checkSubscribers();
         console.log(
-            `Author: ${msg.author_name}\n` +
-            `Message: ${msg.message}\n` +
-            `ID: ${msg.id}\n` +
+            `Author: ${msg.author_name}\n` + 
+            `Message: ${msg.message}\n` + 
+            `ID: ${msg.id}\n` + 
             `===========================================`);
     });
 }
