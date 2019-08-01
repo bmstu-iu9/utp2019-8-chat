@@ -83,7 +83,14 @@ module.exports.chat_history = (key, id, count, offset) => {
     let len = UsersData.length;
     for (; i < len; i++) if (UsersData[i].key === key) break;
     if (i === len) return false;
-    return count, UsersChannels[id].messages.slice(-offset - count, -offset);
+    let start = 0;
+    let end = 0;
+    let len = UsersChannels[id].messages.length;
+    if (offset < len) {
+        end = len - offset;
+        if (offset + count < len) start = len - offset - count;
+    }
+    return [count, UsersChannels[id].messages.slice(start, end)];
 }
 
 module.exports.send_message = (key, id, message) => {
