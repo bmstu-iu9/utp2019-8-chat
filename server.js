@@ -29,6 +29,46 @@ app.get("*.(html|css|js)", (request, response) => {
 
 chatModule.start(app); //Enable API methods for chats work
 
+//API methods
+app.post("api/register", urlencodedParser, (login, password) => {
+	response.status(200).send("test_REGISTER_method");
+});
+
+app.post("api/auth", urlencodedParser, (login, password) => {
+	response.status(200).send("test_AUTH_method");
+});
+
+app.post("api/channels_list", urlencodedParser, (session_key) => {
+	response.status(200).send("test_CHANNELS_LIST_method");
+});
+
+app.post("api/channels_add", urlencodedParser, (session_key, channel_id) => {
+	response.status(200).send("test_CHANNELS_ADD_mehod");
+});
+
+app.post("api/channels_remove", urlencodedParser, (session_key, channel_id) => {
+	response.status(200).send("test_CHANNELS_REMOVE_method");
+});
+
+app.post("api/channels_create", urlencodedParser, (session_key, channel_name) => {
+	response.status(200).send("test_CHANNELS_CREATE_method");
+});
+
+app.post("api/channels_delete", urlencodedParser, (session_key, channel_id) => {
+	response.status(200).send("test_CHANNELS_DELETE_method");
+});
+
+app.post("api/chat_history", urlencodedParser, (session_key, channel_id, count, offset) => {
+	response.status(200).send("test_CHAT_HISTORY_method");
+});
+
+app.post("api/send_message", urlencodedParser, (session_key, channel_id, message) => {
+	response.status(200).send("test_SEND_MESSAGE_method");
+});
+
+app.post("api/listen", urlencodedParser, (session_key, channel_id, last_msg) => {
+	response.status(200).send("test_LISTEN_method");
+});
 
 //Redirect to index page if request is empty
 app.get("/", (request, response) => 
