@@ -85,7 +85,7 @@ module.exports.chat_history = (key, id, count, offset) => {
     if (i === len) return false;
     let start = 0;
     let end = 0;
-    let len = UsersChannels[id].messages.length;
+    len = UsersChannels[id].messages.length;
     if (offset < len) {
         end = len - offset;
         if (offset + count < len) start = len - offset - count;
