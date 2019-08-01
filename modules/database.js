@@ -3,6 +3,7 @@
 const fs = require("fs");
 
 let UsersData = [];
+let UsersChannels = [];
 
 const makeSessionKey() {
     let result = "";
@@ -58,3 +59,4 @@ module.exports.channels_remove = (key, id) {
         cur.channels[i] = false;
         break;
     }
+}
