@@ -2,64 +2,6 @@
 
 const fs = require("fs");
 
-class Message {
-    constructor(message_id, author_id, author_name, message) {
-        this.message_id = message_id;
-        this.author_id = author_id;
-        this.author_name = author_name;
-        this.message = message;
-    }
-
-    get message_id() {
-        return message_id;
-    }
-    get author_id() {
-        return author_id;
-    }
-    get author_name() {
-        return author_name;
-    }
-    get message() {
-        return message;
-    }
-
-    set message_id(value) {
-        message_id = value;
-    }
-    set author_id(value) {
-        author_id = value;
-    }
-    set author_name(value) {
-        author_name = value;
-    }
-    set message(value) {
-        message = value;
-    }
-}
-
-class Channel {
-    constructor(id, name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    get id() {
-        return id;
-    }
-    get name() {
-        return name;
-    }
-
-    set id(value) {
-        id = value;
-    }
-    set name(value) {
-        name = value;
-    }
-}
-
-
-
 let UsersData = [];
 
 const makeSessionKey() {
