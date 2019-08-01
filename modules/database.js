@@ -60,3 +60,20 @@ module.exports.channels_remove = (key, id) {
         break;
     }
 }
+
+module.exports.channels_create = (key, name) {
+    let i = 0;
+    let len = UsersData.length;
+    for (; i < len; i++) if (UsersData[i].key === key) break;
+    if (i === len) return false;
+    UsersChannels.push({id: UsersChannels.length, name: name});
+    return UsersChannels.length;
+}
+
+module.exports.channels_delete = (key, id) {
+    let i = 0;
+    let len = UsersData.length;
+    for (; i < len; i++) if (UsersData[i].key === key) break;
+    if (i === len) return false;
+    UsersChannels[id] = false;
+}
