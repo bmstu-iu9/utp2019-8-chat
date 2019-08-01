@@ -58,6 +58,8 @@ class Channel {
     }
 }
 
+
+
 let UsersData = [];
 
 const makeSessionKey() {
@@ -69,7 +71,7 @@ const makeSessionKey() {
 }
 
 module.exports.registration = (login, password) => {
-    UsersData.push([login, password, ""]);
+    UsersData.push({login: login, password: password, key = ""});
 };
 
 module.exports.authentication = (login, password) => {
@@ -77,14 +79,14 @@ module.exports.authentication = (login, password) => {
     let len = UsersData.length;
     for (; i < len; i++) {
         let cur = UsersData[i];
-        if (cur[0] === login) {
-            if (cur[1] === password) break;
+        if (cur.login === login) {
+            if (cur.password === password) break;
             else return false;
         }
     }
     if (i === len) return false;
     let key = makeSessionKey();
-    UsersData[i][2] = key;
+    UsersData[i].key = key;
     return key;
 }
 
