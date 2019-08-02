@@ -30,8 +30,6 @@ app.get("*.(html|css|js)", (request, response) => {
 });
 
 
-// chatModule.start(app); //Enable API methods for chats work
-
 //API methods
 app.post("/api/register", urlencodedParser, (request, response) => {
 	response.status(200).send("test_REGISTER_method");
@@ -66,12 +64,16 @@ app.post("/api/chat_history", urlencodedParser, (request, response) => {
 });
 
 app.post("/api/send_message", urlencodedParser, (request, response) => {
+    //Here must be getted a message object from database
+    //and called the chatModule.newMessage method
 	response.status(200).send("test_SEND_MESSAGE_method");
 });
 
 app.post("/api/listen", urlencodedParser, (request, response) => {
+    //Here must be called the chatModule.addListener method
 	response.status(200).send("test_LISTEN_method");
 });
+
 
 //Redirect to index page if request is empty
 app.get("/", (request, response) => 

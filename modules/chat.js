@@ -1,11 +1,20 @@
 'use strict'
 
+/*
+    message {
+        id: 1,                  //Integer, starts from 1
+        author_id: 42,          //Dont know
+        author_name: "Alice",   //Nickname
+        message: "Hello hell!"   //Text of message
+    }
+*/
+
 let listeners = [];
 let channels = [];
 
 const broadcast = (channelId) => {
+    //Get a message following the message with id=lastMsg or false
     const nextMsg = (lastMsg) => {
-        //Get a message following the message with id=lastMsg or false
         let messages = channels[channelId];
         if (messages.length !== 0 && lastMsg < messages[messages.length - 1].id) {
             let t = messages.length - 1;
@@ -21,21 +30,22 @@ const broadcast = (channelId) => {
     let waiters = []; //Array for connections that didnt get response in this broadcast
     for (let i = 0; i < listeners[channelId].length; i++) {
         let msg = nextMsg(listeners[channelId][i].lastMsg);
-        if (msg) {
+        if (msg) { //If new message exist
             listeners[channelId][i].response.
                 status(200).
                 send(JSON.stringify({
                     message_id: msg.id,
                     author_id: msg.author_id,
                     author_name: msg.author_name,
-                    message: msg
+                    message: msg.message
                 }));
+            listeners[channelId][i].response.end();
         }
         else {
             waiters.push(listeners[channelId][i].lastMsg);
         }
     }
-    listeners[channelId] = waiters;
+    listeners[channelId] = waiters; //Leave in the array only opened connections
 }
 
 module.exports.addListener = (channelId, response, lastMsg) => {
