@@ -88,6 +88,6 @@ xhr.onreadystatechange = () => {
 }
 xhr.open("POST", url, true);
 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-xhr.send(`last_msg=${lastMsg}`);
+xhr.send(`channel_id=1&last_msg=${lastMsg}`);
 }
 subscribe("/api/listen")

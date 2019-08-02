@@ -63,15 +63,28 @@ app.post("/api/chat_history", urlencodedParser, (request, response) => {
 	response.status(200).send("test_CHAT_HISTORY_method");
 });
 
+let tid = 1;
 app.post("/api/send_message", urlencodedParser, (request, response) => {
     //Here must be getted a message object from database
     //and called the chatModule.newMessage method
-	response.status(200).send("test_SEND_MESSAGE_method");
+    let msg = {
+        id: tid++,
+        author_id: 42,
+        author_name: request.body.author_name,
+        message: request.body.message
+    };
+    let chId = request.body.channel_id;
+    response.status(200).send("test_SEND_MESSAGE_method");
+    chatModule.newMessage(chId, msg);
+    console.log(`New message in the channel with id=${chId}:\n${JSON.stringify(msg)}\n` +
+                    `=========================\n`);
 });
 
 app.post("/api/listen", urlencodedParser, (request, response) => {
     //Here must be called the chatModule.addListener method
-	response.status(200).send("test_LISTEN_method");
+    chatModule.addListener(request.body.channel_id, response, request.body.last_msg);
+    //Also, there should be no response for the request
+	// response.status(200).send("test_LISTEN_method");
 });
 
 
