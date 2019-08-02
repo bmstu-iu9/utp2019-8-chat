@@ -1,67 +1,55 @@
 'use strict'
 
-const bodyParser = require("body-parser");  
-const urlencodedParser = bodyParser.urlencoded({extended: false});
+let listeners = [];
+let channels = [];
 
-class message { 
-    constructor(author_name, message) {
-        this.author_name = author_name;
-        this.message = message;
-        this.id = msgCounter++;
-    }
-}
-
-var msgCounter = 1; //For messages ids
-
-var messages = []; //Now we accepts only one channel
-var subscribers = []; //Connected clients, waiting for new message
-
-const checkSubscribers = () => { //Check all connected clients
-    let temp = []; //This contains clients that didnt get response in this check, another clients must reconnect
-    for (let i = 0; i < subscribers.length; i++) {
-        if (messages.length != 0 && subscribers[i].last_msg < messages[messages.length - 1].id) {
+const broadcast = (channelId) => {
+    const nextMsg = (lastMsg) => {
+        //Get a message following the message with id=lastMsg or false
+        let messages = channels[channelId];
+        if (messages.length !== 0 && lastMsg < messages[messages.length - 1].id) {
             let t = messages.length - 1;
-            while (t >= 0 && messages[t].id != subscribers[i].last_msg)
+            while (t >= 0 && messages[t].id != lastMsg)
                 t--;
             t++;
-            subscribers[i].response.status(200).send(JSON.stringify({
-                id: messages[t].id, //Its id of change. Now it equal to id of message
-                message: {
-                    message_id: messages[t].id,
-                    author_id: 0, //FIX THIS!!!!!!!
-                    author_name: messages[t].author_name,
-                    message: messages[t].message
-                }
-            }));
-            subscribers[i].response.end();
+            return messages[t];
+        }
+        else
+            return false;
+    }
+
+    let waiters = []; //Array for connections that didnt get response in this broadcast
+    for (let i = 0; i < listeners[channelId].length; i++) {
+        let msg = nextMsg(listeners[channelId][i].lastMsg);
+        if (msg) {
+            listeners[channelId][i].response.
+                status(200).
+                send(JSON.stringify({
+                    message_id: msg.id,
+                    author_id: msg.author_id,
+                    author_name: msg.author_name,
+                    message: msg
+                }));
         }
         else {
-            temp.push(subscribers[i]);
+            waiters.push(listeners[channelId][i].lastMsg);
         }
     }
-    subscribers = temp;
+    listeners[channelId] = waiters;
 }
 
-//Init chat module
-module.exports.start = (app) => {
-    
-    app.post("/api/listen", urlencodedParser, (request, response) => {
-        subscribers.push({
-            response: response,
-            last_msg: request.body.last_msg
-        });
-        checkSubscribers();
+module.exports.addListener = (channelId, response, lastMsg) => {
+    if (listeners[channelId] === undefined)
+        listeners[channelId] = [];
+    listeners[channelId].push({
+        response: response,
+        lastMsg: lastMsg
     });
+}
 
-    app.post("/api/send_message", urlencodedParser, (request, response) => {
-        let msg = new message(request.body.author_name, request.body.message);
-        messages.push(msg);
-        response.status(200).send(JSON.stringify({result:true}));
-        checkSubscribers();
-        console.log(
-            `Author: ${msg.author_name}\n` + 
-            `Message: ${msg.message}\n` + 
-            `ID: ${msg.id}\n` + 
-            `===========================================`);
-    });
+module.exports.newMessage = (channelId, msg) => {
+    if (channels[channelId] === undefined)
+        channels[channelId] = [];
+    channels[channelId].push(msg); //Warning: messages in the array must be sorted by id in ascending order!
+    broadcast(channelId);
 }

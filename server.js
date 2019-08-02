@@ -8,7 +8,7 @@ const express = require("express");
 const fs = require("fs");
 const process = require("process");
 
-const chatModule = require("./modules/chat")
+const chatModule = require("./modules/chat");
 
 const app = express();
 
@@ -18,7 +18,7 @@ app.get("*.(html|css|js)", (request, response) => {
     try {
         file = fs.readFileSync(`./client${request.path}`).toString("utf-8");
     } catch {
-        response.send(fs.readFileSync(`./client/404.html`).toString("utf-8"))
+        response.send(fs.readFileSync(`./client/404.html`).toString("utf-8"));
         return;
     }
     if (request.path.endsWith(".html"))
@@ -84,9 +84,9 @@ app.get("*", (request, response) =>
 
 if (process.argv.length > 2) {
     app.listen(process.argv[2]);
-    console.log(`Server started on ${process.argv[2]} port`)
+    console.log(`Server started on ${process.argv[2]} port`);
 }
 else {
     app.listen(3000);
-    console.log(`Server started on 3000 port`)
+    console.log(`Server started on 3000 port`);
 }
