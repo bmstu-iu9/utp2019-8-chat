@@ -107,10 +107,12 @@ module.exports.save = () => {
     for (let i = 0; i < UsersData.length; i++) {
         if (i === 0) fs.writeFile("UsersData.json", JSON.stringify(UsersData[i]));
         else fs.appendFile("UsersData.json", JSON.stringify(UsersData[i]));
+        if (i < UsersData.length - 1) fs.appendFile("UsersData.json", "\n");
     }
-    for (let i = 0; i < UsersData.length; i++) {
+    for (let i = 0; i < UsersChannels.length; i++) {
         if (i === 0) fs.writeFile("UsersChannels.json", JSON.stringify(UsersData[i]));
         else fs.appendFile("UsersChannels.json", JSON.stringify(UsersData[i]));
+        if (i < UsersChannels.length - 1) fs.appendFile("UsersChannels.json", "\n");
     }
 }
 
