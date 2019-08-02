@@ -99,5 +99,5 @@ module.exports.send_message = (key, id, message) => {
     for (; i < len; i++) if (UsersData[i].key === key) break;
     if (i === len) return false;
     UsersChannels[id].messages.push({message_id: UsersChannels[id].messages.length, author_id: UsersData[i].id, author_name: UsersData[i].author_name, message: message});
-    return UsersChannels[id].messages[UsersChannels[id].messages.length];
+    return UsersChannels[id].messages[UsersChannels[id].messages.length - 1];
 }
