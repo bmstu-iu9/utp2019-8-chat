@@ -30,7 +30,7 @@ app.get("*.(html|css|js)", (request, response) => {
 });
 
 
-chatModule.start(app); //Enable API methods for chats work
+// chatModule.start(app); //Enable API methods for chats work
 
 //API methods
 app.post("/api/register", urlencodedParser, (request, response) => {
