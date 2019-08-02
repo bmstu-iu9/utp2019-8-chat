@@ -66,7 +66,7 @@ module.exports.channels_create = (key, name) => {
     let len = UsersData.length;
     for (; i < len; i++) if (UsersData[i].key === key) break;
     if (i === len) return false;
-    UsersChannels.push({id: UsersChannels.length, name: name, messages: []});
+    UsersChannels.push({id: UsersChannels.length, name: name, messages: [false]});
     return UsersChannels.length;
 }
 
@@ -99,4 +99,5 @@ module.exports.send_message = (key, id, message) => {
     for (; i < len; i++) if (UsersData[i].key === key) break;
     if (i === len) return false;
     UsersChannels[id].messages.push({message_id: UsersChannels[id].messages.length, author_id: UsersData[i].id, author_name: UsersData[i].author_name, message: message});
+    return UsersChannels[id].messages[UsersChannels[id].messages.length];
 }
