@@ -1,6 +1,9 @@
 #!/usr/bin/nodejs
 'use strict'
 
+const bodyParser = require("body-parser");
+const urlencodedParser = bodyParser.urlencoded({extended: false});
+
 const express = require("express");
 const fs = require("fs");
 const process = require("process");
@@ -29,6 +32,46 @@ app.get("*.(html|css|js)", (request, response) => {
 
 chatModule.start(app); //Enable API methods for chats work
 
+//API methods
+app.post("/api/register", urlencodedParser, (request, response) => {
+	response.status(200).send("test_REGISTER_method");
+});
+
+app.post("/api/auth", urlencodedParser, (request, response) => {
+	response.status(200).send("test_AUTH_method");
+});
+
+app.post("/api/channels_list", urlencodedParser, (request, response) => {
+	response.status(200).send("test_CHANNELS_LIST_method");
+});
+
+app.post("/api/channels_add", urlencodedParser, (request, response) => {
+	response.status(200).send("test_CHANNELS_ADD_mehod");
+});
+
+app.post("/api/channels_remove", urlencodedParser, (request, response) => {
+	response.status(200).send("test_CHANNELS_REMOVE_method");
+});
+
+app.post("/api/channels_create", urlencodedParser, (request, response) => {
+	response.status(200).send("test_CHANNELS_CREATE_method");
+});
+
+app.post("/api/channels_delete", urlencodedParser, (request, response) => {
+	response.status(200).send("test_CHANNELS_DELETE_method");
+});
+
+app.post("/api/chat_history", urlencodedParser, (request, response) => {
+	response.status(200).send("test_CHAT_HISTORY_method");
+});
+
+app.post("/api/send_message", urlencodedParser, (request, response) => {
+	response.status(200).send("test_SEND_MESSAGE_method");
+});
+
+app.post("/api/listen", urlencodedParser, (request, response) => {
+	response.status(200).send("test_LISTEN_method");
+});
 
 //Redirect to index page if request is empty
 app.get("/", (request, response) => 
