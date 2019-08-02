@@ -1,6 +1,7 @@
 'use-strict'
 
 const fs = require("fs");
+const readline = require("readline");
 
 let UsersData = [];
 let UsersChannels = [];
@@ -100,4 +101,26 @@ module.exports.send_message = (key, id, message) => {
     if (i === len) return false;
     UsersChannels[id].messages.push({message_id: UsersChannels[id].messages.length, author_id: UsersData[i].id, author_name: UsersData[i].author_name, message: message});
     return UsersChannels[id].messages[UsersChannels[id].messages.length - 1];
+}
+
+module.exports.save = () => {
+    for (let i = 0; i < UsersData.length; i++) {
+        if (i === 0) fs.writeFile("UsersData.json", JSON.stringify(UsersData[i]));
+        else fs.appendFile("UsersData.json", JSON.stringify(UsersData[i]));
+    }
+    for (let i = 0; i < UsersData.length; i++) {
+        if (i === 0) fs.writeFile("UsersChannels.json", JSON.stringify(UsersData[i]));
+        else fs.appendFile("UsersChannels.json", JSON.stringify(UsersData[i]));
+    }
+}
+
+module.exports.load = () => {
+    let current = readline.createInterface({input: fs.createReadStream("UsersData.json")});
+    current.on('line', function(line) {
+        UsersData.push(JSON.parse(line));
+    });
+    current = readline.createInterface({input: fs.createReadStream("UsersChannels.json")});
+    current.on('line', function(line) {
+        UsersChannels.push(JSON.parse(line));
+    });
 }
