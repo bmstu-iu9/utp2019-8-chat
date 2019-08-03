@@ -123,26 +123,26 @@ module.exports.send_message = (key, id, message) => {
 //Information inside UsersData and UsersChannels, which accumulates during server's session, 
 //saves into UsersData.json and UsersChannels.json accordingly
 module.exports.save = () => {
-    fs.writeFileSync("UsersData.json", JSON.stringify(UsersData[0]));
+    fs.writeFileSync("../Data/UsersData.json", JSON.stringify(UsersData[0]));
     for (let i = 1; i < UsersData.length; i++) {
-        fs.appendFileSync("UsersData.json", JSON.stringify(UsersData[i]));
-        if (i < UsersData.length - 1) fs.appendFileSync("UsersData.json", "\n");
+        fs.appendFileSync("../Data/UsersData.json", JSON.stringify(UsersData[i]));
+        if (i < UsersData.length - 1) fs.appendFileSync("../Data/UsersData.json", "\n");
     }
-    fs.writeFileSync("UsersChannels.json", JSON.stringify(UsersChannels[0]));
+    fs.writeFileSync("../Data/UsersChannels.json", JSON.stringify(UsersChannels[0]));
     for (let i = 1; i < UsersChannels.length; i++) {
-        fs.appendFileSync("UsersChannels.json", JSON.stringify(UsersChannels[i]));
-        if (i < UsersChannels.length - 1) fs.appendFileSync("UsersChannels.json", "\n");
+        fs.appendFileSync("../Data/UsersChannels.json", JSON.stringify(UsersChannels[i]));
+        if (i < UsersChannels.length - 1) fs.appendFileSync("../Data/UsersChannels.json", "\n");
     }
 }
 
 //Loading information, that had been recording during previous server's sessions, 
 //from UsersData.json and UsersChannels.json to UsersData and UsersChannels respectively
 module.exports.load = () => {
-    let current = readline.createInterface({input: fs.createReadStream("UsersData.json")});
+    let current = readline.createInterface({input: fs.createReadStream("../Data/UsersData.json")});
     current.on('line', function(line) {
         UsersData.push(JSON.parse(line));
     });
-    current = readline.createInterface({input: fs.createReadStream("UsersChannels.json")});
+    current = readline.createInterface({input: fs.createReadStream("../Data/UsersChannels.json")});
     current.on('line', function(line) {
         UsersChannels.push(JSON.parse(line));
     });
