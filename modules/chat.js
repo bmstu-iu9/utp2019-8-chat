@@ -1,67 +1,79 @@
 'use strict'
 
-const bodyParser = require("body-parser");  
-const urlencodedParser = bodyParser.urlencoded({extended: false});
-
-class message { 
-    constructor(author_name, message) {
-        this.author_name = author_name;
-        this.message = message;
-        this.id = msgCounter++;
+/*
+    message {
+        id: 1,                  //Integer, starts from 1
+        author_id: 42,          //Dont know
+        author_name: "Alice",   //Nickname
+        message: "Hello hell!"  //Text of message
     }
-}
+*/
 
-var msgCounter = 1; //For messages ids
+let listeners = [];
+let channels = []; //This contains only messages sended in current session
 
-var messages = []; //Now we accepts only one channel
-var subscribers = []; //Connected clients, waiting for new message
-
-const checkSubscribers = () => { //Check all connected clients
-    let temp = []; //This contains clients that didnt get response in this check, another clients must reconnect
-    for (let i = 0; i < subscribers.length; i++) {
-        if (messages.length != 0 && subscribers[i].last_msg < messages[messages.length - 1].id) {
+const broadcast = (channelId) => {
+    const nextMsg = (lastMsg) => { //Get a message following the message with id=lastMsg or false
+        let messages = channels[channelId];
+        if (messages === undefined)
+            return false;
+        if (messages.length !== 0 && lastMsg < messages[messages.length - 1].id) {
             let t = messages.length - 1;
-            while (t >= 0 && messages[t].id != subscribers[i].last_msg)
+            while (t >= 0 && messages[t].id != lastMsg)
                 t--;
             t++;
-            subscribers[i].response.status(200).send(JSON.stringify({
-                id: messages[t].id, //Its id of change. Now it equal to id of message
-                message: {
-                    message_id: messages[t].id,
-                    author_id: 0, //FIX THIS!!!!!!!
-                    author_name: messages[t].author_name,
-                    message: messages[t].message
-                }
-            }));
-            subscribers[i].response.end();
+            return messages[t];
+        }
+        else
+            return false;
+    }
+
+    if (listeners[channelId] === undefined)
+        return;
+    let waiters = []; //Array for connections that didnt get response in this broadcast
+    for (let i = 0; i < listeners[channelId].length; i++) {
+        let msg = nextMsg(listeners[channelId][i].lastMsg);
+        if (msg) { //If new message exist
+            listeners[channelId][i].response.
+                status(200).
+                send(JSON.stringify({
+                    id: msg.id,
+                    message: {
+                        message_id: msg.id,
+                        author_id: msg.author_id,
+                        author_name: msg.author_name,
+                        message: msg.message
+                    }
+                }));
+            listeners[channelId][i].response.end();
         }
         else {
-            temp.push(subscribers[i]);
+            waiters.push(listeners[channelId][i]);
         }
     }
-    subscribers = temp;
+    listeners[channelId] = waiters; //Leave in the array only opened connections
 }
 
-//Init chat module
-module.exports.start = (app) => {
-    
-    app.post("/api/listen", urlencodedParser, (request, response) => {
-        subscribers.push({
-            response: response,
-            last_msg: request.body.last_msg
-        });
-        checkSubscribers();
+//Add a new listener to the channel
+module.exports.addListener = (channelId, response, lastMsg) => {
+    if (listeners[channelId] === undefined)
+        listeners[channelId] = [];
+    listeners[channelId].push({
+        response: response,
+        lastMsg: lastMsg
     });
+    broadcast(channelId);
+}
 
-    app.post("/api/send_message", urlencodedParser, (request, response) => {
-        let msg = new message(request.body.author_name, request.body.message);
-        messages.push(msg);
-        response.status(200).send(JSON.stringify({result:true}));
-        checkSubscribers();
-        console.log(
-            `Author: ${msg.author_name}\n` + 
-            `Message: ${msg.message}\n` + 
-            `ID: ${msg.id}\n` + 
-            `===========================================`);
-    });
+//Add a new message to the broadcast list
+module.exports.newMessage = (channelId, msg) => {
+    if (channels[channelId] === undefined)
+        channels[channelId] = [];
+    channels[channelId].push(msg); //Warning: messages in the array must be sorted by id in ascending order!
+    broadcast(channelId);
+}
+
+//Manually check the listeners in the channel for new messages
+module.exports.checkListeners = (channelId) => {
+    broadcast(channelId);
 }
