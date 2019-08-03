@@ -8,7 +8,7 @@ const express = require("express");
 const fs = require("fs");
 const process = require("process");
 
-const chatModule = require("./modules/chat")
+const chatModule = require("./modules/chat");
 
 const app = express();
 
@@ -18,7 +18,7 @@ app.get("*.(html|css|js)", (request, response) => {
     try {
         file = fs.readFileSync(`./client${request.path}`).toString("utf-8");
     } catch {
-        response.send(fs.readFileSync(`./client/404.html`).toString("utf-8"))
+        response.send(fs.readFileSync(`./client/404.html`).toString("utf-8"));
         return;
     }
     if (request.path.endsWith(".html"))
@@ -29,8 +29,6 @@ app.get("*.(html|css|js)", (request, response) => {
         response.set("Content-Type", "text/javascript").send(file);
 });
 
-
-chatModule.start(app); //Enable API methods for chats work
 
 //API methods
 app.post("/api/register", urlencodedParser, (request, response) => {
@@ -66,12 +64,16 @@ app.post("/api/chat_history", urlencodedParser, (request, response) => {
 });
 
 app.post("/api/send_message", urlencodedParser, (request, response) => {
-	response.status(200).send("test_SEND_MESSAGE_method");
+    //Here must be getted a message object from database
+    //and called the chatModule.newMessage(ch, msg) method
+    response.status(200).send("test_SEND_MESSAGE_method");
 });
 
 app.post("/api/listen", urlencodedParser, (request, response) => {
-	response.status(200).send("test_LISTEN_method");
+    chatModule.addListener(request.body.channel_id, response, request.body.last_msg);
+    //Here should be no response for the request
 });
+
 
 //Redirect to index page if request is empty
 app.get("/", (request, response) => 
@@ -84,9 +86,9 @@ app.get("*", (request, response) =>
 
 if (process.argv.length > 2) {
     app.listen(process.argv[2]);
-    console.log(`Server started on ${process.argv[2]} port`)
+    console.log(`Server started on ${process.argv[2]} port`);
 }
 else {
     app.listen(3000);
-    console.log(`Server started on 3000 port`)
+    console.log(`Server started on 3000 port`);
 }
