@@ -12,23 +12,7 @@ const chatModule = require("./modules/chat");
 
 const app = express();
 
-//Next function returns requested file, if it has html, css or js extension
-app.get("*.(html|css|js)", (request, response) => {
-    let file = "";
-    try {
-        file = fs.readFileSync(`./client${request.path}`).toString("utf-8");
-    } catch {
-        response.send(fs.readFileSync(`./client/404.html`).toString("utf-8"));
-        return;
-    }
-    if (request.path.endsWith(".html"))
-        response.set("Content-Type", "text/html").send(file);
-    else if (request.path.endsWith(".css"))
-        response.set("Content-Type", "text/css").send(file);
-    else if (request.path.endsWith(".js"))
-        response.set("Content-Type", "text/javascript").send(file);
-});
-
+app.use(express.static("./client"));
 
 //API methods
 app.post("/api/register", urlencodedParser, (request, response) => {
