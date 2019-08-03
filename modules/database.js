@@ -123,15 +123,15 @@ module.exports.send_message = (key, id, message) => {
 //Information inside UsersData and UsersChannels, which accumulates during server's session, 
 //saves into UsersData.json and UsersChannels.json accordingly
 module.exports.save = () => {
-    for (let i = 0; i < UsersData.length; i++) {
-        if (i === 0) fs.writeFile("UsersData.json", JSON.stringify(UsersData[i]));
-        else fs.appendFile("UsersData.json", JSON.stringify(UsersData[i]));
-        if (i < UsersData.length - 1) fs.appendFile("UsersData.json", "\n");
+    fs.writeFileSync("UsersData.json", JSON.stringify(UsersData[0]));
+    for (let i = 1; i < UsersData.length; i++) {
+        fs.appendFileSync("UsersData.json", JSON.stringify(UsersData[i]));
+        if (i < UsersData.length - 1) fs.appendFileSync("UsersData.json", "\n");
     }
-    for (let i = 0; i < UsersChannels.length; i++) {
-        if (i === 0) fs.writeFile("UsersChannels.json", JSON.stringify(UsersData[i]));
-        else fs.appendFile("UsersChannels.json", JSON.stringify(UsersData[i]));
-        if (i < UsersChannels.length - 1) fs.appendFile("UsersChannels.json", "\n");
+    fs.writeFileSync("UsersChannels.json", JSON.stringify(UsersChannels[0]));
+    for (let i = 1; i < UsersChannels.length; i++) {
+        fs.appendFileSync("UsersChannels.json", JSON.stringify(UsersChannels[i]));
+        if (i < UsersChannels.length - 1) fs.appendFileSync("UsersChannels.json", "\n");
     }
 }
 
