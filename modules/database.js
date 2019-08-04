@@ -125,13 +125,13 @@ module.exports.send_message = (key, id, message) => {
 module.exports.save = () => {
     fs.writeFileSync("/Data/UsersData.json", JSON.stringify(UsersData[0]));
     for (let i = 1; i < UsersData.length; i++) {
-        fs.appendFileSync("/Data/UsersData.json", JSON.stringify(UsersData[i]));
         if (i < UsersData.length - 1) fs.appendFileSync("/Data/UsersData.json", "\n");
+        fs.appendFileSync("/Data/UsersData.json", JSON.stringify(UsersData[i]));
     }
     fs.writeFileSync("/Data/UsersChannels.json", JSON.stringify(UsersChannels[0]));
     for (let i = 1; i < UsersChannels.length; i++) {
-        fs.appendFileSync("/Data/UsersChannels.json", JSON.stringify(UsersChannels[i]));
         if (i < UsersChannels.length - 1) fs.appendFileSync("/Data/UsersChannels.json", "\n");
+        fs.appendFileSync("/Data/UsersChannels.json", JSON.stringify(UsersChannels[i]));
     }
 }
 
@@ -142,8 +142,13 @@ module.exports.load = () => {
     current.on('line', function(line) {
         UsersData.push(JSON.parse(line));
     });
-    current = readline.createInterface({input: fs.createReadStream("/Data/UsersChannels.json")});
-    current.on('line', function(line) {
-        UsersChannels.push(JSON.parse(line));
+    current.on('close', () => {
+        let current_1 = readline.createInterface({input: fs.createReadStream("/Data/UsersChannels.json")});
+        current_1.on('line', function(line) {
+            UsersChannels.push(JSON.parse(line));
+        });
+        current_1.on('close', () => {
+            callback();
+        });
     });
 }
