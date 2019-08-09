@@ -1,10 +1,12 @@
 'use-strict'
 
 const fs = require("fs");
+const readline = require("readline");
 
 let UsersData = [];
 let UsersChannels = [false];
 
+//Function for creating session key
 const makeSessionKey = () => {
     let result = "";
     let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -27,6 +29,7 @@ module.exports.registration = (login, password, name) => {
     UsersData.push({login: login, password: password, key: "", channels: [], author_name: name, id: UsersData.length});
 }
 
+//Authentification user
 module.exports.authentication = (login, password) => {
     let i = 0;
     let len = UsersData.length;
@@ -43,12 +46,14 @@ module.exports.authentication = (login, password) => {
     return key;
 }
 
+//Shows all channels, available for user
 module.exports.channels_list = (key) => {
 	let i = checkSessionKey(key);
     if (i === false) return false;
     return UsersData[i].channels;
 }
 
+//Adds channel for user
 module.exports.channels_add = (key, id) => {
     let i = checkSessionKey(key);
     if (i === false) return false;
@@ -56,6 +61,7 @@ module.exports.channels_add = (key, id) => {
 	return true;
 }
 
+//Removes channell from user (not deleting channel for all users, only for one user)
 module.exports.channels_remove = (key, id) => {
     let i = checkSessionKey(key);
     if (i === false) return false;
@@ -68,6 +74,7 @@ module.exports.channels_remove = (key, id) => {
     return true;
 }
 
+//Creating new channel (available for (almost)any user)
 module.exports.channels_create = (key, name) => {
     let i = checkSessionKey(key);
     if (i === false) return false;
@@ -76,6 +83,7 @@ module.exports.channels_create = (key, name) => {
     return UsersChannels.length - 1;
 }
 
+//Deleting channel for ALL users
 module.exports.channels_delete = (key, id) => {
     let i = checkSessionKey(key);
     if (i === false) return false;
@@ -84,6 +92,7 @@ module.exports.channels_delete = (key, id) => {
 	return true;
 }
 
+//Returns chat history for a channel
 module.exports.chat_history = (key, id, count, offset) => {
     let i = checkSessionKey(key);
     if (i === false) return false;
@@ -99,6 +108,7 @@ module.exports.chat_history = (key, id, count, offset) => {
     return [end - start, UsersChannels[id].messages.slice(start, end)];
 }
 
+//Sending message for a channel
 module.exports.send_message = (key, id, message) => {
     let i = checkSessionKey(key);
     if (i === false) return false;
