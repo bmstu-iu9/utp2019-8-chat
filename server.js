@@ -1,20 +1,21 @@
 #!/usr/bin/nodejs
 'use strict'
 
-const bodyParser = require("body-parser");
-const urlencodedParser = bodyParser.urlencoded({extended: false});
+const DEFAULT_PORT = 3000; //Warning: some ports require the admin privileges to launch the server (80 for example)
+const SAVING_INTERVAL = 60; //In seconds (Set a negative number to disable autosaving)
 
-const express = require("express");
 const fs = require("fs");
 const process = require("process");
+const express = require("express");
+const bodyParser = require("body-parser");
 
+const dbModulle = require("./modules/database");
 const chatModule = require("./modules/chat");
 
 const app = express();
+const urlencodedParser = bodyParser.urlencoded({extended: false});
 
-app.use(express.static("./client"));
 
-//API methods
 app.post("/api/register", urlencodedParser, (request, response) => {
 	response.status(200).send("test_REGISTER_method");
 });
@@ -59,20 +60,38 @@ app.post("/api/listen", urlencodedParser, (request, response) => {
 });
 
 
-//Redirect to index page if request is empty
-app.get("/", (request, response) => 
-    response.redirect("/index.html"));
+app.use(express.static("./client"));
+app.get("/", (request, response) => {
+    response.redirect("/index.html"); //Redirect to index page if request is empty
+});
+app.get("*", (request, response) => {
+    response.send(fs.readFileSync("./client/404.html").toString("utf-8")); //If page is not found
+});
 
-//If page is not found
-app.get("*", (request, response) => 
-    response.send(fs.readFileSync("./client/404.html").toString("utf-8")));
+
+dbModulle.load(() => {
+    console.log("Data loaded");
+    const port = process.argv.length > 2 ? process.argv[2] : DEFAULT_PORT;
+    app.listen(port);
+    console.log(`Server started on ${port} port`);
+});
 
 
-if (process.argv.length > 2) {
-    app.listen(process.argv[2]);
-    console.log(`Server started on ${process.argv[2]} port`);
+let saverId = undefined; //Id of the saving timer
+if (SAVING_INTERVAL >= 0) {
+    saverId = setInterval(() => {
+        console.log("Saving data...");
+        dbModulle.save();
+        console.log("Data saved");
+    }, SAVING_INTERVAL * 1000);
 }
-else {
-    app.listen(3000);
-    console.log(`Server started on 3000 port`);
-}
+
+process.once("SIGINT", (c) => { //Saving before exit
+    app.disable();
+    if (saverId !== undefined)
+        clearInterval(saverId);
+    console.log("Saving data before app closing...");
+    dbModulle.save();
+    console.log("Data saved");
+    process.exit(-1);
+});
