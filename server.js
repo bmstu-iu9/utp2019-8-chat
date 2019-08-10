@@ -49,13 +49,33 @@ app.post("/api/chat_history", urlencodedParser, (request, response) => {
 });
 
 app.post("/api/send_message", urlencodedParser, (request, response) => {
-    //Here must be getted a message object from database
-    //and called the chatModule.newMessage(ch, msg) method
     response.status(200).send("test_SEND_MESSAGE_method");
 });
 
 app.post("/api/listen", urlencodedParser, (request, response) => {
-    chatModule.addListener(request.body.channel_id, response, request.body.last_msg);
+    let token, channel_id, last_msg;
+    token = request.body.token;
+    if (token === undefined) {
+        response.status(200).send(JSON.stringify({
+            err_code: 1, //Wrong number of arguments
+            err_cause: `Argument not found (token)`
+        }));
+    }
+    channel_id = request.body.channel_id;
+    if (channel_id === undefined) {
+        response.status(200).send(JSON.stringify({
+            err_code: 1, //Wrong number of arguments
+            err_cause: `Argument not found (channel_id)`
+        }));
+    }
+    last_msg = request.body.last_msg;
+    if (last_msg === undefined) {
+        response.status(200).send(JSON.stringify({
+            err_code: 1, //Wrong number of arguments
+            err_cause: `Argument not found (last_msg)`
+        }));
+    }
+    chatModule.addListener(channel_id, response, last_msg);
     //Here should be no response for the request
 });
 
