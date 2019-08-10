@@ -97,7 +97,7 @@
 | Имя | Тип | Описание | Пример |
 | - | - | - | - |
 | success | bool | Результат | `true`/`false` |
-| *err_cause* | *string* | *Причина ошибки* | `"Channel with id 1 does not exist"` |
+| *err_cause* | *string* | *Причина ошибки* | `"Channel with id 2 does not exist"` |
 
 ***
 ### Удалить пользователя из канала ###
@@ -119,7 +119,7 @@
 | Имя | Тип | Описание | Пример |
 | - | - | - | - |
 | success | bool | Результат | `true`/`false` |
-| *err_cause* | *string* | *Причина ошибки* | `"Channel with id 1 does not exist"` |
+| *err_cause* | *string* | *Причина ошибки* | `"Channel with id 2 does not exist"` |
 
 ***
 ### Изменить аватар пользователю ###
@@ -166,3 +166,44 @@
 | - | - | - | - |
 | success | bool | Результат | `true`/`false` |
 | *err_cause* | *string* | *Причина ошибки* | `"User with id 1 does not exist"` |
+
+## Методы работы с каналами ##
+### Создать новый канал ###
+**/api/create_channel**
+
+Создать новый канал с указанным названием. 
+Создатель автоматически будет добавлен в созданный канал.
+
+Параметры:
+
+| Имя | Тип | Описание | Пример |
+| - | - | - | - |
+| token | string | Ключ сессии | `"aS31L42n21hD"` |
+| channel_name | string | Название канала | `"IU9-23 chat"` |
+
+Ответ:
+
+| Имя | Тип | Описание | Пример |
+| - | - | - | - |
+| success | bool | Результат | `true`/`false` |
+| *err_cause* | *string* | *Причина ошибки* | `"Bad token"` |
+
+***
+### Удалить канал ###
+**/api/delete_channel**
+
+Создать удалить канал. 
+
+Параметры:
+
+| Имя | Тип | Описание | Пример |
+| - | - | - | - |
+| token | string | Ключ сессии | `"aS31L42n21hD"` |
+| channel_id | int | ID канала | `2` |
+
+Ответ:
+
+| Имя | Тип | Описание | Пример |
+| - | - | - | - |
+| success | bool | Результат | `true`/`false` |
+| *err_cause* | *string* | *Причина ошибки* | `"Channel with id 2 does not exist"` |
