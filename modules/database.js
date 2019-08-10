@@ -24,6 +24,11 @@ const checkSessionKey = (key) => {
 
 //Registration new user
 module.exports.registration = (login, password, name) => {
+    if (login.length < 2 || password.length < 6 || name.length < 1) return false;
+	
+    //Checking, if login occupied
+    for (let i = 0, i < UsersData.length; i++) if (UsersData[i].login === login) return false;
+	
     UsersData.push({login: login, password: password, key: "", channels: [], author_name: name, id: UsersData.length});
 }
 
