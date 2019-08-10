@@ -59,11 +59,10 @@ app.post("/api/listen", urlencodedParser, (request, response) => {
     //Here should be no response for the request
 });
 
-
-app.use(express.static("./client"));
 app.get("/", (request, response) => {
-    response.redirect("/index.html"); //Redirect to index page if request is empty
+    response.redirect("/authorization.html"); //Redirect to index page if request is empty
 });
+app.use(express.static("./client"));
 app.get("*", (request, response) => {
     response.send(fs.readFileSync("./client/404.html").toString("utf-8")); //If page is not found
 });
