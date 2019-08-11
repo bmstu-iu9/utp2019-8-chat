@@ -15,41 +15,261 @@ const chatModule = require("./modules/chat");
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
-
+//API methods
 app.post("/api/register", urlencodedParser, (request, response) => {
-	response.status(200).send("test_REGISTER_method");
+	let login, password;
+	login = request.body.login;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (login)`
+		}));
+	}
+	password = request.body.password;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (password)`
+		}));
+	}
 });
 
 app.post("/api/auth", urlencodedParser, (request, response) => {
-	response.status(200).send("test_AUTH_method");
+	let login, password;
+	login = request.body.login;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (login)`
+		}));
+	}
+	password = request.body.password;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (password)`
+		}));
+	}
 });
 
+app.post("/api/get_user", urlencodedParser, (request, response) => {
+	let id;
+	id = request.body.id;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (id)`
+		}));
+	}
+});
+/*
 app.post("/api/channels_list", urlencodedParser, (request, response) => {
 	response.status(200).send("test_CHANNELS_LIST_method");
 });
-
-app.post("/api/channels_add", urlencodedParser, (request, response) => {
-	response.status(200).send("test_CHANNELS_ADD_mehod");
+*/
+app.post("/api/add_to_channel", urlencodedParser, (request, response) => {
+	let token, user_id, channel_id;
+	token = request.body.token;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (token)`
+		}));
+	}
+	user_id = request.body.user_id;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (user_id)`
+		}));
+	}
+	channel_id = request.body.channel_id;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (channel_id)`
+		}));
+	}
 });
 
-app.post("/api/channels_remove", urlencodedParser, (request, response) => {
-	response.status(200).send("test_CHANNELS_REMOVE_method");
+app.post("/api/remove_from_channel", urlencodedParser, (request, response) => {
+	let token, user_id, channel_id;
+	token = request.body.token;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (token)`
+		}));
+	}
+	user_id = request.body.user_id;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (user_id)`
+		}));
+	}
+	channel_id = request.body.channel_id;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (channel_id)`
+		}));
+	}
 });
 
-app.post("/api/channels_create", urlencodedParser, (request, response) => {
-	response.status(200).send("test_CHANNELS_CREATE_method");
+app.post("/api/change_avatar", urlencodedParser, (request, response) => {
+	let token, user_id, avatar;
+	token = request.body.token;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (token)`
+		}));
+	}
+	user_id = request.body.user_id;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (user_id)`
+		}));
+	}
+	avatar = request.body.avatar;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (avatar)`
+		}));
+	}
 });
 
-app.post("/api/channels_delete", urlencodedParser, (request, response) => {
-	response.status(200).send("test_CHANNELS_DELETE_method");
+app.post("/api/change_meta", urlencodedParser, (request, response) => {
+	let token, user_id, meta;
+	token = request.body.token;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (token)`
+		}));
+	}
+	user_id = request.body.user_id;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (user_id)`
+		}));
+	}
+	meta = request.body.meta;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (meta)`
+		}));
+	}
 });
 
-app.post("/api/chat_history", urlencodedParser, (request, response) => {
-	response.status(200).send("test_CHAT_HISTORY_method");
+app.post("/api/get_channel", urlencodedParser, (request, response) => {
+	let id;
+	id = request.body.id;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (id)`
+		}));
+	}
+	chatModule.addListener(id);
+});
+
+app.post("/api/create_channel", urlencodedParser, (request, response) => {
+	let token, channel_name;
+	token = request.body.token;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (token)`
+		}));
+	}
+	channel_name = request.body.channel_name;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (channel_name)`
+		}));
+	}
+});
+
+app.post("/api/delete_channel", urlencodedParser, (request, response) => {
+	let token, channel_id;
+	token = request.body.token;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (token)`
+		}));
+	}
+	channel_id = request.body.channel_id;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (channel_id)`
+		}));
+	}
+});
+
+app.post("/api/get_messages", urlencodedParser, (request, response) => {
+	let token, channel_id, offset, count;
+	token = request.body.token;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (token)`
+		}));
+	}
+	channel_id = request.body.channel_id;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (channel_id)`
+		}));
+	}
+	offset = request.body.offset;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (offset)`
+		}));
+	}
+	count = request.body.count;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (count)`
+		}));
+	}
 });
 
 app.post("/api/send_message", urlencodedParser, (request, response) => {
-    response.status(200).send("test_SEND_MESSAGE_method");
+	let token, channel_id, message;
+	token = request.body.token;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (token)`
+		}));
+	}
+	channel_id = request.body.channel_id;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (channel_id)`
+		}));
+	}
+	message = request.body.message;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (message)`
+		}));
+	}
 });
 
 app.post("/api/listen", urlencodedParser, (request, response) => {
@@ -79,6 +299,23 @@ app.post("/api/listen", urlencodedParser, (request, response) => {
     //Here should be no response for the request
 });
 
+app.post("/api/public_cipher", urlencodedParser, (request, response) => {
+	let count, ident;
+	count = request.body.count;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (count)`
+		}));
+	}
+	ident = request.body.ident;
+	if (login === undefined) {
+		response.status(200).send(JSON.stringify({
+			err_code: 1,
+			err_cause: `Argument not found (ident)`
+		}));
+	}
+});
 
 app.get("/", (request, response) => {
     response.redirect("/index.html"); //Redirect to index page if request is empty
