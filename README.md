@@ -12,21 +12,14 @@
 
 ## Быстрый старт ##
 
-### Linux ###
 ```sh
     git clone https://github.com/bmstu-iu9/utp2019-8-chat.git
     cd ./utp2019-8-chat/
     git checkout --track origin/dev #До тех пор, пока код не будет залит в мастер
-    chmod +x ./server.js
     cp ./default_config.json ./config.json
-    ./server.js -p 3000 -c ./config.json
+    node ./server.js -p 3000 -c ./config.json
     sensible-browser localhost:3000 #Выполнить в отдельном терминале либо открыть в браузере
     #Ctrl + C для сохранения данных и остановки сервера
-```
-
-### Windows ###
-```sh
-    #Скоро появится
 ```
 
 ## Файл конфигурации ##
@@ -39,3 +32,22 @@
 | mysql_user      | Строка | `9SpT1uQOyM`          | Имя пользователя базы данных                                                                         |
 | mysql_pass      | Строка | -                     | Пароль для базы данных                                                                               |
 | mysql_database  | Строка | `9SpT1uQOyM`          | Название базы данных                                                                                 |
+
+## Дополнительная информация ##
+
+- **[Методы API](https://github.com/bmstu-iu9/utp2019-8-chat/blob/dev/API_DESCRIPTION.md)**
+- **Структура базы данных**
+
+
+TODO: ссылки ведут в dev ветку. Сменить на master.
+
+## Участники ##
+
+1. Васянович Дмитрий - [Ga1ath](https://github.com/Ga1ath)
+2. Волков Михаил - [sleepymare](https://github.com/sleepymare)
+3. Горовец Максим - [atommaks](https://github.com/atommaks)
+4. Литовченко Павел - [573pn01v01k](https://github.com/573pn01v01k)
+5. Максимов Михаил - [Mikle54](https://github.com/Mikle54)
+6. Несон Сергей - [blissdeathour](https://github.com/blissdeathour)
+7. Соколовский Михаил - [Sokolmish](https://github.com/Sokolmish)
+8. Хрипач Георгий - [NotThatWay](https://github.com/NotThatWay)
