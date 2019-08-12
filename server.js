@@ -1,19 +1,79 @@
 #!/usr/bin/nodejs
 'use strict'
 
-const DEFAULT_PORT = 3000; //Warning: some ports require the admin privileges to launch the server (80 for example)
-const SAVING_INTERVAL = 60; //In seconds (Set a negative number to disable autosaving)
-
 const fs = require("fs");
 const process = require("process");
+const minimist = require('minimist');
 const express = require("express");
 const bodyParser = require("body-parser");
 
 const dbModulle = require("./modules/database");
 const chatModule = require("./modules/chat");
 
+
+const VERSION = "v1.0.0";
+const CONFIG_PATH = "./config.json";
+
+const defaultConfig = {
+    "default_port": 3000,
+    "saving_interval": 60,
+
+    "mysql_host": "remotemysql.com",
+    "mysql_user": "9SpT1uQOyM",
+    "mysql_pass": "",
+    "mysql_database": "9SpT1uQOyM"
+}
+
+const loadConfig = (path) => {
+    let config;
+    try {
+        if (fs.existsSync(path)) {
+            config = JSON.parse(fs.readFileSync(path));
+            for (let key in defaultConfig)
+                if (config[key] === undefined)
+                    config[key] = defaultConfig[key];
+        }
+        else {
+            console.error(`File "${path}" does not exist`);
+            return defaultConfig;
+        }
+    }
+    catch (err) {
+        console.error("Failed to load config: " + err);
+        return defaultConfig;
+    }
+    return config;
+}
+
+const argv = minimist(process.argv.slice(2), {
+    alias: {
+        'h': 'help',
+        'v': 'version',
+        'p': 'port',
+        'c': 'config',
+    },
+    default: {
+        'c': CONFIG_PATH,
+    },
+    unknown: (arg) => {
+        console.error('Unknown option: ', arg)
+        process.exit(-1);
+    }
+});
+if (argv.help) {
+    console.log("HELP PAGE"); //TODO
+    process.exit(0);
+}
+if (argv.version) {
+    console.log(VERSION); //TODO
+    process.exit(0);
+}
+
+
+const config = loadConfig(argv.config);
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
+
 
 //checking API methods arguments function
 const checkArg = (response, arg) => {
@@ -28,7 +88,6 @@ const checkArg = (response, arg) => {
         return request.body[arg];
 }
 
-//API methods
 app.post("/api/register", urlencodedParser, (request, response) => {
 	let login = checkArg(response, "login");
     let password = checkArg(response, "password");
@@ -115,10 +174,9 @@ app.post("/api/listen", urlencodedParser, (request, response) => {
 });
 
 app.post("/api/public_cipher", urlencodedParser, (request, response) => {
-	let count = checkArg(response, "count");
-    let ident = checkArg(response, "ident");
     response.status(200).send("test_PUBLIC_CIPHER_method");
 });
+
 
 app.get("/", (request, response) => {
     response.redirect("/index.html"); //Redirect to index page if request is empty
@@ -131,19 +189,19 @@ app.get("*", (request, response) => {
 
 dbModulle.load(() => {
     console.log("Data loaded");
-    const port = process.argv.length > 2 ? process.argv[2] : DEFAULT_PORT;
+    const port = argv.port === undefined ? config.default_port : argv.port;
     app.listen(port);
     console.log(`Server started on ${port} port`);
 });
 
 
 let saverId = undefined; //Id of the saving timer
-if (SAVING_INTERVAL >= 0) {
+if (config.saving_interval >= 0) {
     saverId = setInterval(() => {
         console.log("Saving data...");
         dbModulle.save();
         console.log("Data saved");
-    }, SAVING_INTERVAL * 1000);
+    }, config.saving_interval * 1000);
 }
 
 process.once("SIGINT", (c) => { //Saving before exit
@@ -153,5 +211,5 @@ process.once("SIGINT", (c) => { //Saving before exit
     console.log("Saving data before app closing...");
     dbModulle.save();
     console.log("Data saved");
-    process.exit(-1);
+    process.exit(0);
 });
