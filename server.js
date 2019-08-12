@@ -1,9 +1,6 @@
 #!/usr/bin/nodejs
 'use strict'
 
-const DEFAULT_PORT = 3000; //Warning: some ports require the admin privileges to launch the server (80 for example)
-const SAVING_INTERVAL = 60; //In seconds (Set a negative number to disable autosaving)
-
 const fs = require("fs");
 const process = require("process");
 const express = require("express");
@@ -12,6 +9,41 @@ const bodyParser = require("body-parser");
 const dbModulle = require("./modules/database");
 const chatModule = require("./modules/chat");
 
+
+const CONFIG_PATH = "./config.json";
+const defaultConfig = {
+    "default_port": 3000,
+    "saving_interval": 60,
+
+    "mysql_host": "remotemysql.com",
+    "mysql_user": "9SpT1uQOyM",
+    "mysql_pass": "",
+    "mysql_database": "9SpT1uQOyM"
+}
+const loadConfig = (path) => {
+    let config;
+    try {
+        if (fs.existsSync(path)) {
+            config = JSON.parse(fs.readFileSync(path));
+            for (let key in defaultConfig)
+                if (config[key] === undefined)
+                    config[key] = defaultConfig[key];
+        }
+        else {
+            console.error(`File "${path}" does not exist`);
+            return defaultConfig;
+        }
+    }
+    catch (err) {
+        console.error("Failed to load config: " + err);
+        return defaultConfig;
+    }
+    return config;
+}
+
+
+
+const config = loadConfig(CONFIG_PATH);
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
@@ -91,19 +123,19 @@ app.get("*", (request, response) => {
 
 dbModulle.load(() => {
     console.log("Data loaded");
-    const port = process.argv.length > 2 ? process.argv[2] : DEFAULT_PORT;
+    const port = process.argv.length > 2 ? process.argv[2] : config.default_port;
     app.listen(port);
     console.log(`Server started on ${port} port`);
 });
 
 
 let saverId = undefined; //Id of the saving timer
-if (SAVING_INTERVAL >= 0) {
+if (config.saving_interval >= 0) {
     saverId = setInterval(() => {
         console.log("Saving data...");
         dbModulle.save();
         console.log("Data saved");
-    }, SAVING_INTERVAL * 1000);
+    }, config.saving_interval * 1000);
 }
 
 process.once("SIGINT", (c) => { //Saving before exit

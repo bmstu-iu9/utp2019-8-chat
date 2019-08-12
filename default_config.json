@@ -1,0 +1,9 @@
+{
+    "default_port": 3000,
+    "saving_interval": 60,
+
+    "mysql_host": "remotemysql.com",
+    "mysql_user": "9SpT1uQOyM",
+    "mysql_pass": "",
+    "mysql_database": "9SpT1uQOyM"
+}
