@@ -27,7 +27,7 @@ const sendRequest = (dest, params, callback) => {
 		paramStr.push(`${key}=${encodeMessage(params[key])}`);
 	}
     xhr.send(paramStr.join('&'));
-    return dest + "<br>" + paramStr;
+    return dest + "\n" + paramStr;
 }
 
 document.getElementById("send_btn").addEventListener('click', (sender) => {
@@ -47,7 +47,7 @@ document.getElementById("send_btn").addEventListener('click', (sender) => {
     if (name !== "")
         params[name] = document.getElementById("param_val_4").value;
     let req = sendRequest(dest, params, (response, status) => {
-        document.getElementById("response_area").innerText = response;
+        document.getElementById("response_area").innerHTML = response;
     });
-    document.getElementById("request_area").innerText = req;
+    document.getElementById("request_area").innerHTML = req;
 });
