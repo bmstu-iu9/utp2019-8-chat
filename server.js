@@ -74,6 +74,7 @@ const config = loadConfig(argv.config);
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
+
 //checking API methods arguments function
 const checkArg = (response, arg) => {
     if (request.body[arg] === undefined) {
@@ -87,7 +88,6 @@ const checkArg = (response, arg) => {
         return request.body[arg];
 }
 
-//API methods
 app.post("/api/register", urlencodedParser, (request, response) => {
 	let login = checkArg(response, "login");
     let password = checkArg(response, "password");
@@ -174,10 +174,9 @@ app.post("/api/listen", urlencodedParser, (request, response) => {
 });
 
 app.post("/api/public_cipher", urlencodedParser, (request, response) => {
-	let count = checkArg(response, "count");
-    let ident = checkArg(response, "ident");
     response.status(200).send("test_PUBLIC_CIPHER_method");
 });
+
 
 app.get("/", (request, response) => {
     response.redirect("/index.html"); //Redirect to index page if request is empty
