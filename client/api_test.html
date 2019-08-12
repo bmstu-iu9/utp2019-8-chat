@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>API test</title>
+    </head>
+    <body>
+        <h1>API methods test</h1>
+        <!-- <h3 id="method_name">Send message</h3> -->
+        <span>Method name:&nbsp;&nbsp;</span>
+        <input type="text" id="dest" value="api/send_message">
+        <div id="input">
+            <h4>Params:</h4>
+            <div class="param_block" style>
+                <!-- <span>token:&nbsp;&nbsp;</span> -->
+                <input type="text" id ="param_name_1" class="param_name" style="width: 150px;">
+                :
+                <input type="text" id ="param_val_1" class="param_val" style="width: 500px;">
+            </div>
+            <br>
+            <div class="param_block" style>
+                <!-- <span>token:&nbsp;&nbsp;</span> -->
+                <input type="text" id ="param_name_2" class="param_name" style="width: 150px;">
+                :
+                <input type="text" id ="param_val_2" class="param_val" style="width: 500px;">
+            </div>
+            <br>
+            <div class="param_block" style>
+                <!-- <span>token:&nbsp;&nbsp;</span> -->
+                <input type="text" id ="param_name_3" class="param_name" style="width: 150px;">
+                :
+                <input type="text" id ="param_val_3" class="param_val" style="width: 500px;">
+            </div>
+            <br>
+            <div class="param_block" style>
+                <!-- <span>token:&nbsp;&nbsp;</span> -->
+                <input type="text" id ="param_name_4" class="param_name" style="width: 150px;">
+                :
+                <input type="text" id ="param_val_4" class="param_val" style="width: 500px;">
+            </div>
+            <br>
+        </div>
+        <button id="send_btn">Send</button>
+        <div id="reqest_block">
+                <h4>Request:</h4>
+                <textarea id="request_area" style="width: 500px; height: 150px;">{}</textarea>
+            </div>
+        <div id="response_block">
+            <h4>Response:</h4>
+            <textarea id="response_area" style="width: 500px; height: 250px;">{}</textarea>
+        </div>
+        <script src="scripts/api_test.js"></script>
+    </body>
+</html>

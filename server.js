@@ -75,153 +75,124 @@ const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
 
-//checking API methods arguments function
-const checkArg = (request, response, arg) => {
-    if (request.body[arg] === undefined) {
-        response.status(200).send(JSON.stringify({
-            success: false,
-            err_code: 1,
-            err_cause: `Argument not found (${arg})`
-        }));
+const getArgs = (request, response, args) => {
+    let res = {};
+    for (let i in args) {
+        res[args[i]] = request.body[args[i]];
+        if (res[args[i]] === undefined) {
+            response.status(200).send(JSON.stringify({
+                success: false,
+                err_code: 1,
+                err_cause: `Argument not found (${args[i]})`
+            }));
+            return undefined;
+        }
     }
-    else
-        return request.body[arg];
+    return res;
 }
 
 app.post("/api/register", urlencodedParser, (request, response) => {
-    let res = {};
-    res.login = checkArg(request, response, "login");
-    res.password = checkArg(request, response, "password");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["login", "password"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_REGISTER_method");
 });
 
 app.post("/api/auth", urlencodedParser, (request, response) => {
-    let res = {};
-	res.login = checkArg(request, response, "login");
-    res.password = checkArg(request, response, "password");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["login", "password"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_AUTH_method");
 });
 
 app.post("/api/get_user", urlencodedParser, (request, response) => {
-    let res = {};
-    res.id = checkArg(request, response, "id");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["id"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_GET_USER_method");
 });
 
 app.post("/api/add_to_channel", urlencodedParser, (request, response) => {
-    let res = {};
-    res.token = checkArg(request, response, "token");
-    res.user_id = checkArg(request, response, "user_id");
-    res.channel_id = checkArg(request, response, "channel_id");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["token", "user_id", "channel_id"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_ADD_TO_CHANNEL_method");
 });
 
 app.post("/api/remove_from_channel", urlencodedParser, (request, response) => {
-    let res = {};
-    res.token = checkArg(request, response, "token");
-    res.user_id = checkArg(request, response, "user_id");
-    res.channel_id = checkArg(request, response, "channel_id");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["token", "user_id", "channel_id"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_REMOVE_FROM_CHANNEL_method");
 });
 
 app.post("/api/change_avatar", urlencodedParser, (request, response) => {
-    let res = {};
-	res.token = checkArg(request, response, "token");
-    res.user_id = checkArg(request, response, "user_id");
-    res.avatar = checkArg(request, response, "avatar");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["token", "user_id", "avatar"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_CHANGE_AVATAR_method");
 });
 
 app.post("/api/change_meta", urlencodedParser, (request, response) => {
-    let res = {};
-    res.token = checkArg(request, response, "token");
-    res.user_id = checkArg(request, response, "user_id");
-    res.meta = checkArg(request, response, "meta");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["token", "user_id", "meta"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_CHANGE_META_method");
 });
 
 app.post("/api/get_channel", urlencodedParser, (request, response) => {
-    let res = {};
-    res.id = checkArg(request, response, "id");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["id"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_GET_CHANNEL_method");
 });
 
 app.post("/api/create_channel", urlencodedParser, (request, response) => {
-    let res = {};
-	res.token = checkArg(request, response, "token");
-    res.channel_name = checkArg(request, response, "channel_name");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["token", "channel_name"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_CREATE_CHANNEL_method");
 });
 
 app.post("/api/delete_channel", urlencodedParser, (request, response) => {
-    let res = {};
-	res.token = checkArg(request, response, "token");
-    res.channel_id = checkArg(request, response, "channel_id");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["token", "channel_id"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_DELETE_CHANNEL_method");
 });
 
 app.post("/api/get_messages", urlencodedParser, (request, response) => {
-    let res = {};
-	res.token = checkArg(request, response, "token");
-    res.channel_id = checkArg(request, response, "channel_id");
-    res.offset = checkArg(request, response, "offset");
-    res.count = checkArg(request, response, "count");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["token", "channel_id", "offset", "count"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_GET_NESSAGES_method");
 });
 
 app.post("/api/send_message", urlencodedParser, (request, response) => {
-    let res = {};
-	res.token = checkArg(request, response, "token");
-    res.channel_id = checkArg(request, response, "channel_id");
-    res.message = checkArg(request, response, "message");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
+    const args = ["token", "channel_id", "message"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
     response.status(200).send("test_SEND_MESSAGE_method");
 });
 
 app.post("/api/listen", urlencodedParser, (request, response) => {
-    let res = {};
-    res.token = checkArg(request, response, "token");
-    res.channel_id = checkArg(request, response, "channel_id");
-    res.last_msg = checkArg(request, response, "last_msg");
-    for (let key in res)
-        if (res[key] === undefined)
-            return;
-    chatModule.addListener(channel_id, response, last_msg);
+    const args = ["token", "channel_id", "last_msg"];
+    let res = getArgs(request, response, args);
+    if (res === undefined)
+        return;
+    chatModule.addListener(res.channel_id, response, res.last_msg);
     //Here should be no response for the request
 });
 
