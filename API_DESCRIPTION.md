@@ -52,6 +52,7 @@
 | 0   | Успех (Может не использоваться)                           | Success                                                     |
 | -1  | Неизвестная ошибка                                        | Something weird happened                                    |
 | -2  | Другая ошибка                                             | ¯\\\_(ツ)\_\/¯                                              |
+| -3  | Неизвестный метод API                                     | Unknown API method (send_messaeg)                           |
 | 1   | Ошибка в количестве аргументов (Не был передан аргумент)  | Argument not found (token)                                  |
 | 2   | Ошибка в типе аргументов                                  | Wrong argument type (count). Expected int, but found string |
 | 3   | Данный объект уже существует (пользователь, канал и т.д.) | User with the same nickname already exist                   |

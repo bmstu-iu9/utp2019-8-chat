@@ -208,6 +208,13 @@ app.use(express.static("./client"));
 app.get("*", (request, response) => {
     response.send(fs.readFileSync("./client/404.html").toString("utf-8")); //If page is not found
 });
+app.post("*", (request, response) => {
+    response.send(JSON.stringify({
+        success: false,
+        err_code: -3,
+        err_cause: `Unknown API method`
+    }));
+});
 
 
 dbModulle.load(() => {
