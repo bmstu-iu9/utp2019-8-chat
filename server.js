@@ -43,7 +43,7 @@ const loadConfig = (path) => {
 
 
 
-const config = loadConfig(CONFIG_PATH);
+const config = loadConfig(process.argv.length > 3 ? process.argv[3] : CONFIG_PATH);
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
