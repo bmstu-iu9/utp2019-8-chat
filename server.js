@@ -64,7 +64,7 @@ if (argv.help) {
     console.log("HELP PAGE"); //TODO
     process.exit(0);
 }
-if (argv.help) {
+if (argv.version) {
     console.log(VERSION); //TODO
     process.exit(0);
 }
