@@ -3,6 +3,7 @@
 
 const fs = require("fs");
 const process = require("process");
+const minimist = require('minimist');
 const express = require("express");
 const bodyParser = require("body-parser");
 
@@ -10,7 +11,9 @@ const dbModulle = require("./modules/database");
 const chatModule = require("./modules/chat");
 
 
+const VERSION = "v1.0.0";
 const CONFIG_PATH = "./config.json";
+
 const defaultConfig = {
     "default_port": 3000,
     "saving_interval": 60,
@@ -20,6 +23,7 @@ const defaultConfig = {
     "mysql_pass": "",
     "mysql_database": "9SpT1uQOyM"
 }
+
 const loadConfig = (path) => {
     let config;
     try {
@@ -41,9 +45,32 @@ const loadConfig = (path) => {
     return config;
 }
 
+const argv = minimist(process.argv.slice(2), {
+    alias: {
+        'h': 'help',
+        'v': 'version',
+        'p': 'port',
+        'c': 'config',
+    },
+    default: {
+        'c': CONFIG_PATH,
+    },
+    unknown: (arg) => {
+        console.error('Unknown option: ', arg)
+        process.exit(-1);
+    }
+});
+if (argv.help) {
+    console.log("HELP PAGE"); //TODO
+    process.exit(0);
+}
+if (argv.help) {
+    console.log(VERSION); //TODO
+    process.exit(0);
+}
 
 
-const config = loadConfig(process.argv.length > 3 ? process.argv[3] : CONFIG_PATH);
+const config = loadConfig(argv.config);
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
@@ -123,7 +150,7 @@ app.get("*", (request, response) => {
 
 dbModulle.load(() => {
     console.log("Data loaded");
-    const port = process.argv.length > 2 ? process.argv[2] : config.default_port;
+    const port = argv.port === undefined ? config.default_port : argv.port;
     app.listen(port);
     console.log(`Server started on ${port} port`);
 });
@@ -145,5 +172,5 @@ process.once("SIGINT", (c) => { //Saving before exit
     console.log("Saving data before app closing...");
     dbModulle.save();
     console.log("Data saved");
-    process.exit(-1);
+    process.exit(0);
 });
