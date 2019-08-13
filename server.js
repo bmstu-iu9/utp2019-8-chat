@@ -16,8 +16,8 @@ const VERSION = "v1.0.0";
 const CONFIG_PATH = "./config.json";
 
 const defaultConfig = {
-    "default_http_port": 80,
-    "default_https_port": 433,
+    "http_port": 80,
+    "https_port": 433,
     "saving_interval": 60,
     
     "use_https": false,
@@ -226,7 +226,7 @@ app.post("*", (request, response) => {
 dbModulle.load(() => {
     console.log("Data loaded");
     if (config.use_https) {
-        const port = argv.port === undefined ? config.default_https_port : argv.port;
+        const port = argv.port === undefined ? config.https_port : argv.port;
         const httpsOptions = {
             key: fs.readFileSync(config.ssl_key),
             cert: fs.readFileSync(config.ssl_cert)
@@ -235,7 +235,7 @@ dbModulle.load(() => {
         console.log(`Server started on ${port} port using HTTPS`);
     }
     else {
-        const port = argv.port === undefined ? config.default_http_port : argv.port;
+        const port = argv.port === undefined ? config.http_port : argv.port;
         app.listen(port);
         console.log(`Server started on ${port} port using HTTP`);
     }

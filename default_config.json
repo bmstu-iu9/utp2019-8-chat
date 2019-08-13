@@ -1,11 +1,11 @@
 {
-    "default_http_port": 80,
-    "default_https_port": 433,
+    "http_port": 80,
+    "https_port": 443,
     "saving_interval": 60,
     
     "use_https": false,
-    "ssl_cert": "./crt.pem",
-    "ssl_key": "./key.pem",
+    "ssl_cert": "./ssl/crt.pem",
+    "ssl_key": "./ssl/key.pem",
 
     "mysql_host": "remotemysql.com",
     "mysql_user": "9SpT1uQOyM",
