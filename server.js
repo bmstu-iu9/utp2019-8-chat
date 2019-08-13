@@ -7,7 +7,6 @@ const minimist = require("minimist");
 const http = require("http");
 const express = require("express");
 const bodyParser = require("body-parser");
-const ws = require("ws");
 
 const dbModulle = require("./modules/database");
 const chatModule = require("./modules/chat");
@@ -76,10 +75,6 @@ const config = loadConfig(argv.config);
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 const server = http.createServer(app);
-const wss = new ws.Server({ 
-    server, 
-    path: "/webSocket"
-});
 
 const getArgs = (request, response, args) => {
     let res = {};
@@ -194,12 +189,13 @@ app.post("/api/send_message", urlencodedParser, (request, response) => {
 });
 
 app.post("/api/listen", urlencodedParser, (request, response) => {
-    const args = ["token", "channel_id", "last_msg"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
-        return;
-    chatModule.addListener(res.channel_id, response, res.last_msg);
-    //Here should be no response for the request
+    // const args = ["token", "channel_id", "last_msg"];
+    // let res = getArgs(request, response, args);
+    // if (res === undefined)
+    //     return;
+    // chatModule.addListener(res.channel_id, response, res.last_msg);
+    // //Here should be no response for the request
+    response.status(405).send("Deprecated");
 });
 
 app.post("/api/public_cipher", urlencodedParser, (request, response) => {
@@ -222,7 +218,8 @@ app.post("*", (request, response) => {
     }));
 });
 
-chatModule.init(wss);
+
+chatModule.init(server);
 dbModulle.load(() => {
     console.log("Data loaded");
     const port = argv.port === undefined ? config.default_port : argv.port;
@@ -242,6 +239,7 @@ if (config.saving_interval >= 0) {
 }
 
 process.once("SIGINT", (c) => { //Saving before exit
+    chatModule.stop();
     app.disable();
     if (saverId !== undefined)
         clearInterval(saverId);
