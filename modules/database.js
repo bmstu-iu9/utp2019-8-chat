@@ -4,7 +4,7 @@ const fs = require("fs");
 
 let UsersData = [];
 let UsersChannels = [false];
-
+/*
 const makeSessionKey = () => {
     let result = "";
     let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -47,6 +47,15 @@ module.exports.authentication = (login, password) => {
     UsersData[i].key = key;
     return key;
 }
+*/
+
+module.exports.get_user = (id) => {
+	if (arguments.length < 1) return {success: false, err_code: 1, err_cause: "undefined arguments exist"};
+	if (typeof(id) !== "number") return {success: false, err_code: 2, err_cause: "wrong type of argument"};
+	let current = UsersData[id];
+	if (typeof(current) === "undefined") return {success: false, err_code: 7, err_cause: "user doesn't exist"};
+	return {success: true, user: current};
+}	
 
 module.exports.channels_list = (key) => {
 	let i = checkSessionKey(key);
