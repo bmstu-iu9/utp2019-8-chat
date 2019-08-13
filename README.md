@@ -39,11 +39,21 @@
 
 ## Дополнительная информация ##
 
-- **[Методы API](https://github.com/bmstu-iu9/utp2019-8-chat/blob/dev/API_DESCRIPTION.md)**
-- **Структура базы данных**
-
+- [Методы API](https://github.com/bmstu-iu9/utp2019-8-chat/blob/dev/API_DESCRIPTION.md)
+- Структура сообщений WebSockets
+- Структура базы данных
 
 TODO: ссылки ведут в dev ветку. Сменить на master.
+
+## Зависимости ##
+
+- [express](https://www.npmjs.com/package/express)
+- [body-parser](https://www.npmjs.com/package/body-parser)
+- [ws](https://www.npmjs.com/package/ws) - WebSockets
+- [mysql](https://www.npmjs.com/package/mysql)
+- [minimist](https://www.npmjs.com/package/minimist) - Парсинг аргументов коммандной строки (возможно временно)
+- [node-rsa](https://www.npmjs.com/package/node-rsa) - На текущий момент более не используется (присутствует в ветке Cryptography)
+
 
 ## Участники ##
 
