@@ -5,6 +5,7 @@ const fs = require("fs");
 const process = require("process");
 const minimist = require("minimist");
 const http = require("http");
+const https = require("https");
 const express = require("express");
 const bodyParser = require("body-parser");
 
@@ -16,8 +17,13 @@ const VERSION = "v1.0.0";
 const CONFIG_PATH = "./config.json";
 
 const defaultConfig = {
-    "default_port": 3000,
+    "http_port": 80,
+    "https_port": 433,
     "saving_interval": 60,
+    
+    "use_https": false,
+    "ssl_cert": "./crt.pem",
+    "ssl_key": "./key.pem",
 
     "mysql_host": "remotemysql.com",
     "mysql_user": "9SpT1uQOyM",
@@ -222,10 +228,20 @@ app.post("*", (request, response) => {
 chatModule.init(server);
 dbModulle.load(() => {
     console.log("Data loaded");
-    const port = argv.port === undefined ? config.default_port : argv.port;
-    server.listen(port, () => {
-        console.log(`Server started on ${port} port`);
-    });
+    if (config.use_https) {
+        const port = argv.port === undefined ? config.https_port : argv.port;
+        const httpsOptions = {
+            key: fs.readFileSync(config.ssl_key),
+            cert: fs.readFileSync(config.ssl_cert)
+        }        
+        https.createServer(httpsOptions, app).listen(port);
+        console.log(`Server started on ${port} port using HTTPS`);
+    }
+    else {
+        const port = argv.port === undefined ? config.http_port : argv.port;
+        app.listen(port);
+        console.log(`Server started on ${port} port using HTTP`);
+    }
 });
 
 
