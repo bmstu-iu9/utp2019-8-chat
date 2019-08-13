@@ -78,6 +78,15 @@ module.exports.remove_from_channel = (user_id, channel_id) => {
     UsersData[user_id].channels[channel_id] = false;
 	return {success: true};
 }
+
+module.exports.get_channel = (id) => {
+	if (arguments.length < 1) return {success: false, err_code: 1, err_cause: "undefined arguments exist"};
+	if (typeof(id) !== "number") return {success: false, err_code: 2, err_cause: "wrong type of argument"};
+	let current = UsersChannels[id];
+	if (typeof(current) === "undefined") return {success: false, err_code: 7, err_cause: "channel doesn't exist"};
+    return {success: true, channel = current};
+}
+
 module.exports.channels_create = (key, name) => {
     let i = checkSessionKey(key);
     if (i === false) return false;
