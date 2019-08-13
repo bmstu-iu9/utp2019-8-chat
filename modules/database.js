@@ -63,25 +63,21 @@ module.exports.channels_list = (key) => {
     return UsersData[i].channels;
 }
 
-module.exports.channels_add = (key, id) => {
-    let i = checkSessionKey(key);
-    if (i === false) return false;
-    UsersData[i].channels.push(id);
-	return true;
+module.exports.add_to_channel = (user_id, channel_id) => {
+    if (arguments.length < 2) return {success: false, err_code: 1, err_cause: "undefined arguments exist"};
+	if (typeof(user_id) !== "number" || typeof(channel_id) !== "number") return {success: false, err_code: 2, err_cause: "wrong type of argument"};
+	if (typeof(UsersData[user_id]) === "undefined") return {success: false, err_code: 7, err_cause: "user doesn't exist"};
+	UsersData[user_id].channels.push(channel_id);
+	return {success: true};
 }
 
-module.exports.channels_remove = (key, id) => {
-    let i = checkSessionKey(key);
-    if (i === false) return false;
-
-    let cur = UsersData[i];
-    for (i = 0; i < cur.channels.length; i++) if (cur.channels[i] === id) {
-        cur.channels[i] = false;
-        break;
-    }
-    return true;
+module.exports.remove_from_channel = (user_id, channel_id) => {
+    if (arguments.length < 2) return {success: false, err_code: 1, err_cause: "undefined arguments exist"};
+	if (typeof(user_id) !== "number" || typeof(channel_id) !== "number") return {success: false, err_code: 2, err_cause: "wrong type of argument"};
+	if (typeof(UsersData[user_id]) === "undefined") return {success: false, err_code: 7, err_cause: "user doesn't exist"};
+    UsersData[user_id].channels[channel_id] = false;
+	return {success: true};
 }
-
 module.exports.channels_create = (key, name) => {
     let i = checkSessionKey(key);
     if (i === false) return false;
