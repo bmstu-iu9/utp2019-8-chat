@@ -21,7 +21,7 @@ const addMessage = (author, text) => { //Add message to chat-flow zone
     chatFlow.scrollTop = 9999;
 }
 
-let socket = new WebSocket(`ws://${location.host}/chatSocket`);
+let socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
 
 socket.onopen = (e) => {
     console.log("Web socket connected");

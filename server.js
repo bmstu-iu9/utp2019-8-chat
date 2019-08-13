@@ -80,7 +80,11 @@ if (argv.version) {
 const config = loadConfig(argv.config);
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
-const server = http.createServer(app);
+const httpsOptions = {
+    key: fs.readFileSync(config.ssl_key),
+    cert: fs.readFileSync(config.ssl_cert)
+}        
+const server = config.use_https ? https.createServer(httpsOptions, app) :http.createServer(app);
 
 const getArgs = (request, response, args) => {
     let res = {};
@@ -228,20 +232,10 @@ app.post("*", (request, response) => {
 chatModule.init(server);
 dbModulle.load(() => {
     console.log("Data loaded");
-    if (config.use_https) {
-        const port = argv.port === undefined ? config.https_port : argv.port;
-        const httpsOptions = {
-            key: fs.readFileSync(config.ssl_key),
-            cert: fs.readFileSync(config.ssl_cert)
-        }        
-        https.createServer(httpsOptions, app).listen(port);
-        console.log(`Server started on ${port} port using HTTPS`);
-    }
-    else {
-        const port = argv.port === undefined ? config.http_port : argv.port;
-        app.listen(port);
-        console.log(`Server started on ${port} port using HTTP`);
-    }
+    const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
+    server.listen(port, () => {
+        console.log(`Server started on ${port} port using ${config.use_https ? "HTTPS" : "HTTP"}`);
+    });
 });
 
 
