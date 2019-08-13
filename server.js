@@ -222,45 +222,7 @@ app.post("*", (request, response) => {
     }));
 });
 
-
-let ids = 1;
-wss.on('connection', (ws) => {
-    ws.isAlive = true;
-    
-    ws.on('pong', () => {
-        ws.isAlive = true;
-    });
-
-    ws.on('message', (message) => {
-        // console.log('received: %s', message);
-        let res = JSON.parse(message);
-        if (res.type === "send_message") {
-            wss.clients.forEach((client) => {
-                client.send(JSON.stringify({
-                    success: true,
-                    type: "new_message",
-                    data: {
-                        message_id: ids++,
-                        author_id: res.author_id,
-                        author_name: res.author_name,
-                        message: res.message
-                    }
-                }));
-            });
-        }
-    });
-});
-
-setInterval(() => {
-    wss.clients.forEach((ws) => {
-        if (!ws.isAlive) 
-            return ws.terminate();
-        ws.isAlive = false;
-        ws.ping(null, false, true);
-    });
-}, 30 * 1000);
-
-
+chatModule.init(wss);
 dbModulle.load(() => {
     console.log("Data loaded");
     const port = argv.port === undefined ? config.default_port : argv.port;
