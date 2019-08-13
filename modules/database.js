@@ -1,4 +1,4 @@
-'use-strict'
+'use strict'
 
 const fs = require("fs");
 
@@ -67,7 +67,9 @@ module.exports.add_to_channel = (user_id, channel_id) => {
     if (arguments.length < 2) return {success: false, err_code: 1, err_cause: "undefined arguments exist"};
 	if (typeof(user_id) !== "number" || typeof(channel_id) !== "number") return {success: false, err_code: 2, err_cause: "wrong type of argument"};
 	if (typeof(UsersData[user_id]) === "undefined") return {success: false, err_code: 7, err_cause: "user doesn't exist"};
+	if (typeof(UsersChannels[channel_id]) === "undefined") return {success: false, err_code: 7, err_cause: "channel doesn't exist"};
 	UsersData[user_id].channels.push(channel_id);
+	UsersChannels[channel_id].listeners_ids.push(user_id);
 	return {success: true};
 }
 
@@ -75,7 +77,14 @@ module.exports.remove_from_channel = (user_id, channel_id) => {
     if (arguments.length < 2) return {success: false, err_code: 1, err_cause: "undefined arguments exist"};
 	if (typeof(user_id) !== "number" || typeof(channel_id) !== "number") return {success: false, err_code: 2, err_cause: "wrong type of argument"};
 	if (typeof(UsersData[user_id]) === "undefined") return {success: false, err_code: 7, err_cause: "user doesn't exist"};
+	if (typeof(UsersChannels[channel_id]) === "undefined") return {success: false, err_code: 7, err_cause: "channel doesn't exist"};
     UsersData[user_id].channels[channel_id] = false;
+	for (let i = 0, i < UsersChannels[channel_id].listeners_ids.length; i++) {
+		if (UsersChannels[channel_id].listeners_ids[i] === user_id) {
+			UsersChannels[channel_id].listeners_ids[i] = false;
+			break;
+		}
+	}
 	return {success: true};
 }
 
@@ -87,12 +96,11 @@ module.exports.get_channel = (id) => {
     return {success: true, channel = current};
 }
 
-module.exports.channels_create = (key, name) => {
-    let i = checkSessionKey(key);
-    if (i === false) return false;
-
-    UsersChannels.push({id: UsersChannels.length, name: name, messages: []});
-    return UsersChannels.length - 1;
+module.exports.create_channel = (user_id, channel_name) => {
+     if (arguments.length < 2) return {success: false, err_code: 1, err_cause: "undefined arguments exist"};
+     if (typeof(user_id) !== "number" || typeof(channel_name) !== "string") return {success: false, err_code: 2, err_cause: "wrong type of argument"};
+     for (let i = 1; i < UsersChannels.length; i++) if (UsersChannels[i].name === channel_name) return {success: false, err_code: 3, err_cause: "channel with this name already exists"};
+     
 }
 
 module.exports.channels_delete = (key, id) => {
