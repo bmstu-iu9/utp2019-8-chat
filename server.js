@@ -3,9 +3,11 @@
 
 const fs = require("fs");
 const process = require("process");
-const minimist = require('minimist');
+const minimist = require("minimist");
+const http = require("http");
 const express = require("express");
 const bodyParser = require("body-parser");
+const ws = require("ws");
 
 const dbModulle = require("./modules/database");
 const chatModule = require("./modules/chat");
@@ -73,7 +75,11 @@ if (argv.version) {
 const config = loadConfig(argv.config);
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
-
+const server = http.createServer(app);
+const wss = new ws.Server({ 
+    server, 
+    path: "/webSocket"
+});
 
 const getArgs = (request, response, args) => {
     let res = {};
@@ -217,11 +223,50 @@ app.post("*", (request, response) => {
 });
 
 
+let ids = 1;
+wss.on('connection', (ws) => {
+    ws.isAlive = true;
+    
+    ws.on('pong', () => {
+        ws.isAlive = true;
+    });
+
+    ws.on('message', (message) => {
+        // console.log('received: %s', message);
+        let res = JSON.parse(message);
+        if (res.type === "send_message") {
+            wss.clients.forEach((client) => {
+                client.send(JSON.stringify({
+                    success: true,
+                    type: "new_message",
+                    data: {
+                        message_id: ids++,
+                        author_id: res.author_id,
+                        author_name: res.author_name,
+                        message: res.message
+                    }
+                }));
+            });
+        }
+    });
+});
+
+setInterval(() => {
+    wss.clients.forEach((ws) => {
+        if (!ws.isAlive) 
+            return ws.terminate();
+        ws.isAlive = false;
+        ws.ping(null, false, true);
+    });
+}, 30 * 1000);
+
+
 dbModulle.load(() => {
     console.log("Data loaded");
     const port = argv.port === undefined ? config.default_port : argv.port;
-    app.listen(port);
-    console.log(`Server started on ${port} port`);
+    server.listen(port, () => {
+        console.log(`Server started on ${port} port`);
+    });
 });
 
 
