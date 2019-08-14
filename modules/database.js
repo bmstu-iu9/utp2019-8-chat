@@ -100,15 +100,25 @@ module.exports.create_channel = (user_id, channel_name) => {
      if (arguments.length < 2) return {success: false, err_code: 1, err_cause: "undefined arguments exist"};
      if (typeof(user_id) !== "number" || typeof(channel_name) !== "string") return {success: false, err_code: 2, err_cause: "wrong type of argument"};
      for (let i = 1; i < UsersChannels.length; i++) if (UsersChannels[i].name === channel_name) return {success: false, err_code: 3, err_cause: "channel with this name already exists"};
-     
-}
+     UsersData[user_id].channels.push(UsersChannels.length);
+	 UsersChannels.push({id: UsersChannels.length, name: channel_name, owner_id: user_id, listeners_ids: {user_id}, last_message_id: undefined, last_message_time: undefined}); 
+	 return {success: true};
+}					
 
-module.exports.channels_delete = (key, id) => {
-    let i = checkSessionKey(key);
-    if (i === false) return false;
-
-    UsersChannels[id] = false;
-	return true;
+module.exports.channels_delete = (channel_id) => {
+    if (arguments.length < 2) return {success: false, err_code: 1, err_cause: "undefined arguments exist"};
+     if (typeof(channel_id) !== "number") return {success: false, err_code: 2, err_cause: "wrong type of argument"};
+	if (UsersChannels.length <= channel_id) return {success: false, err_code: 7, err_cause: "channel doesn't exist"};
+     for (let i = 0; i < UsersChannels[channel_id].listeners_ids.length; i++) {
+		 for (let j = 0; j < UsersData[i].channels.length; j++) {
+			 if (UsersData[i].channels[j].id === channel_id) {
+				 UsersData[i].channels[j] = false;
+				 break;
+			 }
+		 }
+	 }
+	 UsersChannels[channel_id] = false;
+	 return {success: true};
 }
 
 module.exports.chat_history = (key, id, count, offset) => {
