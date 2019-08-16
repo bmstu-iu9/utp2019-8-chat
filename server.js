@@ -20,6 +20,8 @@ const defaultConfig = {
     "http_port": 80,
     "https_port": 433,
     "saving_interval": 60,
+
+    "local_param": "azerty",
     
     "use_https": false,
     "ssl_cert": "./crt.pem",
