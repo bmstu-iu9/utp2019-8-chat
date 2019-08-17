@@ -33,6 +33,36 @@ const deleteCookie = (name) => {
     setCookie(name, "", { 'max-age': -1 });
 }
 
+const sendRequest = (dest, params, callback) => {
+	const encodeMessage = (str) => { //Replace special charasters to codes
+		return str.toString().
+			replace(/\$/g, "%24").
+			replace(/\&/g, "%26").
+			replace(/\+/g, "%2b").
+			replace(/\,/g, "%2c").
+			replace(/\//g, "%2f").
+			replace(/\:/g, "%3a").
+			replace(/\;/g, "%3b").
+			replace(/\=/g, "%3d").
+			replace(/\?/g, "%3f").
+			replace(/\@/g, "%40");
+	}
+	let xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = () => {
+        if (xhr.readyState != 4) 
+            return;
+		callback(xhr.responseText, xhr.status);
+    }
+    xhr.open('POST', dest, true);
+	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	let paramStr = [];
+	for (let key in params) {
+		paramStr.push(`${key}=${encodeMessage(params[key])}`);
+	}
+    xhr.send(paramStr.join('&'));
+    return dest + "\n" + paramStr;
+}
+
 const addMessage = (author, text) => { //Add message to chat-flow zone
     chatFlow.innerHTML +=
         `<div class="msg_box">` +
@@ -42,6 +72,25 @@ const addMessage = (author, text) => { //Add message to chat-flow zone
         `</div>`;
     chatFlow.scrollTop = 9999;
 }
+
+sendRequest("/api/get_messages", {
+    token: getCookie("accessToken"),
+    channel_id: 1,
+    offset: 0,
+    count: 50
+}, (response, status) => {
+    response = JSON.parse(response);
+    if (response.success) {
+        for (let i = 0; i < response.count; i++) {
+            let cur = response.messages[i];
+            addMessage(cur.author_name, cur.message);
+        }
+    }
+    else {
+        console.log(response);
+    }
+});
+
 
 let socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
 
@@ -75,6 +124,8 @@ socket.onclose = (event) => {
 socket.onerror = (error) => {
     alert(`[error] ${error.message}`);
 };
+
+
 
 const sendMessage = () => {
     if (msgTextbox.value == "")
