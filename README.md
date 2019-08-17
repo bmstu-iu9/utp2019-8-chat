@@ -53,7 +53,6 @@ TODO: ссылки ведут в dev ветку. Сменить на master.
 - [ws](https://www.npmjs.com/package/ws) - WebSockets
 - [mysql](https://www.npmjs.com/package/mysql)
 - [minimist](https://www.npmjs.com/package/minimist) - Парсинг аргументов коммандной строки (возможно временно)
-- [node-rsa](https://www.npmjs.com/package/node-rsa) - На текущий момент более не используется (присутствует в ветке Cryptography)
 
 
 ## Участники ##
