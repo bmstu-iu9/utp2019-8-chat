@@ -1,53 +1,10 @@
 'use strict'
 
 const fs = require("fs");
+const readline = require("readline");
 
 let UsersData = [];
 let UsersChannels = [false];
-/*
-const makeSessionKey = () => {
-    let result = "";
-    let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let charactersLength = characters.length;
-    for (let i = 0; i < 5; i++) result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    return result;
-}
-
-//Function for checking session key
-const checkSessionKey = (key) => {
-	let i = 0;
-    let len = UsersData.length;
-    for (; i < len; i++) if (UsersData[i].key === key) break;
-    if (i === len) return false;
-	return i;
-}
-
-//Registration new user
-module.exports.registration = (login, password, name) => {
-    if (login.length < 2 || password.length < 6 || name.length < 1) return false;
-	
-    //Checking, if login occupied
-    for (let i = 0, i < UsersData.length; i++) if (UsersData[i].login === login) return false;
-	
-    UsersData.push({login: login, password: password, key: "", channels: [], author_name: name, id: UsersData.length});
-}
-
-module.exports.authentication = (login, password) => {
-    let i = 0;
-    let len = UsersData.length;
-    for (; i < len; i++) {
-        let cur = UsersData[i];
-        if (cur.login === login) {
-            if (cur.password === password) break;
-            else return false;
-        }
-    }
-    if (i === len) return false;
-    let key = makeSessionKey();
-    UsersData[i].key = key;
-    return key;
-}
-*/
 
 module.exports.get_user = (id) => {
 	if (arguments.length < 1) return {success: false, err_code: 1, err_cause: "undefined arguments exist"};
@@ -67,13 +24,6 @@ module.exports.change_avatar = (user_id, avatar) => {
 	return {success: true};
 }
 
-/*
-module.exports.channels_list = (key) => {
-	let i = checkSessionKey(key);
-    if (i === false) return false;
-    return UsersData[i].channels;
-}
-*/
 module.exports.add_to_channel = (user_id, channel_id) => {
     if (arguments.length < 2) return {success: false, err_code: 1, err_cause: "undefined arguments exist"};
 	if (typeof(user_id) !== "number" || typeof(channel_id) !== "number") return {success: false, err_code: 2, err_cause: "wrong type of argument"};
