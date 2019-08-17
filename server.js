@@ -292,7 +292,7 @@ app.post("*", (request, response) => {
 });
 
 
-chatModule.init(server, authModule);
+chatModule.init(server, authModule, dbModule);
 dbModule.load(() => {
     console.log("Data loaded");
     const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
