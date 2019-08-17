@@ -5,6 +5,21 @@ const readline = require("readline");
 
 let UsersData = [];
 let UsersChannels = [false];
+let messages = [];
+
+// USERS
+
+module.exports.create_user = (id, nickname) => {
+	let newUser = {
+		id: id,
+		nickname: nickname,
+		permissions: 0,
+		avatar: "default.png",
+		channels: [],
+		meta: {}
+	};
+	UsersData[id] = newUser;
+}
 
 module.exports.get_user = (id) => {
 	let current = UsersData[id];
@@ -51,6 +66,8 @@ module.exports.remove_from_channel = (user_id, channel_id) => {
 	return { success: true };
 }
 
+// CHANNELS
+
 module.exports.get_channel = (id) => {
 	let current = UsersChannels[id];
 	if (current === undefined) {
@@ -72,7 +89,8 @@ module.exports.create_channel = (user_id, channel_name) => {
 		owner_id: user_id,
 		listeners_ids: { user_id },
 		last_message_id: undefined,
-		last_message_time: undefined
+		last_message_time: undefined,
+		messages: []
 	};
 	UsersChannels.push(newChannel);
 	return { success: true };
@@ -93,6 +111,8 @@ module.exports.channels_delete = (channel_id) => {
 	UsersChannels[channel_id] = false;
 	return { success: true };
 }
+
+// MESSAGES
 
 module.exports.chat_history = (channel_id, offset, count) => {
 	if (UsersChannels[channel_id] === undefined) {
@@ -116,7 +136,7 @@ module.exports.send_message = (channel_id, message, author_id, broadcast) => {
 	let newMsg = {
 		message_id: UsersChannels[channel_id].messages.length,
 		author_id: author_id,
-		author_name: "NULL",
+		author_name: this.get_user(author_id).user.nickname,
 		message: message,
 		time: new Date().getTime(),
 		channel_id: channel_id
@@ -126,41 +146,44 @@ module.exports.send_message = (channel_id, message, author_id, broadcast) => {
 	return { success: true };
 }
 
+
+
 //Information inside UsersData and UsersChannels, which accumulates during server's session,
 //saves into UsersData.json and UsersChannels.json accordingly
 module.exports.save = () => {
-	if (UsersData.length > 0) {
-		fs.writeFileSync("./Data/UsersData.json", JSON.stringify(UsersData[0]));
-		fs.appendFileSync("./Data/UsersData.json", "\n");
-	}
-	for (let i = 1; i < UsersData.length; i++) {
-		fs.appendFileSync("./Data/UsersData.json", JSON.stringify(UsersData[i]));
-		if (i < UsersData.length - 1) fs.appendFileSync("./Data/UsersData.json", "\n");
-	}
-	if (UsersChannels.length > 0) {
-		fs.writeFileSync("./Data/UsersChannels.json", JSON.stringify(UsersChannels[0]));
-		fs.appendFileSync("./Data/UsersChannels.json", "\n");
-	}
-	for (let i = 1; i < UsersChannels.length; i++) {
-		fs.appendFileSync("./Data/UsersChannels.json", JSON.stringify(UsersChannels[i]));
-		if (i < UsersChannels.length - 1) fs.appendFileSync("./Data/UsersChannels.json", "\n");
-	}
+	// if (UsersData.length > 0) {
+	// 	fs.writeFileSync("./Data/UsersData.json", JSON.stringify(UsersData[0]));
+	// 	fs.appendFileSync("./Data/UsersData.json", "\n");
+	// }
+	// for (let i = 1; i < UsersData.length; i++) {
+	// 	fs.appendFileSync("./Data/UsersData.json", JSON.stringify(UsersData[i]));
+	// 	if (i < UsersData.length - 1) fs.appendFileSync("./Data/UsersData.json", "\n");
+	// }
+	// if (UsersChannels.length > 0) {
+	// 	fs.writeFileSync("./Data/UsersChannels.json", JSON.stringify(UsersChannels[0]));
+	// 	fs.appendFileSync("./Data/UsersChannels.json", "\n");
+	// }
+	// for (let i = 1; i < UsersChannels.length; i++) {
+	// 	fs.appendFileSync("./Data/UsersChannels.json", JSON.stringify(UsersChannels[i]));
+	// 	if (i < UsersChannels.length - 1) fs.appendFileSync("./Data/UsersChannels.json", "\n");
+	// }
 }
 
 //Loading information, that had been recording during previous server's sessions,
 //from UsersData.json and UsersChannels.json to UsersData and UsersChannels respectively
 module.exports.load = (callback) => {
-	let current = readline.createInterface({ input: fs.createReadStream("./Data/UsersData.json") });
-	current.on('line', (line) => {
-		if (line.length > 5) UsersData.push(JSON.parse(line));
-	});
-	current.on('close', () => {
-		let current_1 = readline.createInterface({ input: fs.createReadStream("./Data/UsersChannels.json") });
-		current_1.on('line', (line) => {
-			if (line.length > 5) UsersChannels.push(JSON.parse(line));
-		});
-		current_1.on('close', () => {
-			callback();
-		});
-	});
+	// let current = readline.createInterface({ input: fs.createReadStream("./Data/UsersData.json") });
+	// current.on('line', (line) => {
+	// 	if (line.length > 5) UsersData.push(JSON.parse(line));
+	// });
+	// current.on('close', () => {
+	// 	let current_1 = readline.createInterface({ input: fs.createReadStream("./Data/UsersChannels.json") });
+	// 	current_1.on('line', (line) => {
+	// 		if (line.length > 5) UsersChannels.push(JSON.parse(line));
+	// 	});
+	// 	current_1.on('close', () => {
+	// 		callback();
+	// 	});
+	// });
+	callback();
 }

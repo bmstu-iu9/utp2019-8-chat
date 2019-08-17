@@ -9,7 +9,8 @@ const https = require("https");
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const dbModulle = require("./modules/database");
+const authModule = require("./modules/auth");
+const dbModule = require("./modules/database");
 const chatModule = require("./modules/chat");
 
 
@@ -22,7 +23,7 @@ const defaultConfig = {
     "saving_interval": 60,
 
     "local_param": "azerty",
-    
+
     "use_https": false,
     "ssl_cert": "./crt.pem",
     "ssl_key": "./key.pem",
@@ -81,18 +82,18 @@ if (argv.version) {
 
 const config = loadConfig(argv.config);
 const app = express();
-const urlencodedParser = bodyParser.urlencoded({extended: false});
+const urlencodedParser = bodyParser.urlencoded({ extended: false });
 const httpsOptions = {
     key: fs.readFileSync(config.ssl_key),
     cert: fs.readFileSync(config.ssl_cert)
-}        
-const server = config.use_https ? https.createServer(httpsOptions, app) :http.createServer(app);
+}
+const server = config.use_https ? https.createServer(httpsOptions, app) : http.createServer(app);
 
 const getArgs = (request, response, args) => {
-    let res = {};
+    let req = {};
     for (let i in args) {
-        res[args[i]] = request.body[args[i]];
-        if (res[args[i]] === undefined) {
+        req[args[i]] = request.body[args[i]];
+        if (req[args[i]] === undefined) {
             response.status(200).send(JSON.stringify({
                 success: false,
                 err_code: 1,
@@ -101,117 +102,177 @@ const getArgs = (request, response, args) => {
             return undefined;
         }
     }
-    return res;
+    return req;
 }
 
 app.post("/api/register", urlencodedParser, (request, response) => {
     const args = ["login", "password"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_REGISTER_method");
+    let resp = authModule.register(req.login, req.password);
+    if (!resp.success) {
+        response.status(200).send(JSON.stringify(resp));
+        return;
+    }
+    dbModule.create_user(resp.id, req.login);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/auth", urlencodedParser, (request, response) => {
     const args = ["login", "password"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_AUTH_method");
+    let resp = authModule.auth(req.login, req.password);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/get_user", urlencodedParser, (request, response) => {
     const args = ["id"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_GET_USER_method");
+    let resp = dbModule.get_user(req.id);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/add_to_channel", urlencodedParser, (request, response) => {
     const args = ["token", "user_id", "channel_id"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_ADD_TO_CHANNEL_method");
+    let auth = authModule.getUser(req.token);
+    if (!auth.success) {
+        response.status(200).send(JSON.stringify(auth));
+        return;
+    }
+    //Permissions
+    let resp = dbModule.add_to_channel(req.user_id, req.channel_id);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/remove_from_channel", urlencodedParser, (request, response) => {
     const args = ["token", "user_id", "channel_id"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_REMOVE_FROM_CHANNEL_method");
+    let auth = authModule.getUser(req.token);
+    if (!auth.success) {
+        response.status(200).send(JSON.stringify(auth));
+        return;
+    }
+    //Permissionss
+    let resp = dbModule.remove_from_channel(req.user_id, req.channel_id);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/change_avatar", urlencodedParser, (request, response) => {
     const args = ["token", "user_id", "avatar"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_CHANGE_AVATAR_method");
+    let auth = authModule.getUser(req.token);
+    if (!auth.success) {
+        response.status(200).send(JSON.stringify(auth));
+        return;
+    }
+    //Permissionss
+    let resp = dbModule.change_avatar(req.user_id, req.avatar);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/change_meta", urlencodedParser, (request, response) => {
     const args = ["token", "user_id", "meta"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_CHANGE_META_method");
+    let auth = authModule.getUser(req.token);
+    if (!auth.success) {
+        response.status(200).send(JSON.stringify(auth));
+        return;
+    }
+    //Permissionss
+    // NOT IMPLEMENTED
+    // let resp = dbModule.(req.user_id, req.avatar);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/get_channel", urlencodedParser, (request, response) => {
     const args = ["id"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_GET_CHANNEL_method");
+    let resp = dbModule.get_channel(req.id);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/create_channel", urlencodedParser, (request, response) => {
     const args = ["token", "channel_name"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_CREATE_CHANNEL_method");
+    let auth = authModule.getUser(req.token);
+    if (!auth.success) {
+        response.status(200).send(JSON.stringify(auth));
+        return;
+    }
+    let resp = dbModule.create_channel(auth.userID, req.channel_name);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/delete_channel", urlencodedParser, (request, response) => {
     const args = ["token", "channel_id"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_DELETE_CHANNEL_method");
+    let auth = authModule.getUser(req.token);
+    if (!auth.success) {
+        response.status(200).send(JSON.stringify(auth));
+        return;
+    }
+    //Permissions
+    let resp = dbModule.channels_delete(req.channel_id);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/get_messages", urlencodedParser, (request, response) => {
     const args = ["token", "channel_id", "offset", "count"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_GET_NESSAGES_method");
+    let auth = authModule.getUser(req.token);
+    if (!auth.success) {
+        response.status(200).send(JSON.stringify(auth));
+        return;
+    }
+    //Permissions
+    let resp = dbModule.chat_history(req.channel_id, req.offset, req.count);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/send_message", urlencodedParser, (request, response) => {
     const args = ["token", "channel_id", "message"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
+    let req = getArgs(request, response, args);
+    if (req === undefined)
         return;
-    response.status(200).send("test_SEND_MESSAGE_method");
+    let auth = authModule.getUser(req.token);
+    if (!auth.success) {
+        response.status(200).send(JSON.stringify(auth));
+        return;
+    }
+    //Permissions
+    let resp = dbModule.send_message(req.channel_id, req.message, auth.userID, chatModule.broadcast);
+    response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/listen", urlencodedParser, (request, response) => {
-    // const args = ["token", "channel_id", "last_msg"];
-    // let res = getArgs(request, response, args);
-    // if (res === undefined)
-    //     return;
-    // chatModule.addListener(res.channel_id, response, res.last_msg);
-    // //Here should be no response for the request
-    response.status(405).send("Deprecated");
+    response.status(405).send("{deprecated:true}");
 });
 
 app.post("/api/public_cipher", urlencodedParser, (request, response) => {
-    response.status(200).send("test_PUBLIC_CIPHER_method");
+    let resp = {};
+    response.status(200).send(JSON.stringify(resp));
 });
 
 
@@ -231,8 +292,8 @@ app.post("*", (request, response) => {
 });
 
 
-chatModule.init(server);
-dbModulle.load(() => {
+chatModule.init(server, authModule);
+dbModule.load(() => {
     console.log("Data loaded");
     const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
     server.listen(port, () => {
@@ -245,7 +306,7 @@ let saverId = undefined; //Id of the saving timer
 if (config.saving_interval >= 0) {
     saverId = setInterval(() => {
         console.log("Saving data...");
-        dbModulle.save();
+        dbModule.save();
         console.log("Data saved");
     }, config.saving_interval * 1000);
 }
@@ -256,7 +317,7 @@ process.once("SIGINT", (c) => { //Saving before exit
     if (saverId !== undefined)
         clearInterval(saverId);
     console.log("Saving data before app closing...");
-    dbModulle.save();
+    dbModule.save();
     console.log("Data saved");
     process.exit(0);
 });

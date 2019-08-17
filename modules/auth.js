@@ -18,7 +18,7 @@ module.exports.register = (login, password) => {
         id: data.length + 1,
         hash: crypto.createHash("sha512").update(password).digest("base64")
     });
-    return { success: true };
+    return { success: true, id: data.length };
 }
 
 module.exports.auth = (login, password) => {

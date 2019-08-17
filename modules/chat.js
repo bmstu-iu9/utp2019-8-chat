@@ -5,13 +5,14 @@ const ws = require("ws");
 const PING_INTERVAL = 30; //In seconds
 const WS_PATH = "/chatSocket"
 
+let auth;
 let wss;
 let ids = 1;
 let aliveCheckerId = undefined;
 
 module.exports.broadcast = (channel_id, msg) => {
     wss.clients.forEach((e) => {
-        if (e.readyState === ws.OPEN && e.channel_id === channel_id) {
+        if (e.readyState === ws.OPEN && e.channel_id == channel_id) {
             e.send(JSON.stringify({
                 success: true,
                 type: "new_message",
@@ -21,7 +22,8 @@ module.exports.broadcast = (channel_id, msg) => {
     })
 }
 
-module.exports.init = (server) => {
+module.exports.init = (server, authModule) => {
+    auth = authModule;
     wss = new ws.Server({ 
         server, 
         path: WS_PATH
