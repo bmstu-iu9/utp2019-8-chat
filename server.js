@@ -74,7 +74,7 @@ if (argv.help) {
     process.exit(0);
 }
 if (argv.version) {
-    console.log(VERSION); //TODO
+    console.log(VERSION);
     process.exit(0);
 }
 
