@@ -90,9 +90,9 @@ module.exports.create_channel = (user_id, channel_name) => {
 		listeners_ids: { user_id },
 		last_message_id: undefined,
 		last_message_time: undefined,
-		messages: []
 	};
 	UsersChannels.push(newChannel);
+	messages[newChannel.id] = [];
 	return { success: true };
 }
 
@@ -120,13 +120,16 @@ module.exports.chat_history = (channel_id, offset, count) => {
 	}
 	let start = 0;
 	let end = 0;
-	let len = UsersChannels[channel_id].messages.length;
+	let len = messages[channel_id].length;
 	if (offset < len) {
 		end = len - offset;
 		if (offset + count < len)
 			start = len - offset - count;
 	}
-	return { success: true, count: end - start, messages: UsersChannels[channel_id].messages.slice(start, end) };
+	return { 
+		success: true,
+		count: end - start, 
+		messages: messages[channel_id].slice(start, end) };
 }
 
 module.exports.send_message = (channel_id, message, author_id, broadcast) => {
@@ -134,14 +137,14 @@ module.exports.send_message = (channel_id, message, author_id, broadcast) => {
 		return { success: false, err_code: 7, err_cause: "channel doesn't exist" };
 	}
 	let newMsg = {
-		message_id: UsersChannels[channel_id].messages.length,
+		message_id: messages[channel_id].length,
 		author_id: author_id,
 		author_name: this.get_user(author_id).user.nickname,
 		message: message,
 		time: new Date().getTime(),
 		channel_id: channel_id
 	};
-	UsersChannels[channel_id].messages.push(newMsg);
+	messages[channel_id].push(newMsg);
 	broadcast(channel_id, newMsg);
 	return { success: true };
 }
