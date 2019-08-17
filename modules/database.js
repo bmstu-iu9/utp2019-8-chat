@@ -157,6 +157,13 @@ module.exports.send_message = (channel_id, message, author_id, broadcast) => {
 module.exports.save = (callback) => {
 	fs.writeFile("./Data/users.json", JSON.stringify(UsersData), {}, (err) => {
 		fs.writeFile("./Data/channels.json", JSON.stringify(UsersChannels), (err) => {
+			for (let i in UsersChannels) {
+				if (UsersChannels[i]) {
+					fs.writeFileSync(
+						`./Data/messages/${UsersChannels[i].id}.json`, 
+						JSON.stringify(messages[UsersChannels[i].id]));
+				}
+			}
 			callback();
 		});
 	});
@@ -178,8 +185,14 @@ module.exports.load = (callback) => {
 			}
 			UsersChannels = JSON.parse(raw);
 			for (let i in UsersChannels) {
-				if (UsersChannels[i] != null) {
-					messages[UsersChannels[i].id] = [];
+				if (UsersChannels[i]) {
+					let raw = fs.readFileSync(`./Data/messages/${UsersChannels[i].id}.json`);
+					if (raw.length === 0) {
+						messages[UsersChannels[i].id] = [];
+					}
+					else {
+						messages[UsersChannels[i].id] = JSON.parse(raw);
+					}
 				}
 			}
 			callback();
