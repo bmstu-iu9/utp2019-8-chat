@@ -18,49 +18,52 @@ const addMessage = (author, text) => { //Add message to chat-flow zone
             `<div class="name">${author}</div>` + 
             `<div class="msg">${text}</div>` + 
         `</div>`;
-    document.getElementById("chat_flow").scrollTop = 9999;
+    chatFlow.scrollTop = 9999;
 }
 
-const encodeMessage = (str) => { //Replace special charasters to codes
-    return str.
-        replace(/\$/g, "%24").
-        replace(/\&/g, "%26").
-        replace(/\+/g, "%2b").
-        replace(/\,/g, "%2c").
-        replace(/\//g, "%2f").
-        replace(/\:/g, "%3a").
-        replace(/\;/g, "%3b").
-        replace(/\=/g, "%3d").
-        replace(/\?/g, "%3f").
-        replace(/\@/g, "%40");
-}
+let socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
+
+socket.onopen = (e) => {
+    console.log("Web socket connected");
+    socket.send(JSON.stringify({
+        type: "set_channel",
+        channel_id: 1
+    }));
+};
+
+socket.onmessage = (event) => {
+    let resp = JSON.parse(event.data);
+    if (resp.success && resp.type === "new_message") {
+        addMessage(resp.data.author_name, resp.data.message);
+    }
+    else {
+        console.log(resp);
+    }
+};
+
+socket.onclose = (event) => {
+    if (event.wasClean) {
+        console.log(`Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
+    } else {
+        console.log('Соединение прервано');
+    }
+};
+
+socket.onerror = (error) =>  {
+  alert(`[error] ${error.message}`);
+};
 
 const sendMessage = () => {
     if (msgTextbox.value == "")
         return;
     let msg = msgTextbox.value;
-    let xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = () => {
-        if (xhr.readyState != 4) 
-            return;
-        if (xhr.status == 200) { //Ok
-        }
-        else if (xhr.status == 401) { //Unauthorized
-            msgTextbox.value = msg;
-            alert("Unauthorized");
-        }
-        else if (xhr.status == 403) { //Forbiden
-            msgTextbox.value = msg;
-            alert("Forbiden");
-        }
-        else {
-            msgTextbox.value = msg;
-            alert("Something weird happened");
-        }
-    }
-    xhr.open('POST', '/api/send_message', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.send(`channel_id=1&author_name=${_username}&message=${encodeMessage(msg)}`);
+    socket.send(JSON.stringify({
+        type: "send_message",
+        token: "saddaad",
+        channel_id: 1,
+        author_name: _username, //TEMPORARY
+        message: msg
+    }));
     msgTextbox.value = "";
 }
 
@@ -69,25 +72,3 @@ msgTextbox.addEventListener("keyup", (sender) => {
     if (sender.key == "Enter")
         sendMessage();
 });
-
-var lastMsg = 0;
-
-const subscribe = (url) => {
-let xhr = new XMLHttpRequest();
-xhr.onreadystatechange = () => {
-    if (xhr.readyState != 4) 
-        return;
-    if (xhr.status == 200) {
-        let response = JSON.parse(xhr.responseText);
-        lastMsg = response.id;
-        addMessage(response.message.author_name, response.message.message);
-    } else {
-        console.log(JSON.parse(xhr));
-    }
-    subscribe(url);
-}
-xhr.open("POST", url, true);
-xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-xhr.send(`channel_id=1&last_msg=${lastMsg}`);
-}
-subscribe("/api/listen")

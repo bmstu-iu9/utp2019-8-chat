@@ -3,7 +3,9 @@
 
 const fs = require("fs");
 const process = require("process");
-const minimist = require('minimist');
+const minimist = require("minimist");
+const http = require("http");
+const https = require("https");
 const express = require("express");
 const bodyParser = require("body-parser");
 
@@ -15,8 +17,15 @@ const VERSION = "v1.0.0";
 const CONFIG_PATH = "./config.json";
 
 const defaultConfig = {
-    "default_port": 3000,
+    "http_port": 80,
+    "https_port": 433,
     "saving_interval": 60,
+
+    "local_param": "azerty",
+    
+    "use_https": false,
+    "ssl_cert": "./crt.pem",
+    "ssl_key": "./key.pem",
 
     "mysql_host": "remotemysql.com",
     "mysql_user": "9SpT1uQOyM",
@@ -73,7 +82,11 @@ if (argv.version) {
 const config = loadConfig(argv.config);
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({extended: false});
-
+const httpsOptions = {
+    key: fs.readFileSync(config.ssl_key),
+    cert: fs.readFileSync(config.ssl_cert)
+}        
+const server = config.use_https ? https.createServer(httpsOptions, app) :http.createServer(app);
 
 const getArgs = (request, response, args) => {
     let res = {};
@@ -188,12 +201,13 @@ app.post("/api/send_message", urlencodedParser, (request, response) => {
 });
 
 app.post("/api/listen", urlencodedParser, (request, response) => {
-    const args = ["token", "channel_id", "last_msg"];
-    let res = getArgs(request, response, args);
-    if (res === undefined)
-        return;
-    chatModule.addListener(res.channel_id, response, res.last_msg);
-    //Here should be no response for the request
+    // const args = ["token", "channel_id", "last_msg"];
+    // let res = getArgs(request, response, args);
+    // if (res === undefined)
+    //     return;
+    // chatModule.addListener(res.channel_id, response, res.last_msg);
+    // //Here should be no response for the request
+    response.status(405).send("Deprecated");
 });
 
 app.post("/api/public_cipher", urlencodedParser, (request, response) => {
@@ -217,11 +231,13 @@ app.post("*", (request, response) => {
 });
 
 
+chatModule.init(server);
 dbModulle.load(() => {
     console.log("Data loaded");
-    const port = argv.port === undefined ? config.default_port : argv.port;
-    app.listen(port);
-    console.log(`Server started on ${port} port`);
+    const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
+    server.listen(port, () => {
+        console.log(`Server started on ${port} port using ${config.use_https ? "HTTPS" : "HTTP"}`);
+    });
 });
 
 
@@ -235,6 +251,7 @@ if (config.saving_interval >= 0) {
 }
 
 process.once("SIGINT", (c) => { //Saving before exit
+    chatModule.stop();
     app.disable();
     if (saverId !== undefined)
         clearInterval(saverId);
