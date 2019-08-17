@@ -3,15 +3,6 @@
 const msgTextbox = document.getElementById("input_msg");
 const chatFlow = document.getElementById("chat_flow");
 
-// TEMPORARY
-var _username = prompt("Enter nickname");
-if (!_username) {
-    let _names = ["Alice", "Bob", "Charlie", "Jack", "Jacob", "Mike"];
-    _username = _names[Math.floor(Math.random() * (_names.length - 1))];
-}
-// END TEMPORARY
-
-
 const getCookie = (name) => {
     let matches = document.cookie.match(new RegExp(
         "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
@@ -93,7 +84,6 @@ const sendMessage = () => {
         type: "send_message",
         token: getCookie("accessToken"),
         channel_id: 1,
-        author_name: _username, //TEMPORARY
         message: msg
     }));
     msgTextbox.value = "";

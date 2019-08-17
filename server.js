@@ -295,9 +295,12 @@ app.post("*", (request, response) => {
 chatModule.init(server, authModule, dbModule);
 dbModule.load(() => {
     console.log("Data loaded");
-    const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
-    server.listen(port, () => {
-        console.log(`Server started on ${port} port using ${config.use_https ? "HTTPS" : "HTTP"}`);
+    authModule.load(() => {
+        console.log("Auth loaded");
+        const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
+        server.listen(port, () => {
+            console.log(`Server started on ${port} port using ${config.use_https ? "HTTPS" : "HTTP"}`);
+        });
     });
 });
 
@@ -305,9 +308,12 @@ dbModule.load(() => {
 let saverId = undefined; //Id of the saving timer
 if (config.saving_interval >= 0) {
     saverId = setInterval(() => {
-        console.log("Saving data...");
-        dbModule.save();
-        console.log("Data saved");
+        dbModule.save(() => {
+            console.log("Data saved");
+            authModule.save(() => {
+                console.log("Auth saved");
+            });
+        });
     }, config.saving_interval * 1000);
 }
 
@@ -317,7 +323,11 @@ process.once("SIGINT", (c) => { //Saving before exit
     if (saverId !== undefined)
         clearInterval(saverId);
     console.log("Saving data before app closing...");
-    dbModule.save();
-    console.log("Data saved");
-    process.exit(0);
+    dbModule.save(() => {
+        console.log("Data saved");
+        authModule.save(() => {
+            console.log("Auth saved");
+            process.exit(0);
+        });
+    });
 });

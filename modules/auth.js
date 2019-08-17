@@ -1,5 +1,6 @@
 'use-strict'
 
+const fs = require("fs");
 const crypto = require("crypto");
 
 const MAX_SESSION_TIME = 180; //In minutes
@@ -55,11 +56,19 @@ module.exports.getUser = (token) => {
     return { success: true, userID: sessions[token].id };
 }
 
-
-module.exports.load = () => {
-
+module.exports.save = (callback) => {
+    fs.writeFile("./Data/auth.json", JSON.stringify(data), {}, (err) => {
+        callback();
+    });
 }
 
-module.exports.save = () => {
-
+module.exports.load = (callback) => {
+    fs.readFile("./Data/auth.json", (err, raw) => {
+        if (raw.length === 0) {
+            callback();
+            return;
+        }
+        data = JSON.parse(raw);
+        callback();
+    });
 }
