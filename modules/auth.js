@@ -2,7 +2,10 @@
 
 const crypto = require("crypto");
 
-data = [];
+const MAX_SESSION_TIME = 180; //In minutes
+
+let data = [];
+let sessions = [];
 
 module.exports.register = (login, password) => {
     if (typeof(login) !== "string" || typeof(password) !== "string") {
@@ -23,7 +26,7 @@ module.exports.register = (login, password) => {
     }
     data.push({
         login: login, 
-        id: data.length, 
+        id: data.length + 1, 
         hash: crypto.createHash("sha512").update(password).digest("base64")
     });
     return { success: true };
@@ -43,12 +46,13 @@ module.exports.auth = (login, password) => {
             current = data[i];
             break;
         }
-        if (i === data.length - 1) 
-            return {
-                success: false, 
-                err_code: 7,
-                err_cause: "user doesn't exist"
-            };
+    }
+    if (current === undefined) {
+        return {
+            success: false, 
+            err_code: 7,
+            err_cause: "user doesn't exist"
+        };
     }
     if (current.hash !== crypto.createHash("sha512").update(password).digest("base64")) {
         return {
@@ -57,11 +61,37 @@ module.exports.auth = (login, password) => {
             err_cause: "wrong password"
         };
     }
+    let sessionKey = crypto.randomBytes(64).toString("base64");
+    sessions[sessionKey] = {
+        token: sessionKey,
+        id: current.id,
+        lastUpdate: new Date().getTime()
+    };
     return {
         success: true, 
-        token: crypto.randomBytes(64).toString("base64")
+        token: sessionKey
     };
 }
+
+module.exports.getUser = (token) => {
+    if (sessions[token] === undefined) {
+        return {
+            success: false,
+            err_code: 5,
+            err_cause: "Wrong access token. Try to authorize again."
+        };
+    }
+    if (new Date().getTime() - sessions[token].lastUpdate > MAX_SESSION_TIME * 60000) {
+        return {
+            success: false,
+            err_code: 5,
+            err_cause: "Access token expired. Try to authorize again."
+        };
+    }
+    sessions[token].lastUpdate = new Date().getTime();
+    return sessions[token].id;
+}
+
 
 module.exports.load = () => {
 
