@@ -85,7 +85,7 @@ if (argv.version) {
 const config = loadConfig(argv.config);
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
-const httpsOptions = { key: fs.readFileSync(config.ssl_key), cert: fs.readFileSync(config.ssl_cert) }
+const httpsOptions = { key: fs.readFileSync(config.ssl_key), cert: fs.readFileSync(config.ssl_cert) } //TODO
 const server = config.use_https ? https.createServer(httpsOptions, app) : http.createServer(app);
 
 const getArgs = (request, response, args) => {
