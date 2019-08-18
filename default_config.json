@@ -3,7 +3,7 @@
     "https_port": 443,
     "saving_interval": 60,
 
-    "local_param": "azerty",
+    "local_param": "aMxERijPY8g13op/pnz/kmnaaxZ6KHyaYDxjDZMGRYYV3gTkY7rvUWYzgu5YJIjExmXSzYDtMOcgCQArH4ZKEA==",
     
     "use_https": false,
     "ssl_cert": "./ssl/crt.pem",

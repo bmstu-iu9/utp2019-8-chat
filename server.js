@@ -22,7 +22,7 @@ const defaultConfig = {
     "https_port": 433,
     "saving_interval": 60,
 
-    "local_param": "azerty",
+    "local_param": "aMxERijPY8g13op/pnz/kmnaaxZ6KHyaYDxjDZMGRYYV3gTkY7rvUWYzgu5YJIjExmXSzYDtMOcgCQArH4ZKEA==",
 
     "use_https": false,
     "ssl_cert": "./crt.pem",
@@ -281,12 +281,12 @@ app.post("/api/get_messages", urlencodedParser, (request, response) => {
     if (req === undefined)
         return;
     let auth = authModule.getUser(req.token);
-    let channel = dbModule.get_channel(req.channel_id);
+    let channel = dbModule.get_channel(+req.channel_id);
     if (!channel.success) {
         let resp = { success: false, err_code: 3, err_cause: "Channel does not exist" };
         response.status(200).send(JSON.stringify(resp));
     }
-    if (!auth.success) {
+    else if (!auth.success) {
         if (channel.channel.meta.public) {
             let resp = dbModule.chat_history(req.channel_id, req.offset, req.count);
             response.status(200).send(JSON.stringify(resp));
@@ -355,6 +355,7 @@ app.post("*", (request, response) => {
 });
 
 
+authModule.init(config.local_param);
 chatModule.init(server, authModule, dbModule);
 dbModule.load(() => {
     console.log("Data loaded");

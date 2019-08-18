@@ -8,6 +8,12 @@ const MAX_SESSION_TIME = 180; //In minutes
 let data = [];
 let sessions = [];
 
+let localParam;
+
+module.exports.init = (local_param) => {
+    localParam = local_param;
+}
+
 module.exports.register = (login, password) => {
     for (let i = 0; i < data.length; i++) {
         if (data[i].login === login) {
@@ -18,7 +24,7 @@ module.exports.register = (login, password) => {
     data.push({
         login: login,
         id: data.length + 1,
-        hash: crypto.createHash("sha512").update(salt + password + salt).digest("base64"),
+        hash: crypto.createHash("sha512").update(localParam + salt + password + salt + localParam).digest("base64"),
         salt: salt
     });
     return { success: true, id: data.length };
@@ -35,7 +41,7 @@ module.exports.auth = (login, password) => {
     if (user === undefined) {
         return { success: false, err_code: 7, err_cause: "user doesn't exist" };
     }
-    const curHash = crypto.createHash("sha512").update(user.salt + password + user.salt).digest("base64");
+    const curHash = crypto.createHash("sha512").update(localParam + user.salt + password + user.salt + localParam).digest("base64");
     if (!crypto.timingSafeEqual(Buffer.from(user.hash), Buffer.from(curHash))) {
         return { success: false, err_code: 4, err_cause: "wrong password" };
     }
