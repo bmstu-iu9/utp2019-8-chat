@@ -1,1 +1,1 @@
-[false,{"id":1,"name":"Brn","owner_id":1,"listeners_ids":[1,2],"meta":{"public":true}},{"id":2,"name":"Secret","owner_id":1,"listeners_ids":[1],"meta":{}}]
+[false,{"id":1,"name":"Brn","owner_id":1,"listeners_ids":[1,false],"meta":{"public":true}},{"id":2,"name":"Secret","owner_id":1,"listeners_ids":[1],"meta":{}}]
