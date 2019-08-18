@@ -3,6 +3,8 @@
 const fs = require("fs");
 const crypto = require("crypto");
 
+const PBKDF2_ITERATIONS = 100000;
+const PBKDF2_LENGTH = 64; //In bytes
 const MAX_SESSION_TIME = 180; //In minutes
 
 let data = [];
@@ -21,10 +23,12 @@ module.exports.register = (login, password) => {
         }
     }
     const salt = crypto.randomBytes(32).toString("base64");
+    const pwdHash = crypto.pbkdf2Sync(password, salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
     data.push({
         login: login,
         id: data.length + 1,
-        hash: crypto.createHash("sha512").update(localParam + salt + password + salt + localParam).digest("base64"),
+        // hash: crypto.createHash("sha512").update(password + salt).digest("base64"),
+        hash: pwdHash.toString('base64'),
         salt: salt
     });
     return { success: true, id: data.length };
@@ -41,8 +45,9 @@ module.exports.auth = (login, password) => {
     if (user === undefined) {
         return { success: false, err_code: 7, err_cause: "user doesn't exist" };
     }
-    const curHash = crypto.createHash("sha512").update(localParam + user.salt + password + user.salt + localParam).digest("base64");
-    if (!crypto.timingSafeEqual(Buffer.from(user.hash), Buffer.from(curHash))) {
+    // const curHash = crypto.createHash("sha512").update(password + user.salt + localParam).digest("base64");
+    const curHash = crypto.pbkdf2Sync(password, user.salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
+    if (!crypto.timingSafeEqual(Buffer.from(user.hash, "base64"), curHash)) {
         return { success: false, err_code: 4, err_cause: "wrong password" };
     }
     let sessionKey = crypto.randomBytes(64).toString("base64");

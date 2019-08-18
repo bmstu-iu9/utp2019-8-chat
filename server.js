@@ -22,7 +22,7 @@ const defaultConfig = {
     "https_port": 433,
     "saving_interval": 60,
 
-    "local_param": "aMxERijPY8g13op/pnz/kmnaaxZ6KHyaYDxjDZMGRYYV3gTkY7rvUWYzgu5YJIjExmXSzYDtMOcgCQArH4ZKEA==",
+    "local_param": "HOImvA9jBnyU36uuex2QNIhtRoOPnpr5Bv+S65Qb8CE=",
 
     "use_https": false,
     "ssl_cert": "./crt.pem",
