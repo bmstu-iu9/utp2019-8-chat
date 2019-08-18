@@ -13,10 +13,10 @@ const authModule = require("./modules/auth");
 const dbModule = require("./modules/database");
 const chatModule = require("./modules/chat");
 
-
 const VERSION = "v1.0.0";
 const CONFIG_PATH = "./config.json";
 
+//#region config
 const defaultConfig = {
     "http_port": 80,
     "https_port": 433,
@@ -54,7 +54,9 @@ const loadConfig = (path) => {
     }
     return config;
 }
+//#endregion
 
+//#region command_line
 const argv = minimist(process.argv.slice(2), {
     alias: {
         'h': 'help',
@@ -78,15 +80,12 @@ if (argv.version) {
     console.log(VERSION);
     process.exit(0);
 }
-
+//#endregion
 
 const config = loadConfig(argv.config);
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
-const httpsOptions = {
-    key: fs.readFileSync(config.ssl_key),
-    cert: fs.readFileSync(config.ssl_cert)
-}
+const httpsOptions = { key: fs.readFileSync(config.ssl_key), cert: fs.readFileSync(config.ssl_cert) } //TODO
 const server = config.use_https ? https.createServer(httpsOptions, app) : http.createServer(app);
 
 const getArgs = (request, response, args) => {
@@ -110,7 +109,7 @@ app.post("/api/register", urlencodedParser, (request, response) => {
     let req = getArgs(request, response, args);
     if (req === undefined)
         return;
-    let resp = authModule.register(req.login, req.password);
+    let resp = authModule.register(req.login, req.password); //TODO: validate
     if (!resp.success) {
         response.status(200).send(JSON.stringify(resp));
         return;
@@ -147,9 +146,15 @@ app.post("/api/add_to_channel", urlencodedParser, (request, response) => {
         response.status(200).send(JSON.stringify(auth));
         return;
     }
-    //Permissions
-    let resp = dbModule.add_to_channel(req.user_id, req.channel_id);
-    response.status(200).send(JSON.stringify(resp));
+    let user = dbModule.get_user(auth.userID).user;
+    if (user.permissions & 1 !== 0 || user.id === +req.user_id) {
+        let resp = dbModule.add_to_channel(req.user_id, req.channel_id);
+        response.status(200).send(JSON.stringify(resp));
+    }
+    else {
+        let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+        response.status(200).send(JSON.stringify(resp));
+    }
 });
 
 app.post("/api/remove_from_channel", urlencodedParser, (request, response) => {
@@ -162,9 +167,15 @@ app.post("/api/remove_from_channel", urlencodedParser, (request, response) => {
         response.status(200).send(JSON.stringify(auth));
         return;
     }
-    //Permissionss
-    let resp = dbModule.remove_from_channel(req.user_id, req.channel_id);
-    response.status(200).send(JSON.stringify(resp));
+    let user = dbModule.get_user(auth.userID).user;
+    if (user.permissions & 1 !== 0 || user.id === +req.user_id) {
+        let resp = dbModule.remove_from_channel(req.user_id, req.channel_id);
+        response.status(200).send(JSON.stringify(resp));
+    }
+    else {
+        let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+        response.status(200).send(JSON.stringify(resp));
+    }
 });
 
 app.post("/api/change_avatar", urlencodedParser, (request, response) => {
@@ -177,9 +188,15 @@ app.post("/api/change_avatar", urlencodedParser, (request, response) => {
         response.status(200).send(JSON.stringify(auth));
         return;
     }
-    //Permissionss
-    let resp = dbModule.change_avatar(req.user_id, req.avatar);
-    response.status(200).send(JSON.stringify(resp));
+    let user = dbModule.get_user(auth.userID).user;
+    if (user.permissions & 1 !== 0 || user.id === +req.user_id) {
+        let resp = dbModule.change_avatar(req.user_id, req.avatar);
+        response.status(200).send(JSON.stringify(resp));
+    }
+    else {
+        let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+        response.status(200).send(JSON.stringify(resp));
+    }
 });
 
 app.post("/api/change_meta", urlencodedParser, (request, response) => {
@@ -192,10 +209,17 @@ app.post("/api/change_meta", urlencodedParser, (request, response) => {
         response.status(200).send(JSON.stringify(auth));
         return;
     }
-    //Permissionss
-    // NOT IMPLEMENTED
-    // let resp = dbModule.(req.user_id, req.avatar);
-    response.status(200).send(JSON.stringify(resp));
+    let user = dbModule.get_user(auth.userID).user;
+    if (user.permissions & 1 !== 0 || user.id === +req.user_id) {
+        // NOT IMPLEMENTED
+        // let resp = dbModule.(req.user_id, req.avatar);
+        // response.status(200).send(JSON.stringify(resp));
+        response.status(200).send(JSON.stringify({ not_implemented: true }));
+    }
+    else {
+        let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+        response.status(200).send(JSON.stringify(resp));
+    }
 });
 
 app.post("/api/get_channel", urlencodedParser, (request, response) => {
@@ -231,9 +255,22 @@ app.post("/api/delete_channel", urlencodedParser, (request, response) => {
         response.status(200).send(JSON.stringify(auth));
         return;
     }
-    //Permissions
-    let resp = dbModule.channels_delete(req.channel_id);
-    response.status(200).send(JSON.stringify(resp));
+    let user = dbModule.get_user(auth.userID).user;
+    let channel = dbModule.get_channel(req.channel_id).channel;
+    if (channel === undefined) {
+        let resp = { success: false, err_code: 3, err_cause: "Channel does not exist" };
+        response.status(200).send(JSON.stringify(resp));
+    }
+    else if (user.permissions & 1 !== 0 || user.id === channel.channel.owner_id) {
+        let resp = dbModule.channels_delete(req.channel_id);
+        response.status(200).send(JSON.stringify(resp));
+    }
+    else {
+        let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+        response.status(200).send(JSON.stringify(resp));
+    }
+    // let resp = dbModule.channels_delete(req.channel_id);
+    // response.status(200).send(JSON.stringify(resp));
 });
 
 app.post("/api/get_messages", urlencodedParser, (request, response) => {
@@ -241,17 +278,32 @@ app.post("/api/get_messages", urlencodedParser, (request, response) => {
     let req = getArgs(request, response, args);
     if (req === undefined)
         return;
-    let channel = dbModule.get_channel(req.channel_id);
     let auth = authModule.getUser(req.token);
+    let channel = dbModule.get_channel(req.channel_id);
+    if (!channel.success) {
+        let resp = { success: false, err_code: 3, err_cause: "Channel does not exist" };
+        response.status(200).send(JSON.stringify(resp));
+    }
     if (!auth.success) {
-        if (!(channel.success && channel.channel.meta.public)) {
+        if (channel.channel.meta.public) {
+            let resp = dbModule.chat_history(req.channel_id, req.offset, req.count);
+            response.status(200).send(JSON.stringify(resp));
+        }
+        else {
             response.status(200).send(JSON.stringify(auth));
-            return;
         }
     }
-    //Permissions
-    let resp = dbModule.chat_history(req.channel_id, req.offset, req.count);
-    response.status(200).send(JSON.stringify(resp));
+    else {
+        let user = dbModule.get_user(auth.userID).user;
+        if (user.permissions & 1 !== 0 || channel.channel.meta.public || user.channels.includes(+req.channel_id)) {
+            let resp = dbModule.chat_history(req.channel_id, req.offset, req.count);
+            response.status(200).send(JSON.stringify(resp));
+        }
+        else {
+            let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+            response.status(200).send(JSON.stringify(resp));
+        }
+    }
 });
 
 app.post("/api/send_message", urlencodedParser, (request, response) => {
@@ -264,9 +316,15 @@ app.post("/api/send_message", urlencodedParser, (request, response) => {
         response.status(200).send(JSON.stringify(auth));
         return;
     }
-    //Permissions
-    let resp = dbModule.send_message(req.channel_id, req.message, auth.userID, chatModule.broadcast);
-    response.status(200).send(JSON.stringify(resp));
+    let user = dbModule.get_user(auth.userID).user;
+    if (user.permissions & 1 !== 0 || user.channels.includes(+req.channel_id)) {
+        let resp = dbModule.send_message(req.channel_id, req.message, auth.userID, chatModule.broadcast);
+        response.status(200).send(JSON.stringify(resp));
+    }
+    else {
+        let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+        response.status(200).send(JSON.stringify(resp));
+    }
 });
 
 app.post("/api/listen", urlencodedParser, (request, response) => {

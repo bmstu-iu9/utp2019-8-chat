@@ -38,42 +38,48 @@ if (getCookie("accessToken") === undefined) {
 }
 
 const sendRequest = (dest, params, callback) => {
-	const encodeMessage = (str) => { //Replace special charasters to codes
-		return str.toString().
-			replace(/\$/g, "%24").
-			replace(/\&/g, "%26").
-			replace(/\+/g, "%2b").
-			replace(/\,/g, "%2c").
-			replace(/\//g, "%2f").
-			replace(/\:/g, "%3a").
-			replace(/\;/g, "%3b").
-			replace(/\=/g, "%3d").
-			replace(/\?/g, "%3f").
-			replace(/\@/g, "%40");
-	}
-	let xhr = new XMLHttpRequest();
+    const encodeMessage = (str) => { //Replace special charasters to codes
+        return str.toString().
+            replace(/\$/g, "%24").
+            replace(/\&/g, "%26").
+            replace(/\+/g, "%2b").
+            replace(/\,/g, "%2c").
+            replace(/\//g, "%2f").
+            replace(/\:/g, "%3a").
+            replace(/\;/g, "%3b").
+            replace(/\=/g, "%3d").
+            replace(/\?/g, "%3f").
+            replace(/\@/g, "%40");
+    }
+    let xhr = new XMLHttpRequest();
     xhr.onreadystatechange = () => {
-        if (xhr.readyState != 4) 
+        if (xhr.readyState != 4)
             return;
-		callback(xhr.responseText, xhr.status);
+        callback(xhr.responseText, xhr.status);
     }
     xhr.open('POST', dest, true);
-	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-	let paramStr = [];
-	for (let key in params) {
-		paramStr.push(`${key}=${encodeMessage(params[key])}`);
-	}
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    let paramStr = [];
+    for (let key in params) {
+        paramStr.push(`${key}=${encodeMessage(params[key])}`);
+    }
     xhr.send(paramStr.join('&'));
     return dest + "\n" + paramStr;
 }
 
-const addMessage = (author, text) => { //Add message to chat-flow zone
+const addMessage = (author, text, time) => { //Add message to chat-flow zone
+    let d = new Date(time);
     chatFlow.innerHTML +=
-        `<div class="msg_box">` +
-        `<div class="msg_icon"></div>` +
-        `<div class="name">${author}</div>` +
-        `<div class="msg">${text}</div>` +
-        `</div>`;
+        `<div class="msg_box">
+            <div class="msg_info_zone">
+                <div class="msg_icon"></div>            
+            </div>
+            <div class="msg_message_zone">
+                <div class="name">${author}</div>
+                <div class="msg_time">${d.getHours()}:${d.getMinutes()}</div>
+                <div class="msg">${text}</div>
+            </div>
+        </div>`
     chatFlow.scrollTop = 9999;
 }
 
@@ -87,7 +93,7 @@ sendRequest("/api/get_messages", {
     if (response.success) {
         for (let i = 0; i < response.count; i++) {
             let cur = response.messages[i];
-            addMessage(cur.author_name, cur.message);
+            addMessage(cur.author_name, cur.message, cur.time);
         }
     }
     else {
@@ -110,7 +116,7 @@ socket.onopen = (e) => {
 socket.onmessage = (event) => {
     let resp = JSON.parse(event.data);
     if (resp.success && resp.type === "new_message") {
-        addMessage(resp.data.author_name, resp.data.message);
+        addMessage(resp.data.author_name, resp.data.message, resp.data.time);
     }
     else {
         console.log(resp);
