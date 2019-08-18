@@ -44,8 +44,8 @@ module.exports.add_to_channel = (user_id, channel_id) => {
 	if (UsersChannels[channel_id] === undefined) {
 		return { success: false, err_code: 7, err_cause: "channel doesn't exist" };
 	}
-	UsersData[user_id].channels.push(channel_id);
-	UsersChannels[channel_id].listeners_ids.push(user_id);
+	UsersData[user_id].channels.push(+channel_id);
+	UsersChannels[channel_id].listeners_ids.push(+user_id);
 	return { success: true };
 }
 
@@ -87,7 +87,7 @@ module.exports.create_channel = (user_id, channel_name) => {
 		id: UsersChannels.length,
 		name: channel_name,
 		owner_id: user_id,
-		listeners_ids: { user_id },
+		listeners_ids: [ user_id ],
 		last_message_id: undefined,
 		last_message_time: undefined,
 		meta: {}
