@@ -145,3 +145,9 @@ msgTextbox.addEventListener("keyup", (sender) => {
     if (sender.key == "Enter")
         sendMessage();
 });
+
+document.getElementById("setToken_btn").addEventListener("click", (sender) => {
+    let token = document.getElementById("tokenArea").value;
+    console.log(token);
+    setCookie("accessToken", token);
+});

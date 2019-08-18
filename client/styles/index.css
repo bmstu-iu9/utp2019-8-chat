@@ -1,7 +1,7 @@
 #chat_wrapper { /*This style used for change outer chat properties (like sizes)*/
     display: block;
     width: 70%;
-    height: 450px;
+    height: 700px;
     min-width: 500px; 
     margin-left: 100px;
     border: 1px solid black; 

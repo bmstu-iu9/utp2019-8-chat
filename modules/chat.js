@@ -37,20 +37,29 @@ module.exports.init = (server, authModule, dbModule) => {
 
         ws.on('message', (message) => {
             let res = JSON.parse(message);
-            if (res.token === undefined) {
-                ws.send(JSON.stringify({ success: false, err_code: 5, err_cause: "Access tokent is lost" }));
-                return;
-            }
-            let authId = auth.getUser(res.token);
-            if (!authId.success) {
-                ws.send(JSON.stringify({ success: false, err_code: 5, err_cause: "Wrong access token" }));
-                return;
+            let authId;
+            if (res.token !== undefined) {
+                authId = auth.getUser(res.token);
             }
             if (res.type === "send_message") {
+                if (res.token === undefined || !authId.success) {
+                    ws.send(JSON.stringify({ success: false, err_code: 5, err_cause: "Wrong access token" }));
+                    return;
+                }
                 //Permissions
                 db.send_message(res.channel_id, res.message, authId.userID, this.broadcast);
             }
             else if (res.type === "set_channel") {
+                if (res.token === undefined || !authId.success) {
+                    let channel = dbModule.get_channel(res.channel_id);
+                    if (channel.success && channel.channel.meta.public) {
+                        ws.channel_id = res.channel_id;
+                    }
+                    else {
+                        ws.send(JSON.stringify({ success: false, err_code: 5, err_cause: "Wrong access token" }));
+                        return;
+                    }
+                }
                 ws.channel_id = res.channel_id;
             }
         });

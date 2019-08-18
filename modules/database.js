@@ -90,6 +90,7 @@ module.exports.create_channel = (user_id, channel_name) => {
 		listeners_ids: { user_id },
 		last_message_id: undefined,
 		last_message_time: undefined,
+		meta: {}
 	};
 	UsersChannels.push(newChannel);
 	messages[newChannel.id] = [];

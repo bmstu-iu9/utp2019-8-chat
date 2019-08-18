@@ -241,10 +241,13 @@ app.post("/api/get_messages", urlencodedParser, (request, response) => {
     let req = getArgs(request, response, args);
     if (req === undefined)
         return;
+    let channel = dbModule.get_channel(req.channel_id);
     let auth = authModule.getUser(req.token);
     if (!auth.success) {
-        response.status(200).send(JSON.stringify(auth));
-        return;
+        if (!(channel.success && channel.channel.meta.public)) {
+            response.status(200).send(JSON.stringify(auth));
+            return;
+        }
     }
     //Permissions
     let resp = dbModule.chat_history(req.channel_id, req.offset, req.count);
