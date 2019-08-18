@@ -33,6 +33,10 @@ const deleteCookie = (name) => {
     setCookie(name, "", { 'max-age': -1 });
 }
 
+if (getCookie("accessToken") === undefined) {
+    setCookie("accessToken", "123");
+}
+
 const sendRequest = (dest, params, callback) => {
 	const encodeMessage = (str) => { //Replace special charasters to codes
 		return str.toString().
