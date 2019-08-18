@@ -14,32 +14,35 @@ module.exports.register = (login, password) => {
             return { success: false, err_code: 3, err_cause: "user with this login already exists" };
         }
     }
+    const salt = crypto.randomBytes(32).toString("base64");
     data.push({
         login: login,
         id: data.length + 1,
-        hash: crypto.createHash("sha512").update(password).digest("base64")
+        hash: crypto.createHash("sha512").update(salt + password + salt).digest("base64"),
+        salt: salt
     });
     return { success: true, id: data.length };
 }
 
 module.exports.auth = (login, password) => {
-    let current = undefined;
+    let user = undefined;
     for (let i = 0; i < data.length; i++) {
         if (data[i].login === login) {
-            current = data[i];
+            user = data[i];
             break;
         }
     }
-    if (current === undefined) {
+    if (user === undefined) {
         return { success: false, err_code: 7, err_cause: "user doesn't exist" };
     }
-    if (current.hash !== crypto.createHash("sha512").update(password).digest("base64")) {
+    const curHash = crypto.createHash("sha512").update(user.salt + password + user.salt).digest("base64");
+    if (!crypto.timingSafeEqual(Buffer.from(user.hash), Buffer.from(curHash))) {
         return { success: false, err_code: 4, err_cause: "wrong password" };
     }
     let sessionKey = crypto.randomBytes(64).toString("base64");
     sessions[sessionKey] = {
         token: sessionKey,
-        id: current.id,
+        id: user.id,
         lastUpdate: new Date().getTime()
     };
     return { success: true, token: sessionKey };
