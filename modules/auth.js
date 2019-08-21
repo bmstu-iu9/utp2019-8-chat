@@ -63,7 +63,11 @@ module.exports.getUser = (token) => {
     if (sessions[token] === undefined) {
         return { success: false, err_code: 5, err_cause: "Wrong access token. Try to authorize again." };
     }
-    if (new Date().getTime() - sessions[token].lastUpdate > MAX_SESSION_TIME * 60000) {
+    let expire = new Date().getTime() - sessions[token].lastUpdate;
+    if (expire > MAX_SESSION_TIME * 60000) {
+        if (expire > 240 * 60000) { //Removing old sessions
+            delete sessions[token];
+        }
         return { success: false, err_code: 5, err_cause: "Access token expired. Try to authorize again." };
     }
     sessions[token].lastUpdate = new Date().getTime();
