@@ -76,7 +76,7 @@ const addMessage = (author, text, time) => { //Add message to chat-flow zone
             </div>
             <div class="msg_message_zone">
                 <div class="name">${author}</div>
-                <div class="msg_time">${d.getHours()}:${d.getMinutes()}</div>
+                <div class="msg_time">${d.getHours()}:${(d.getMinutes()<10?'0':'') + d.getMinutes()}</div>
                 <div class="msg">${text}</div>
             </div>
         </div>`
@@ -135,7 +135,37 @@ socket.onerror = (error) => {
     alert(`[error] ${error.message}`);
 };
 
+var observe;
+		if (window.attachEvent) {
+			observe = function (element, event, handler) {
+				element.attachEvent('on'+event, handler);
+			};
+		}
+		else {
+			observe = function (element, event, handler) {
+				element.addEventListener(event, handler, false);
+			};
+		}
+		function init () {
+			var text = document.getElementById('text');
+			function resize () {
+				text.style.height = 'auto';
+				text.style.height = text.scrollHeight+'px';
+			}
+			/* 0-timeout to get the already changed text */
+			function delayedResize () {
+				window.setTimeout(resize, 0);
+			}
+			observe(text, 'change',  resize);
+			observe(text, 'cut',     delayedResize);
+			observe(text, 'paste',   delayedResize);
+			observe(text, 'drop',    delayedResize);
+			observe(text, 'keydown', delayedResize);
 
+			text.focus();
+			text.select();
+			resize();
+		}
 
 const sendMessage = () => {
     if (msgTextbox.value == "")
@@ -148,6 +178,7 @@ const sendMessage = () => {
         message: msg
     }));
     msgTextbox.value = "";
+	
 }
 
 document.getElementById("send_btn").addEventListener("click", (sender) => sendMessage());

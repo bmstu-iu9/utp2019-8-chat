@@ -3,31 +3,28 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Index</title>
+    <title>Chats</title>
+	<link rel="SHORTCUT ICON" href="styles/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/styles/index.css">
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700|Raleway:300,400,700&display=swap" rel="stylesheet">
+	
 </head>
 
-<body>
-    <h1>The chat</h1>
+<body onload="init();">
+    <h1>BMSTU-C</h1>
     <div id="chat_wrapper">
+		<div id="chat_list"></div>
         <div id="chat_box">
             <div id="chat_flow"></div>
             <div id="chat_input">
+			
                 <div id="input_box">
-                    <input id="input_msg" type="text">
+                   <textarea  id="text" placeholder="Введите сообщение..."></textarea>
                 </div>
-                <button id="send_btn">Send</button>
+                <button id="send_btn"><img src="styles/button.png"</button>
             </div>
         </div>
     </div>
-    <a href="/api_test.html">API testing page</a>
-    <br>
-    Пролистай выше чтобы зарегестрироваться
-    <br>
-    <br>
-    <textarea id="tokenArea"></textarea>
-    <button id="setToken_btn">Set token</button>
     <script src="/scripts/index.js"></script>
 </body>
-
 </html>
