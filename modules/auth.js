@@ -70,6 +70,33 @@ module.exports.getUser = (token) => {
     return { success: true, userID: sessions[token].id };
 }
 
+module.exports.exitSession = (token) => {
+    let auth = this.getUser(token).success;
+    if (!auth.success) {
+        return auth;
+    }
+    else {
+        delete sessions[token];
+        return { success: true };
+    }
+}
+
+module.exports.exitAllSessions = (token) => {
+    let auth = this.getUser(token).success;
+    if (!auth.success) {
+        return auth;
+    }
+    else {
+        const id = sessions[token].id;
+        for (let t in sessions) {
+            if (sessions[t].id === id) {
+                delete sessions[t]; //TODO: chech this
+            }
+        }
+        return { success: true };
+    }
+}
+
 module.exports.save = (callback) => {
     fs.writeFile("./Data/auth.json", JSON.stringify(data), {}, (err) => {
         callback();
