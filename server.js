@@ -129,6 +129,24 @@ app.post("/api/auth", urlencodedParser, (request, response) => {
     response.status(200).send(JSON.stringify(resp));
 });
 
+app.post("/api/exit_session", urlencodedParser, (request, response) => {
+    const args = ["token"];
+    let req = getArgs(request, response, args);
+    if (req === undefined)
+        return;
+    let resp = authModule.exitSession(req.token);
+    response.status(200).send(JSON.stringify(resp));
+});
+
+app.post("/api/exit_all_sessions", urlencodedParser, (request, response) => {
+    const args = ["token"];
+    let req = getArgs(request, response, args);
+    if (req === undefined)
+        return;
+    let resp = authModule.exitAllSessions(req.token);
+    response.status(200).send(JSON.stringify(resp));
+});
+
 app.post("/api/get_user", urlencodedParser, (request, response) => {
     const args = ["id"];
     let req = getArgs(request, response, args);
