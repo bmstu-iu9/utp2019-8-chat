@@ -74,7 +74,8 @@ const argv = minimist(process.argv.slice(2), {
     }
 });
 if (argv.help) {
-    console.log("HELP PAGE"); //TODO
+    const clHelpString = `See: https://github.com/bmstu-iu9/utp2019-8-chat`;
+    console.log(clHelpString);
     process.exit(0);
 }
 if (argv.version) {
