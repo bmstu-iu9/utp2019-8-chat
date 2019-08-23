@@ -53,7 +53,7 @@ module.exports.init = (server, authModule, dbModule) => {
                 if (user === undefined) {
                     ws.send(JSON.stringify(ERR_AUTH_FAILED));
                 }
-                else if (checkPerm(user, 1) || user.channels.includes(res.channel_id)) {
+                else if (checkPerm(user, 1) || user.channels.includes(res.channel_id)) { //TODO: permission
                     db.send_message(res.channel_id, res.message, user.id, this.broadcast);
                 }
                 else {
