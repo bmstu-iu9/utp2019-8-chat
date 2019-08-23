@@ -16,6 +16,10 @@ const getArgs = (request, response, args) => {
     return req;
 }
 
+const checkPerm = (user, check) => {
+    return (user.permissions & (check | 1)) !== 0; // 1 - admin
+}
+
 module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) => {    
     app.post("/api/register", urlencodedParser, (request, response) => {
         const args = ["login", "password"];
@@ -78,7 +82,7 @@ module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) 
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (user.permissions & 1 !== 0 || user.id === +req.user_id) {
+        if (checkPerm(user, 1) || user.id === +req.user_id) { //TODO: permission
             let resp = dbModule.add_to_channel(req.user_id, req.channel_id);
             response.status(200).send(JSON.stringify(resp));
         }
@@ -99,7 +103,7 @@ module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) 
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (user.permissions & 1 !== 0 || user.id === +req.user_id) {
+        if (checkPerm(user, 1) || user.id === +req.user_id) { //TODO: permission
             let resp = dbModule.remove_from_channel(req.user_id, req.channel_id);
             response.status(200).send(JSON.stringify(resp));
         }
@@ -120,7 +124,7 @@ module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) 
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (user.permissions & 1 !== 0 || user.id === +req.user_id) {
+        if (checkPerm(user, 1) || user.id === +req.user_id) { //TODO: permission
             let resp = dbModule.change_avatar(req.user_id, req.avatar);
             response.status(200).send(JSON.stringify(resp));
         }
@@ -141,7 +145,7 @@ module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) 
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (user.permissions & 1 !== 0 || user.id === +req.user_id) {
+        if (checkPerm(user, 1) || user.id === +req.user_id) { //TODO: permission
             // NOT IMPLEMENTED
             // let resp = dbModule.(req.user_id, req.avatar);
             // response.status(200).send(JSON.stringify(resp));
@@ -192,7 +196,7 @@ module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) 
             let resp = { success: false, err_code: 3, err_cause: "Channel does not exist" };
             response.status(200).send(JSON.stringify(resp));
         }
-        else if (user.permissions & 1 !== 0 || user.id === channel.channel.owner_id) {
+        else if (checkPerm(user, 1) || user.id === channel.channel.owner_id) { //TODO: permission
             let resp = dbModule.channels_delete(req.channel_id);
             response.status(200).send(JSON.stringify(resp));
         }
@@ -226,7 +230,7 @@ module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) 
         }
         else {
             let user = dbModule.get_user(auth.userID).user;
-            if (user.permissions & 1 !== 0 || channel.channel.meta.public || user.channels.includes(+req.channel_id)) {
+            if (checkPerm(user, 1) || channel.channel.meta.public || user.channels.includes(+req.channel_id)) { //TODO: permission
                 let resp = dbModule.chat_history(req.channel_id, req.offset, req.count);
                 response.status(200).send(JSON.stringify(resp));
             }
@@ -248,7 +252,7 @@ module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) 
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (user.permissions & 1 !== 0 || user.channels.includes(+req.channel_id)) {
+        if (checkPerm(user, 1) || user.channels.includes(+req.channel_id)) { //TODO: permission
             let resp = dbModule.send_message(req.channel_id, req.message, auth.userID, chatModule.broadcast);
             response.status(200).send(JSON.stringify(resp));
         }
