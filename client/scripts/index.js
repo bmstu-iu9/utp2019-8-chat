@@ -69,6 +69,12 @@ const sendRequest = (dest, params, callback) => {
 
 const addMessage = (author, text, time) => { //Add message to chat-flow zone
     let d = new Date(time);
+    const prepareText = (text) => { //Prevent the html tags inserting
+        return text.
+            replace(/</g, "&lt;").
+            replace(/>/g, "&gt;").
+            replace(/"/g, "&quot;");
+    }
     chatFlow.innerHTML +=
         `<div class="msg_box">
             <div class="msg_info_zone">
@@ -77,7 +83,7 @@ const addMessage = (author, text, time) => { //Add message to chat-flow zone
             <div class="msg_message_zone">
                 <div class="name">${author}</div>
                 <div class="msg_time">${d.getHours()}:${d.getMinutes()}</div>
-                <div class="msg">${text}</div>
+                <div class="msg">${prepareText(text)}</div>
             </div>
         </div>`
     chatFlow.scrollTop = 9999;

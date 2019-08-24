@@ -1,1 +1,1 @@
-[null,{"id":1,"nickname":"admin","permissions":1,"avatar":"default.png","channels":[1,2],"meta":{}},{"id":2,"nickname":"super_user","permissions":0,"avatar":"default.png","channels":[false],"meta":{}}]
+[null,{"id":1,"nickname":"admin","permissions":1,"avatar":"default.png","channels":[false,1],"meta":{}}]
