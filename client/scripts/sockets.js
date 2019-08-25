@@ -19,7 +19,7 @@ const initSocket = () => {
             }
         }
         if (resp.success && resp.type === "new_message") {
-            addMessage(resp.data.author_name, resp.data.message, resp.data.time);
+            addMessage(resp.data, "default.png");
         }
         else if (resp.success) {
             console.warn(`Unknown message: ${JSON.stringify(resp)}`);
