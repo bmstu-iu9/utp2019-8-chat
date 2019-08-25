@@ -87,7 +87,7 @@ module.exports.create_channel = (user_id, channel_name) => {
 		id: UsersChannels.length,
 		name: channel_name,
 		owner_id: user_id,
-		listeners_ids: [ user_id ],
+		listeners_ids: [user_id],
 		last_message_id: undefined,
 		last_message_time: undefined,
 		meta: {}
@@ -155,48 +155,52 @@ module.exports.send_message = (channel_id, message, author_id, broadcast) => {
 
 //Information inside UsersData and UsersChannels, which accumulates during server's session,
 //saves into UsersData.json and UsersChannels.json accordingly
-module.exports.save = (callback) => {
-	fs.writeFile("./Data/users.json", JSON.stringify(UsersData), {}, (err) => {
-		fs.writeFile("./Data/channels.json", JSON.stringify(UsersChannels), (err) => {
-			for (let i in UsersChannels) {
-				if (UsersChannels[i]) {
-					fs.writeFileSync(
-						`./Data/messages/${UsersChannels[i].id}.json`, 
-						JSON.stringify(messages[UsersChannels[i].id]));
+module.exports.save = async () => {
+	return new Promise((resolve, reject) => {
+		fs.writeFile("./Data/users.json", JSON.stringify(UsersData), {}, (err) => {
+			if (err)
+				return reject(err);
+			fs.writeFile("./Data/channels.json", JSON.stringify(UsersChannels), (err) => {
+				if (err)
+					return reject(err);
+				for (let i in UsersChannels) {
+					if (UsersChannels[i]) {
+						fs.writeFileSync(
+							`./Data/messages/${UsersChannels[i].id}.json`,
+							JSON.stringify(messages[UsersChannels[i].id]));
+					}
 				}
-			}
-			callback();
+				return resolve();
+			});
 		});
 	});
 }
 
 //Loading information, that had been recording during previous server's sessions,
 //from UsersData.json and UsersChannels.json to UsersData and UsersChannels respectively
-module.exports.load = (callback) => {
-	fs.readFile("./Data/users.json", (err, raw) => {
-		if (raw.length === 0) {
-			callback();
-			return;
-		}
-		UsersData = JSON.parse(raw);
-		fs.readFile("./Data/channels.json", (err, raw) => {
-			if (raw.length === 0) {
-				callback();
-				return;
-			}
-			UsersChannels = JSON.parse(raw);
-			for (let i in UsersChannels) {
-				if (UsersChannels[i]) {
-					let raw = fs.readFileSync(`./Data/messages/${UsersChannels[i].id}.json`);
-					if (raw.length === 0) {
-						messages[UsersChannels[i].id] = [];
-					}
-					else {
-						messages[UsersChannels[i].id] = JSON.parse(raw);
+module.exports.load = async () => {
+	return new Promise((resolve, reject) => {
+		fs.readFile("./Data/users.json", (err, raw) => {
+			if (err)
+				return reject(err);
+			if (raw.length === 0)
+				return resolve();
+			UsersData = JSON.parse(raw);
+			fs.readFile("./Data/channels.json", (err, raw) => {
+				if (raw.length === 0)
+					return resolve();
+				UsersChannels = JSON.parse(raw);
+				for (let i in UsersChannels) {
+					if (UsersChannels[i]) {
+						let raw = fs.readFileSync(`./Data/messages/${UsersChannels[i].id}.json`);
+						if (raw.length === 0)
+							messages[UsersChannels[i].id] = [];
+						else
+							messages[UsersChannels[i].id] = JSON.parse(raw);
 					}
 				}
-			}
-			callback();
+				return resolve();
+			});
 		});
 	});
 }

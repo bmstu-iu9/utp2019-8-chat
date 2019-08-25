@@ -112,41 +112,41 @@ app.post("*", (request, response) => {
 
 authModule.init(config.local_param);
 chatModule.init(server, authModule, dbModule);
-dbModule.load(() => {
+
+const startServer = async () => {
+    await dbModule.load();
+    await authModule.load();
     console.log("Data loaded");
-    authModule.load(() => {
-        console.log("Auth loaded");
-        const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
-        server.listen(port, () => {
-            console.log(`Server started on ${port} port using ${config.use_https ? "HTTPS" : "HTTP"}`);
-        });
+    const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
+    server.listen(port, () => {
+        console.log(`Server started on ${port} port using ${config.use_https ? "HTTPS" : "HTTP"}`);
     });
-});
-
-
-let saverId = undefined; //Id of the saving timer
-if (config.saving_interval >= 0) {
-    saverId = setInterval(() => {
-        dbModule.save(() => {
-            console.log("Data saved");
-            authModule.save(() => {
-                console.log("Auth saved");
-            });
-        });
-    }, config.saving_interval * 1000);
 }
 
-process.once("SIGINT", (c) => { //Saving before exit
+const stopServer = async () => {
     chatModule.stop();
     app.disable();
     if (saverId !== undefined)
         clearInterval(saverId);
     console.log("Saving data before app closing...");
-    dbModule.save(() => {
+    await dbModule.save();
+    await authModule.save();
+    console.log("Data saved");
+    process.exit(0);
+}
+
+let saverId = undefined; //Id of the saving timer
+if (config.saving_interval >= 0) {
+    saverId = setInterval(async () => {
+        console.log("Saving data...");
+        await dbModule.save();
+        await authModule.save();
         console.log("Data saved");
-        authModule.save(() => {
-            console.log("Auth saved");
-            process.exit(0);
-        });
-    });
+    }, config.saving_interval * 1000);
+}
+
+process.once("SIGINT", (c) => { //Saving before exit
+    stopServer();
 });
+
+startServer();

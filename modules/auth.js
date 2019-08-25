@@ -75,7 +75,7 @@ module.exports.getUser = (token) => {
 }
 
 module.exports.exitSession = (token) => {
-    let auth = this.getUser(token).success;
+    let auth = this.getUser(token);
     if (!auth.success) {
         return auth;
     }
@@ -86,7 +86,7 @@ module.exports.exitSession = (token) => {
 }
 
 module.exports.exitAllSessions = (token) => {
-    let auth = this.getUser(token).success;
+    let auth = this.getUser(token);
     if (!auth.success) {
         return auth;
     }
@@ -94,26 +94,33 @@ module.exports.exitAllSessions = (token) => {
         const id = sessions[token].id;
         for (let t in sessions) {
             if (sessions[t].id === id) {
-                delete sessions[t]; //TODO: chech this
+                delete sessions[t];
             }
         }
         return { success: true };
     }
 }
 
-module.exports.save = (callback) => {
-    fs.writeFile("./Data/auth.json", JSON.stringify(data), {}, (err) => {
-        callback();
+module.exports.save = async () => {
+    return new Promise((resolve, reject) => {
+        fs.writeFile("./Data/auth.json", JSON.stringify(data), {}, (err) => {
+            if (err)
+                return reject(err);
+            else
+                return resolve();
+        });
     });
 }
 
-module.exports.load = (callback) => {
-    fs.readFile("./Data/auth.json", (err, raw) => {
-        if (raw.length === 0) {
-            callback();
-            return;
-        }
-        data = JSON.parse(raw);
-        callback();
+module.exports.load = async () => {
+    return new Promise((resolve, reject) => {
+        fs.readFile("./Data/auth.json", (err, raw) => {
+            if (err)
+                return reject(err);
+            if (raw.length === 0)
+                return resolve();
+            data = JSON.parse(raw);
+            return resolve();
+        });
     });
 }
