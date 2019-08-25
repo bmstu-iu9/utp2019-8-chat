@@ -14,7 +14,7 @@ module.exports.create_user = (id, nickname) => {
 		id: id,
 		nickname: nickname,
 		permissions: 0,
-		avatar: "default.png",
+		avatar: "avatars/default.png",
 		channels: [],
 		meta: {}
 	};

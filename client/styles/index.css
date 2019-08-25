@@ -66,7 +66,7 @@
     border-right: 1px solid black;
 }
 
-.msg_box .msg_icon {
+.msg_box .msg_info_zone .msg_icon {
     margin: 3px 10px 5px 13px;
     border: solid 1px red;
     float: left;
@@ -74,6 +74,18 @@
     height: 50px;
 }
 
+.msg_box .msg_info_zone .msg_icon {
+    margin: 3px 10px 5px 13px;
+    border: solid 1px gray;
+    float: left;
+    width: 50px;
+    height: 50px;
+}
+
+.msg_box .msg_info_zone .msg_icon img {
+    width: inherit;
+    height: inherit;
+}
 
 .msg_box .msg_message_zone {
     width: 100%;

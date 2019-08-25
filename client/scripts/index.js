@@ -67,7 +67,7 @@ const sendRequest = (dest, params, callback) => {
     return dest + "\n" + paramStr;
 }
 
-const addMessage = (author, text, time) => { //Add message to chat-flow zone
+const addMessage = (author, text, time, avatar) => { //Add message to chat-flow zone
     let d = new Date(time);
     const prepareText = (text) => { //Prevent the html tags inserting
         return text.
@@ -78,7 +78,9 @@ const addMessage = (author, text, time) => { //Add message to chat-flow zone
     chatFlow.innerHTML +=
         `<div class="msg_box">
             <div class="msg_info_zone">
-                <div class="msg_icon"></div>            
+                <div class="msg_icon">
+                    <img src="avatars/default.png">
+                </div>            
             </div>
             <div class="msg_message_zone">
                 <div class="name">${author}</div>
