@@ -57,10 +57,9 @@ const init = async () => {
         return false;
     }
     const channelsPromises = [];
-    for (let i in userInfo.user.channels) {
+    for (let i in userInfo.user.channels)
         if (userInfo.user.channels[i]) //I have no words...
             channelsPromises.push(getChannel(userInfo.user.channels[i]));
-    }
     const channels = await Promise.all(channelsPromises);
     return { success: true, user: userInfo.user, channels: channels };
 }

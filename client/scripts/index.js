@@ -1,38 +1,5 @@
 'use strict'
 
-const msgTextbox = document.getElementById("input_msg");
-const chatFlow = document.getElementById("chat_flow");
-
-const getCookie = (name) => {
-    let matches = document.cookie.match(new RegExp(
-        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-    ));
-    return matches ? decodeURIComponent(matches[1]) : undefined;
-}
-
-const setCookie = (name, value, options = {}) => {
-    options = {
-        path: '/',
-        ...options
-    };
-    if (options.expires && options.expires.toUTCString) {
-        options.expires = options.expires.toUTCString();
-    }
-    let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
-    for (let optionKey in options) {
-        updatedCookie += "; " + optionKey;
-        let optionValue = options[optionKey];
-        if (optionValue !== true) {
-            updatedCookie += "=" + optionValue;
-        }
-    }
-    document.cookie = updatedCookie;
-}
-
-const deleteCookie = (name) => {
-    setCookie(name, "", { 'max-age': -1 });
-}
-
 if (getCookie("accessToken") === undefined) {
     setCookie("accessToken", "123");
 }
@@ -75,7 +42,7 @@ const addMessage = (author, text, time, avatar) => { //Add message to chat-flow 
             replace(/>/g, "&gt;").
             replace(/"/g, "&quot;");
     }
-    chatFlow.innerHTML +=
+    document.getElementById("chat_flow").innerHTML +=
         `<div class="msg_box">
             <div class="msg_info_zone">
                 <div class="msg_icon">
@@ -88,7 +55,7 @@ const addMessage = (author, text, time, avatar) => { //Add message to chat-flow 
                 <div class="msg">${prepareText(text)}</div>
             </div>
         </div>`
-    chatFlow.scrollTop = 9999;
+        document.getElementById("chat_flow").scrollTop = 9999;
 }
 
 sendRequest("/api/get_messages", {
@@ -117,42 +84,8 @@ init().then((res) => {
     }
 });
 
-let socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
-
-socket.onopen = (e) => {
-    console.log("Web socket connected");
-    socket.send(JSON.stringify({
-        type: "set_channel",
-        channel_id: 1,
-        token: getCookie("accessToken")
-    }));
-};
-
-socket.onmessage = (event) => {
-    let resp = JSON.parse(event.data);
-    if (resp.success && resp.type === "new_message") {
-        addMessage(resp.data.author_name, resp.data.message, resp.data.time);
-    }
-    else {
-        console.log(resp);
-    }
-};
-
-socket.onclose = (event) => {
-    if (event.wasClean) {
-        console.log(`Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
-    } else {
-        console.log('Соединение прервано');
-    }
-};
-
-socket.onerror = (error) => {
-    alert(`[error] ${error.message}`);
-};
-
-
-
 const sendMessage = () => {
+    const msgTextbox = document.getElementById("input_msg");
     if (msgTextbox.value == "")
         return;
     let msg = msgTextbox.value;
@@ -166,7 +99,7 @@ const sendMessage = () => {
 }
 
 document.getElementById("send_btn").addEventListener("click", (sender) => sendMessage());
-msgTextbox.addEventListener("keyup", (sender) => {
+document.getElementById("input_msg").addEventListener("keyup", (sender) => {
     if (sender.key == "Enter")
         sendMessage();
 });
