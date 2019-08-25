@@ -14,15 +14,18 @@ const initSocket = () => {
         let resp = JSON.parse(event.data);
         if (!resp.success && resp.err_code === 5) {
             console.warn("Unauthorized"); //UNAUTHODRIZED
+            if (confirm("Authorization failed. Do you want to reauthorize?")) {
+                window.location.replace('/auth.html');
+            }
         }
         if (resp.success && resp.type === "new_message") {
             addMessage(resp.data.author_name, resp.data.message, resp.data.time);
         }
         else if (resp.success) {
-            console.warn(`Unknown message: ${resp}`);
+            console.warn(`Unknown message: ${JSON.stringify(resp)}`);
         }
         else {
-            console.warn(`Error: ${resp}`);
+            console.warn(`Error: ${JSON.stringify(resp)}`);
         }
     };
 
