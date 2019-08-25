@@ -1,5 +1,7 @@
 'use strict'
 
+const bodyParser = require("body-parser");
+
 const getArgs = (request, response, args) => {
     let req = {};
     for (let i in args) {
@@ -20,7 +22,9 @@ const checkPerm = (user, check) => {
     return (user.permissions & (check | 1)) !== 0; // 1 - admin
 }
 
-module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) => {    
+module.exports.init = (app, authModule, dbModule, chatModule) => {    
+    const urlencodedParser = bodyParser.urlencoded({ extended: false });
+
     app.post("/api/register", urlencodedParser, (request, response) => {
         const args = ["login", "password"];
         let req = getArgs(request, response, args);
