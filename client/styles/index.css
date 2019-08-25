@@ -62,7 +62,8 @@
 }
 
 .msg_box .msg_info_zone {
-    width: 90px;
+    min-width: 80px;
+    width: 80px;
     border-right: 1px solid black;
 }
 
@@ -88,7 +89,9 @@
 }
 
 .msg_box .msg_message_zone {
+    padding-right: 15px;
     width: 100%;
+    overflow: hidden;
 }
 
 .msg_box .name {
@@ -107,5 +110,7 @@
 
 .msg_box .msg {
     margin: 6px 5px 6px 10px;
-    word-break: break-all;
+    width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
