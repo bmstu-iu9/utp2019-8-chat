@@ -1,22 +1,32 @@
 'use strict'
 
 let socket = undefined;
+let curChannel = 0;
+
+const selectChannel = (id) => {
+    socket.send(JSON.stringify({ type: "set_channel", channel_id: 1, token: getCookie("accessToken") }));
+    curChannel = id;
+}
 
 const initSocket = () => {
     socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
 
     socket.onopen = (e) => {
         console.log("Web socket connected");
-        socket.send(JSON.stringify({ type: "set_channel", channel_id: 1, token: getCookie("accessToken") })); //TEMP
+        selectChannel(1); //TODO: channel selecting
     };
 
     socket.onmessage = (event) => {
         let resp = JSON.parse(event.data);
-        if (!resp.success && resp.err_code === 5) {
-            console.warn("Unauthorized"); //UNAUTHODRIZED
+        if (!resp.success && resp.err_code === 5) { //UNAUTHODRIZED
+            console.warn("Unauthorized");
             if (confirm("Authorization failed. Do you want to reauthorize?")) {
                 window.location.replace('/auth.html');
             }
+        }
+        else if (!resp.success && resp.err_code === 6) { //FORBIDDEN
+            console.warn("Forbidden");
+            alert("You don't have permissions to do that");
         }
         if (resp.success && resp.type === "new_message") {
             addMessage(resp.data, "default.png");

@@ -88,7 +88,7 @@ const sendMessage = () => {
     socket.send(JSON.stringify({
         type: "send_message",
         token: getCookie("accessToken"),
-        channel_id: 1,
+        channel_id: 1, //TODO: channel selecting
         message: msg
     }));
     msgTextbox.value = "";
