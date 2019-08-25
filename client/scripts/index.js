@@ -40,7 +40,7 @@ const addMessage = (author, text, time, avatar) => { //Add message to chat-flow 
         `<div class="msg_box">
             <div class="msg_info_zone">
                 <div class="msg_icon">
-                    <img src="avatars/default.png">
+                    <img src="avatars/${avatar}">
                 </div>            
             </div>
             <div class="msg_message_zone">
@@ -59,6 +59,7 @@ init()
         for (let i in res.channels) {
             console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
         }
+
         sendRequest("/api/get_messages",
             { token: getCookie("accessToken"), channel_id: 1, offset: 0, count: 50 },
             (response, status) => {
@@ -66,11 +67,11 @@ init()
                 if (response.success) {
                     for (let i = 0; i < response.count; i++) {
                         let cur = response.messages[i];
-                        addMessage(cur.author_name, cur.message, cur.time);
+                        addMessage(cur.author_name, cur.message, cur.time, "default.png");
                     }
                 }
                 else {
-                    console.log(response);
+                    console.warn(response);
                 }
             });
         initSocket();

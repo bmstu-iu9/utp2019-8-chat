@@ -12,11 +12,10 @@ for (let i = 0; i < FIELDS_COUNT; i++) {
 }
 
 document.getElementById("send_btn").addEventListener('click', (sender) => {
-    let dest = document.getElementById("dest").value;
+    const dest = document.getElementById("dest").value;
     let params = {};
-    let name, val;
     for (let i = 0; i < FIELDS_COUNT; i++) {
-        name = document.getElementById(`param_name_${i}`).value;
+        const name = document.getElementById(`param_name_${i}`).value;
         if (name !== "")
             params[name] = document.getElementById(`param_val_${i}`).value;
     }
@@ -25,6 +24,6 @@ document.getElementById("send_btn").addEventListener('click', (sender) => {
             document.getElementById("response_area").innerHTML = res.response;
         })
         .catch((err) => {
-            console.log(err);
+            console.warn(err);
         });
 });
