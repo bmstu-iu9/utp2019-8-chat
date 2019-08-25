@@ -7,7 +7,6 @@ const minimist = require("minimist");
 const http = require("http");
 const https = require("https");
 const express = require("express");
-const bodyParser = require("body-parser");
 
 const authModule = require("./modules/auth");
 const dbModule = require("./modules/database");
@@ -86,13 +85,14 @@ if (argv.version) {
 
 const config = loadConfig(argv.config);
 const app = express();
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
 const httpsOptions = config.use_https ?
     { key: fs.readFileSync(config.ssl_key), cert: fs.readFileSync(config.ssl_cert) } :
     undefined;
 const server = config.use_https ? https.createServer(httpsOptions, app) : http.createServer(app);
 
-apiModule.init(app, urlencodedParser, authModule, dbModule, chatModule);
+apiModule.init(app, authModule, dbModule, chatModule);
+authModule.init(config.local_param);
+chatModule.init(server, authModule, dbModule);
 
 app.get("/", (request, response) => {
     response.redirect("/index.html"); //Redirect to index page if request is empty
@@ -109,44 +109,39 @@ app.post("*", (request, response) => {
     }));
 });
 
-
-authModule.init(config.local_param);
-chatModule.init(server, authModule, dbModule);
-dbModule.load(() => {
-    console.log("Data loaded");
-    authModule.load(() => {
-        console.log("Auth loaded");
-        const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
-        server.listen(port, () => {
-            console.log(`Server started on ${port} port using ${config.use_https ? "HTTPS" : "HTTP"}`);
-        });
-    });
-});
-
-
 let saverId = undefined; //Id of the saving timer
 if (config.saving_interval >= 0) {
-    saverId = setInterval(() => {
-        dbModule.save(() => {
-            console.log("Data saved");
-            authModule.save(() => {
-                console.log("Auth saved");
-            });
-        });
+    saverId = setInterval(async () => {
+        console.log("Saving data...");
+        await dbModule.save();
+        await authModule.save();
+        console.log("Data saved");
     }, config.saving_interval * 1000);
 }
 
-process.once("SIGINT", (c) => { //Saving before exit
+const startServer = async () => {
+    await dbModule.load();
+    await authModule.load();
+    console.log("Data loaded");
+    const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
+    server.listen(port, () => {
+        console.log(`Server started on ${port} port using ${config.use_https ? "HTTPS" : "HTTP"}`);
+    });
+}
+
+const stopServer = async () => {
     chatModule.stop();
     app.disable();
     if (saverId !== undefined)
         clearInterval(saverId);
     console.log("Saving data before app closing...");
-    dbModule.save(() => {
-        console.log("Data saved");
-        authModule.save(() => {
-            console.log("Auth saved");
-            process.exit(0);
-        });
-    });
-});
+    await dbModule.save();
+    await authModule.save();
+    console.log("Data saved");
+    process.exit(0);
+}
+
+//Saving before exit
+process.once("SIGINT", (c) => { stopServer(); });
+
+startServer();
