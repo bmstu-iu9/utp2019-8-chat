@@ -43,6 +43,15 @@ module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) 
         let resp = authModule.auth(req.login, req.password);
         response.status(200).send(JSON.stringify(resp));
     });
+
+    app.post("/api/check_token", urlencodedParser, (request, response) => {
+        const args = ["token"]; 
+        let req = getArgs(request, response, args);
+        if (req === undefined)
+            return;
+        let resp = authModule.getUser(req.token);
+        response.status(200).send(JSON.stringify(resp));
+    });
     
     app.post("/api/exit_session", urlencodedParser, (request, response) => {
         const args = ["token"];
