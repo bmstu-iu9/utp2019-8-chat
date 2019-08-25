@@ -75,7 +75,7 @@ module.exports.getUser = (token) => {
 }
 
 module.exports.exitSession = (token) => {
-    let auth = this.getUser(token).success;
+    let auth = this.getUser(token);
     if (!auth.success) {
         return auth;
     }
@@ -86,7 +86,7 @@ module.exports.exitSession = (token) => {
 }
 
 module.exports.exitAllSessions = (token) => {
-    let auth = this.getUser(token).success;
+    let auth = this.getUser(token);
     if (!auth.success) {
         return auth;
     }
@@ -94,7 +94,7 @@ module.exports.exitAllSessions = (token) => {
         const id = sessions[token].id;
         for (let t in sessions) {
             if (sessions[t].id === id) {
-                delete sessions[t]; //TODO: chech this
+                delete sessions[t];
             }
         }
         return { success: true };
