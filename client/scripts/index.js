@@ -107,6 +107,9 @@ sendRequest("/api/get_messages", {
     }
 });
 
+init().then((res) => {
+    console.log(res);
+});
 
 let socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
 
