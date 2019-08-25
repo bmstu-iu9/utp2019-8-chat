@@ -110,7 +110,11 @@ sendRequest("/api/get_messages", {
 });
 
 init().then((res) => {
-    console.log(res);
+    // console.log(res);
+    console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
+    for (let i in res.channels) {
+        console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
+    }
 });
 
 let socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
@@ -165,10 +169,4 @@ document.getElementById("send_btn").addEventListener("click", (sender) => sendMe
 msgTextbox.addEventListener("keyup", (sender) => {
     if (sender.key == "Enter")
         sendMessage();
-});
-
-document.getElementById("setToken_btn").addEventListener("click", (sender) => {
-    let token = document.getElementById("tokenArea").value;
-    console.log(token);
-    setCookie("accessToken", token);
 });
