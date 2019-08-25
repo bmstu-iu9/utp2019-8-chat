@@ -2,6 +2,8 @@
 
 const bodyParser = require("body-parser");
 
+const ERR_NO_PERMISSIONS = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+
 const getArgs = (request, response, args) => {
     let req = {};
     for (let i in args) {
@@ -86,12 +88,12 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.id === +req.user_id) { //TODO: permission
+        if (checkPerm(user, 1) || user.id === +req.user_id) {
             let resp = dbModule.add_to_channel(req.user_id, req.channel_id);
             response.status(200).send(JSON.stringify(resp));
         }
         else {
-            let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+            let resp = ERR_NO_PERMISSIONS;
             response.status(200).send(JSON.stringify(resp));
         }
     });
@@ -107,12 +109,12 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.id === +req.user_id) { //TODO: permission
+        if (checkPerm(user, 1) || user.id === +req.user_id) {
             let resp = dbModule.remove_from_channel(req.user_id, req.channel_id);
             response.status(200).send(JSON.stringify(resp));
         }
         else {
-            let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+            let resp = ERR_NO_PERMISSIONS;
             response.status(200).send(JSON.stringify(resp));
         }
     });
@@ -128,12 +130,12 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.id === +req.user_id) { //TODO: permission
+        if (checkPerm(user, 1) || user.id === +req.user_id) {
             let resp = dbModule.change_avatar(req.user_id, req.avatar);
             response.status(200).send(JSON.stringify(resp));
         }
         else {
-            let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+            let resp = ERR_NO_PERMISSIONS;
             response.status(200).send(JSON.stringify(resp));
         }
     });
@@ -149,14 +151,14 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.id === +req.user_id) { //TODO: permission
+        if (checkPerm(user, 1) || user.id === +req.user_id) {
             // NOT IMPLEMENTED
             // let resp = dbModule.(req.user_id, req.avatar);
             // response.status(200).send(JSON.stringify(resp));
             response.status(200).send(JSON.stringify({ not_implemented: true }));
         }
         else {
-            let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+            let resp = ERR_NO_PERMISSIONS;
             response.status(200).send(JSON.stringify(resp));
         }
     });
@@ -200,12 +202,12 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             let resp = { success: false, err_code: 3, err_cause: "Channel does not exist" };
             response.status(200).send(JSON.stringify(resp));
         }
-        else if (checkPerm(user, 1) || user.id === channel.channel.owner_id) { //TODO: permission
+        else if (checkPerm(user, 1) || user.id === channel.channel.owner_id) {
             let resp = dbModule.channels_delete(req.channel_id);
             response.status(200).send(JSON.stringify(resp));
         }
         else {
-            let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+            let resp = ERR_NO_PERMISSIONS;
             response.status(200).send(JSON.stringify(resp));
         }
         // let resp = dbModule.channels_delete(req.channel_id);
@@ -234,12 +236,12 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         }
         else {
             let user = dbModule.get_user(auth.userID).user;
-            if (checkPerm(user, 1) || channel.channel.meta.public || user.channels.includes(+req.channel_id)) { //TODO: permission
+            if (checkPerm(user, 1) || channel.channel.meta.public || user.channels.includes(+req.channel_id)) {
                 let resp = dbModule.chat_history(req.channel_id, req.offset, req.count);
                 response.status(200).send(JSON.stringify(resp));
             }
             else {
-                let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+                let resp = ERR_NO_PERMISSIONS;
                 response.status(200).send(JSON.stringify(resp));
             }
         }
@@ -256,12 +258,12 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.channels.includes(+req.channel_id)) { //TODO: permission
+        if (checkPerm(user, 1) || user.channels.includes(+req.channel_id)) {
             let resp = dbModule.send_message(req.channel_id, req.message, auth.userID, chatModule.broadcast);
             response.status(200).send(JSON.stringify(resp));
         }
         else {
-            let resp = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+            let resp = ERR_NO_PERMISSIONS;
             response.status(200).send(JSON.stringify(resp));
         }
     });

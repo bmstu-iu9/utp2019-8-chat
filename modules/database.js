@@ -1,13 +1,14 @@
 'use strict'
 
 const fs = require("fs");
-const readline = require("readline");
+
+const ERR_USER_NO_EXIST = { success: false, err_code: 7, err_cause: "User doesn't exist" };
+const ERR_CHANNEL_NO_EXIST = { success: false, err_code: 7, err_cause: "Channel doesn't exist" };
 
 let UsersData = [];
 let UsersChannels = [false];
 let messages = [];
 
-// USERS
 
 module.exports.create_user = (id, nickname) => {
 	let newUser = {
@@ -24,14 +25,14 @@ module.exports.create_user = (id, nickname) => {
 module.exports.get_user = (id) => {
 	let current = UsersData[id];
 	if (current === undefined) {
-		return { success: false, err_code: 7, err_cause: "user doesn't exist" };
+		return ERR_USER_NO_EXIST;
 	}
 	return { success: true, user: current };
 }
 
 module.exports.change_avatar = (user_id, avatar) => {
 	if (UsersData[user_id] === undefined) {
-		return { success: false, err_code: 7, err_cause: "user doesn't exist" };
+		return ERR_USER_NO_EXIST;
 	}
 	UsersData[user_id].avatar = avatar;
 	return { success: true };
@@ -39,10 +40,10 @@ module.exports.change_avatar = (user_id, avatar) => {
 
 module.exports.add_to_channel = (user_id, channel_id) => {
 	if (UsersData[user_id] === undefined) {
-		return { success: false, err_code: 7, err_cause: "user doesn't exist" };
+		return ERR_USER_NO_EXIST;
 	}
 	if (UsersChannels[channel_id] === undefined) {
-		return { success: false, err_code: 7, err_cause: "channel doesn't exist" };
+		return ERR_CHANNEL_NO_EXIST;
 	}
 	UsersData[user_id].channels.push(+channel_id);
 	UsersChannels[channel_id].listeners_ids.push(+user_id);
@@ -51,10 +52,10 @@ module.exports.add_to_channel = (user_id, channel_id) => {
 
 module.exports.remove_from_channel = (user_id, channel_id) => {
 	if (UsersData[user_id] === undefined) {
-		return { success: false, err_code: 7, err_cause: "user doesn't exist" };
+		return ERR_USER_NO_EXIST;
 	}
 	if (UsersChannels[channel_id] === undefined) {
-		return { success: false, err_code: 7, err_cause: "channel doesn't exist" };
+		return ERR_CHANNEL_NO_EXIST;
 	}
 	UsersData[user_id].channels[UsersData[user_id].channels.indexOf(+channel_id)] = false;
 	for (let i = 0; i < UsersChannels[channel_id].listeners_ids.length; i++) {
@@ -66,12 +67,11 @@ module.exports.remove_from_channel = (user_id, channel_id) => {
 	return { success: true };
 }
 
-// CHANNELS
 
 module.exports.get_channel = (id) => {
 	let current = UsersChannels[id];
 	if (current === undefined) {
-		return { success: false, err_code: 7, err_cause: "channel doesn't exist" };
+		return ERR_CHANNEL_NO_EXIST;
 	}
 	return { success: true, channel: current };
 }
@@ -79,7 +79,7 @@ module.exports.get_channel = (id) => {
 module.exports.create_channel = (user_id, channel_name) => {
 	for (let i = 1; i < UsersChannels.length; i++) {
 		if (UsersChannels[i].name === channel_name) {
-			return { success: false, err_code: 3, err_cause: "channel with this name already exists" };
+			return { success: false, err_code: 3, err_cause: "Channel with this name already exists" };
 		}
 	}
 	UsersData[user_id].channels.push(UsersChannels.length);
@@ -99,7 +99,7 @@ module.exports.create_channel = (user_id, channel_name) => {
 
 module.exports.channels_delete = (channel_id) => {
 	if (UsersChannels[channel_id] === undefined) {
-		return { success: false, err_code: 7, err_cause: "channel doesn't exist" };
+		return ERR_CHANNEL_NO_EXIST;
 	}
 	for (let i = 0; i < UsersChannels[channel_id].listeners_ids.length; i++) {
 		for (let j = 0; j < UsersData[i].channels.length; j++) {
@@ -113,11 +113,10 @@ module.exports.channels_delete = (channel_id) => {
 	return { success: true };
 }
 
-// MESSAGES
 
 module.exports.chat_history = (channel_id, offset, count) => {
 	if (UsersChannels[channel_id] === undefined) {
-		return { success: false, err_code: 7, err_cause: "channel doesn't exist" };
+		return ERR_CHANNEL_NO_EXIST;
 	}
 	let start = 0;
 	let end = 0;
@@ -136,7 +135,7 @@ module.exports.chat_history = (channel_id, offset, count) => {
 
 module.exports.send_message = (channel_id, message, author_id, broadcast) => {
 	if (UsersChannels[channel_id] === undefined) {
-		return { success: false, err_code: 7, err_cause: "channel doesn't exist" };
+		return ERR_CHANNEL_NO_EXIST;
 	}
 	let newMsg = {
 		message_id: messages[channel_id].length,
@@ -150,7 +149,6 @@ module.exports.send_message = (channel_id, message, author_id, broadcast) => {
 	broadcast(channel_id, newMsg);
 	return { success: true };
 }
-
 
 
 //Information inside UsersData and UsersChannels, which accumulates during server's session,
