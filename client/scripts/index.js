@@ -1,9 +1,5 @@
 'use strict'
 
-if (getCookie("accessToken") === undefined) {
-    setCookie("accessToken", "123");
-}
-
 const sendRequest = (dest, params, callback) => {
     const encodeMessage = (str) => { //Replace special charasters to codes
         return str.toString().
@@ -27,11 +23,9 @@ const sendRequest = (dest, params, callback) => {
     xhr.open('POST', dest, true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     let paramStr = [];
-    for (let key in params) {
+    for (let key in params)
         paramStr.push(`${key}=${encodeMessage(params[key])}`);
-    }
     xhr.send(paramStr.join('&'));
-    return dest + "\n" + paramStr;
 }
 
 const addMessage = (author, text, time, avatar) => { //Add message to chat-flow zone
@@ -55,34 +49,36 @@ const addMessage = (author, text, time, avatar) => { //Add message to chat-flow 
                 <div class="msg">${prepareText(text)}</div>
             </div>
         </div>`
-        document.getElementById("chat_flow").scrollTop = 9999;
+    document.getElementById("chat_flow").scrollTop = 9999;
 }
 
-sendRequest("/api/get_messages", {
-    token: getCookie("accessToken"),
-    channel_id: 1,
-    offset: 0,
-    count: 50
-}, (response, status) => {
-    response = JSON.parse(response);
-    if (response.success) {
-        for (let i = 0; i < response.count; i++) {
-            let cur = response.messages[i];
-            addMessage(cur.author_name, cur.message, cur.time);
-        }
-    }
-    else {
-        console.log(response);
-    }
-});
 
-init().then((res) => {
-    // console.log(res);
-    console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
-    for (let i in res.channels) {
-        console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
-    }
-});
+init()
+    .then((res) => {
+        console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
+        for (let i in res.channels) {
+            console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
+        }
+        sendRequest("/api/get_messages",
+            { token: getCookie("accessToken"), channel_id: 1, offset: 0, count: 50 },
+            (response, status) => {
+                response = JSON.parse(response);
+                if (response.success) {
+                    for (let i = 0; i < response.count; i++) {
+                        let cur = response.messages[i];
+                        addMessage(cur.author_name, cur.message, cur.time);
+                    }
+                }
+                else {
+                    console.log(response);
+                }
+            });
+        initSocket();
+    })
+    .catch((err) => {
+        console.error(err);
+    });
+
 
 const sendMessage = () => {
     const msgTextbox = document.getElementById("input_msg");
