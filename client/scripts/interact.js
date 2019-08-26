@@ -121,7 +121,7 @@ const selectChannel = async (id) => {
             sendRequest("/api/get_messages", { token: getCookie("accessToken"), channel_id: id, offset: 0, count: 250 },
                 async (response, status) => {
                     response = JSON.parse(response);
-                    if (response.success && response.count > 0) {
+                    if (response.success && response.count >= 0) {
                         let builder = "";
                         for (let i = 0; i < response.count; i++)
                             builder += await createMessage(response.messages[i]);
