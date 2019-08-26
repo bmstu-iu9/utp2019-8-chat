@@ -1,5 +1,5 @@
 {
-    "http_port": 80,
+    "http_port": 3000,
     "https_port": 443,
     "saving_interval": 60,
 

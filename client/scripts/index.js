@@ -1,6 +1,6 @@
 'use strict'
 
-const msgTextbox = document.getElementById("input_msg");
+const msgTextbox = document.getElementById("text");
 const chatFlow = document.getElementById("chat_flow");
 
 const getCookie = (name) => {
@@ -152,7 +152,6 @@ var observe;
 				text.style.height = 'auto';
 				text.style.height = text.scrollHeight+'px';
 			}
-			/* 0-timeout to get the already changed text */
 			function delayedResize () {
 				window.setTimeout(resize, 0);
 			}
@@ -183,7 +182,7 @@ const sendMessage = () => {
 
 document.getElementById("send_btn").addEventListener("click", (sender) => sendMessage());
 msgTextbox.addEventListener("keyup", (sender) => {
-    if (sender.key == "Enter")
+    if (!sender.shiftKey && sender.keyCode == 13)
         sendMessage();
 });
 
