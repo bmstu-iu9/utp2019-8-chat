@@ -20,12 +20,63 @@ const checkPerm = (user, check) => {
     return (user.permissions & (check | 1)) !== 0; // 1 - admin
 }
 
+const checkLogin = (login) => {
+	const len = login.length;
+	if (len < 1 && len > 20) {
+		return false;
+	}
+	for (let i = 0; i < len; i++) {
+		if ((login[i] < 'A' || login[i] > 'Z') &&
+			(login[i] < 'a' || login[i] > 'z') &&
+			(login[i] < '0' || login[i] > '9') &&
+			login[i] != '_' && login[i] != '.' &&
+			login[i] != '-' && login[i] != ' ') {
+			return false;
+		}
+	}
+	return true;
+}
+
+const checkPassword = (password) => {
+	const len = password.length;
+	if (len < 6 && len > 20) {
+		return false;
+	}
+	for (let i = 0; i < len; i++) {
+		if ((password[i] < 'A' || password[i] > 'Z') &&
+			(password[i] < 'a' || password[i] > 'z') &&
+			(password[i] < '0' || password[i] > '9')) {
+			return false;
+		}
+	}
+	return true;
+}
+
 module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) => {    
     app.post("/api/register", urlencodedParser, (request, response) => {
         const args = ["login", "password"];
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
+        if (!checkLogin(req["login"])) {
+        	response.status(200).send(JSON.stringify({
+        		success: false,
+        		err_code: 8,
+        		err_cause: `Login can be between 1 and 20 characters long
+        					and have only latin characters, numbers
+        					underscores, points, dashes and spaces`
+        	}));
+        	return;
+        }
+        if (!checkPassword(req["password"])) {
+        	response.status(200).send(JSON.stringify({
+        		success: false,
+        		err_code: 8,
+        		err_cause: `Password can be between 6 and 20 characters long
+        					and have only latin characters and numbers`
+        	}));
+        	return;
+        }
         let resp = authModule.register(req.login, req.password); //TODO: validate
         if (!resp.success) {
             response.status(200).send(JSON.stringify(resp));
@@ -40,6 +91,25 @@ module.exports.init = (app, urlencodedParser, authModule, dbModule, chatModule) 
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
+        if (!checkLogin(req["login"])) {
+        	response.status(200).send(JSON.stringify({
+        		success: false,
+        		err_code: 8,
+        		err_cause: `Login can be between 1 and 20 characters long
+        					and have only latin characters, numbers
+        					underscores, points, dashes and spaces`
+        	}));
+        	return;
+        }
+        if (!checkPassword(req["password"])) {
+        	response.status(200).send(JSON.stringify({
+        		success: false,
+        		err_code: 8,
+        		err_cause: `Password can be between 6 and 20 characters long
+        					and have only latin characters and numbers`
+        	}));
+        	return;
+        }
         let resp = authModule.auth(req.login, req.password);
         response.status(200).send(JSON.stringify(resp));
     });
