@@ -1,33 +1,43 @@
 'use strict'
 
-let timer;
-
-const registration = () => {
-  let login = document.getElementById("login");
-  let password = document.getElementById("password");
-  if(login && password && login.value != "" && password.value != ""){
-    let sendData = "login="+login.value+"&"+"password="+password.value;
-    send(adress+"api/register",sendData);
-    timer = setInterval(function(){
-      if (time < 1500)
-        time*=2;
-      else clearInterval(timer);
-      let r = get();
-      if (r!="") {
-        let responseObj = JSON.parse(r);
-        process(responseObj,"Пользователь успешно зарегистрирован");
-        clearInterval(timer);
-      }
-    },time);
-  }
-  else showMessage("Введите логин и пароль для нового пользователя","error");
-};
-
-const process = (data, msg) =>{
-  if(!data.success)
-    showMessage(data.err_cause, "error");
-  else
-    showMessage(msg, "ok");
+const checkLogin = (login) => {
+    return login !== ""; //TODO
+}
+const checkPassword = (password) => {
+    return password !== ""; //TODO
 }
 
-document.getElementById("btnSend").addEventListener("click",registration);
+const registration = async (login, password) => {
+    return new Promise((resolve, reject) => {
+        request("api/register", { login: login, password: password })
+            .then((res) => {
+                const response = JSON.parse(res.response);
+                if (response.success) {
+                    return resolve();
+                }
+                else {
+                    return reject(response.err_cause);
+                }
+            })
+            .catch((err) => {
+                return reject(err);
+            });
+    });
+}
+
+document.getElementById("btnSend").addEventListener("click", () => {
+    const login = document.getElementById("login").value;
+    const password = document.getElementById("password").value;
+    if (checkLogin(login) && checkPassword(password)) {
+        registration(login, password)
+            .then((res) => {
+                window.location.replace('/auth.html');
+            })
+            .catch((err) => {
+                alert(err);
+            });
+    }
+    else {
+        alert("Логин или пароль не соответствуют внутренней политике");
+    }
+})

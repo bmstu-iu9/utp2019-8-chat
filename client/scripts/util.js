@@ -30,7 +30,7 @@ const deleteCookie = (name) => {
     setCookie(name, "", { 'max-age': -1 });
 }
 
-const request = async (dest, params) => {
+const request = (dest, params) => {
     return new Promise((resolve, reject) => {
         const encodeMessage = (str) => { //Replace special charasters to codes
             return str.toString().
