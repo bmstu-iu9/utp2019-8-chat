@@ -18,6 +18,7 @@ https://54.93.122.236.xip.io/index.html
     cd ./utp2019-8-chat/
     git checkout --track origin/dev #До тех пор, пока код не будет залит в мастер
     cp ./default_config.json ./config.json
+    node ./server.js --init
     node ./server.js -p 3000 -c ./config.json
     sensible-browser localhost:3000 #Выполнить в отдельном терминале либо открыть в браузере
     #Ctrl + C для сохранения данных и остановки сервера
