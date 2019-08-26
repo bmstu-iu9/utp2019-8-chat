@@ -38,7 +38,10 @@ const initSocket = (opened) => {
             alert("You don't have permissions to do that");
         }
         else if (resp.success && resp.type === "new_message") {
-            addMessage(resp.data, "default.png");
+            createMessage(resp.data).then((msg) => {
+                document.getElementById("chat_flow").innerHTML += msg;
+                document.getElementById("chat_flow").scrollTop = 9999;
+            });
         }
         else if (resp.success) {
             console.warn(`Unknown message: ${JSON.stringify(resp)}`);

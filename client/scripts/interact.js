@@ -68,7 +68,7 @@ const init = () => {
     });
 }
 
-const addMessage = (message) => {
+const createMessage = (message) => {
     const getAuthor = (id) => {
         return new Promise((resolve, reject) => {
             let saved = usersCache.get(message.author_id);
@@ -121,7 +121,7 @@ const loadMessages = (id) => {
                 if (response.success && response.count > 0) {
                     let builder = "";
                     for (let i = 0; i < response.count; i++) {
-                        builder += await addMessage(response.messages[i]);
+                        builder += await createMessage(response.messages[i]);
                     }
                     return resolve(builder);
                 }
