@@ -106,19 +106,6 @@ module.exports.chat_history = (channel_id, offset, count) => {
 	const channel = channels.get(+channel_id);
 	if (channel === undefined)
 		return ERR_CHANNEL_NO_EXIST;
-	// let start = 0;
-	// let end = 0;
-	// let len = messages.get(+channel_id).length;
-	// if (offset < len) {
-	// 	end = len - offset;
-	// 	if (offset + count < len)
-	// 		start = len - offset - count;
-	// }
-	// return {
-	// 	success: true,
-	// 	count: end - start,
-	// 	messages: messages[channel_id].slice(start, end)
-	// };
 	const msgMap = messages.get(+channel_id);
 	let curCount = 0;
 	let msgs = [];
