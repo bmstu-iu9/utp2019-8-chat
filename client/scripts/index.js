@@ -1,33 +1,5 @@
 'use strict'
 
-const sendRequest = (dest, params, callback) => {
-    const encodeMessage = (str) => { //Replace special charasters to codes
-        return str.toString().
-            replace(/\$/g, "%24").
-            replace(/\&/g, "%26").
-            replace(/\+/g, "%2b").
-            replace(/\,/g, "%2c").
-            replace(/\//g, "%2f").
-            replace(/\:/g, "%3a").
-            replace(/\;/g, "%3b").
-            replace(/\=/g, "%3d").
-            replace(/\?/g, "%3f").
-            replace(/\@/g, "%40");
-    }
-    let xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = () => {
-        if (xhr.readyState != 4)
-            return;
-        callback(xhr.responseText, xhr.status);
-    }
-    xhr.open('POST', dest, true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    let paramStr = [];
-    for (let key in params)
-        paramStr.push(`${key}=${encodeMessage(params[key])}`);
-    xhr.send(paramStr.join('&'));
-}
-
 init()
     .then((res) => {
         initSocket(() => {
