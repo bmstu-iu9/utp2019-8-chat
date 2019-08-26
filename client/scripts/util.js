@@ -60,3 +60,10 @@ const request = (dest, params) => {
         xhr.send(paramStr.join('&'));
     });
 }
+
+const checkLogin = (login) => {
+    return login !== ""; //TODO
+}
+const checkPassword = (password) => {
+    return password !== ""; //TODO
+}

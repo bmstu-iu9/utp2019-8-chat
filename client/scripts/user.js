@@ -345,3 +345,63 @@ const processApiGetPublicCipher = (data) =>{
   else
     console.log(data);
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+// api/exit_session
+
+const apiExitSession = () => {
+  let paramsStr = "token=" + token;
+  send(adress + "api/exit_session", paramsStr);
+  let ltime = time;
+  let timer = setInterval(function () {
+      if (ltime < 1500)
+          ltime *= 2;
+      else clearInterval(timer);
+      let r = get();
+      if (r != "") {
+          let responseObj = JSON.parse(r);
+          processApiExitSession(responseObj);
+          clearInterval(timer);
+      }
+  }, ltime);
+}
+
+const processApiExitSession = (data) => {
+  if (!data.success)
+      console.log("Error " + data.err_code + ": " + data.err_cause);
+  //showMessage(data.err_cause, "error");
+  else {
+      console.log("Успешный выход (" + token + ")");
+      //  token = "";
+  }
+}
+
+// api/exit_all_session
+
+const apiExitAllSessions = () => {
+  let paramsStr = "token=" + token;
+  send(adress + "api/exit_all_session", paramsStr);
+  let ltime = time;
+  let timer = setInterval(function () {
+      if (ltime < 1500)
+          ltime *= 2;
+      else clearInterval(timer);
+      let r = get();
+      if (r != "") {
+          let responseObj = JSON.parse(r);
+          processApiExitAllSessions(responseObj);
+          clearInterval(timer);
+      }
+  }, ltime);
+}
+
+const processApiExitAllSessions = (data) => {
+  if (!data.success)
+      console.log("Error " + data.err_code + ": " + data.err_cause);
+  //showMessage(data.err_cause, "error");
+  else
+      console.log("Успешный выход из всех сессий");
+}
