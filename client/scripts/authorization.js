@@ -18,3 +18,13 @@ db.connect((err) => {
 	}
 	console.log("Connected");
 });
+
+document.getElementById("Save").addEventListener('click',function ()
+    {
+     alert("hello");
+     //validation code to see State field is mandatory.  
+    }  ); 
+
+const registration = () => {
+	alert("lol");
+}
