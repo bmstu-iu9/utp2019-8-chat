@@ -80,17 +80,14 @@ init()
     });
 
 
+let lastMsg = "";
+
 const sendMessage = () => {
     const msgTextbox = document.getElementById("input_msg");
     if (msgTextbox.value == "")
         return;
-    let msg = msgTextbox.value;
-    socket.send(JSON.stringify({
-        type: "send_message",
-        token: getCookie("accessToken"),
-        channel_id: 1, //TODO: channel selecting
-        message: msg
-    }));
+    socketSendMessage(msgTextbox.value);
+    lastMsg = msgTextbox.value;
     msgTextbox.value = "";
 }
 
@@ -98,4 +95,9 @@ document.getElementById("send_btn").addEventListener("click", (sender) => sendMe
 document.getElementById("input_msg").addEventListener("keyup", (sender) => {
     if (sender.key == "Enter")
         sendMessage();
+    else if (sender.key == "ArrowUp") {
+        const msgTextbox = document.getElementById("input_msg");
+        if (msgTextbox.value === "")
+            msgTextbox.value = lastMsg;
+    }
 });

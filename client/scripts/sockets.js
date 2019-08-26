@@ -3,9 +3,18 @@
 let socket = undefined;
 let curChannel = 0;
 
-const selectChannel = (id) => {
-    socket.send(JSON.stringify({ type: "set_channel", channel_id: 1, token: getCookie("accessToken") }));
+const socketSelectChannel = (id) => {
+    socket.send(JSON.stringify({ type: "set_channel", token: getCookie("accessToken"), channel_id: id }));
     curChannel = id;
+}
+
+const socketSendMessage = (msg) => {
+    socket.send(JSON.stringify({
+        type: "send_message",
+        token: getCookie("accessToken"),
+        channel_id: curChannel,
+        message: msg
+    }));
 }
 
 const initSocket = () => {
@@ -13,7 +22,7 @@ const initSocket = () => {
 
     socket.onopen = (e) => {
         console.log("Web socket connected");
-        selectChannel(1); //TODO: channel selecting
+        socketSelectChannel(1); //TODO: channel selecting
     };
 
     socket.onmessage = (event) => {
@@ -28,7 +37,7 @@ const initSocket = () => {
             console.warn("Forbidden");
             alert("You don't have permissions to do that");
         }
-        if (resp.success && resp.type === "new_message") {
+        else if (resp.success && resp.type === "new_message") {
             addMessage(resp.data, "default.png");
         }
         else if (resp.success) {
