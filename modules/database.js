@@ -1,157 +1,204 @@
-'use-strict'
+'use strict'
 
 const fs = require("fs");
-const readline = require("readline");
+
+const ERR_USER_NO_EXIST = { success: false, err_code: 7, err_cause: "User doesn't exist" };
+const ERR_CHANNEL_NO_EXIST = { success: false, err_code: 7, err_cause: "Channel doesn't exist" };
 
 let UsersData = [];
 let UsersChannels = [false];
+let messages = [];
 
-//Function for creating session key
-const makeSessionKey = () => {
-    let result = "";
-    let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let charactersLength = characters.length;
-    for (let i = 0; i < 5; i++) result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    return result;
+
+module.exports.create_user = (id, nickname) => {
+	let newUser = {
+		id: id,
+		nickname: nickname,
+		permissions: 0,
+		avatar: "avatars/default.png",
+		channels: [],
+		meta: {}
+	};
+	UsersData[id] = newUser;
 }
 
-//Function for checking session key
-const checkSessionKey = (key) => {
-	let i = 0;
-    let len = UsersData.length;
-    for (; i < len; i++) if (UsersData[i].key === key) break;
-    if (i === len) return false;
-	return i;
+module.exports.get_user = (id) => {
+	let current = UsersData[id];
+	if (current === undefined) {
+		return ERR_USER_NO_EXIST;
+	}
+	return { success: true, user: current };
 }
 
-//Registration new user
-module.exports.registration = (login, password, name) => {
-    UsersData.push({login: login, password: password, key: "", channels: [], author_name: name, id: UsersData.length});
+module.exports.change_avatar = (user_id, avatar) => {
+	if (UsersData[user_id] === undefined) {
+		return ERR_USER_NO_EXIST;
+	}
+	UsersData[user_id].avatar = avatar;
+	return { success: true };
 }
 
-//Authentification user
-module.exports.authentication = (login, password) => {
-    let i = 0;
-    let len = UsersData.length;
-    for (; i < len; i++) {
-        let cur = UsersData[i];
-        if (cur.login === login) {
-            if (cur.password === password) break;
-            else return false;
-        }
-    }
-    if (i === len) return false;
-    let key = makeSessionKey();
-    UsersData[i].key = key;
-    return key;
+module.exports.add_to_channel = (user_id, channel_id) => {
+	if (UsersData[user_id] === undefined) {
+		return ERR_USER_NO_EXIST;
+	}
+	if (UsersChannels[channel_id] === undefined) {
+		return ERR_CHANNEL_NO_EXIST;
+	}
+	UsersData[user_id].channels.push(+channel_id);
+	UsersChannels[channel_id].listeners_ids.push(+user_id);
+	return { success: true };
 }
 
-//Shows all channels, available for user
-module.exports.channels_list = (key) => {
-	let i = checkSessionKey(key);
-    if (i === false) return false;
-    return UsersData[i].channels;
+module.exports.remove_from_channel = (user_id, channel_id) => {
+	if (UsersData[user_id] === undefined) {
+		return ERR_USER_NO_EXIST;
+	}
+	if (UsersChannels[channel_id] === undefined) {
+		return ERR_CHANNEL_NO_EXIST;
+	}
+	UsersData[user_id].channels[UsersData[user_id].channels.indexOf(+channel_id)] = false;
+	for (let i = 0; i < UsersChannels[channel_id].listeners_ids.length; i++) {
+		if (UsersChannels[channel_id].listeners_ids[i] === +user_id) {
+			UsersChannels[channel_id].listeners_ids[i] = false;
+			break;
+		}
+	}
+	return { success: true };
 }
 
-//Adds channel for user
-module.exports.channels_add = (key, id) => {
-    let i = checkSessionKey(key);
-    if (i === false) return false;
-    UsersData[i].channels.push(id);
-	return true;
+
+module.exports.get_channel = (id) => {
+	let current = UsersChannels[id];
+	if (current === undefined) {
+		return ERR_CHANNEL_NO_EXIST;
+	}
+	return { success: true, channel: current };
 }
 
-//Removes channell from user (not deleting channel for all users, only for one user)
-module.exports.channels_remove = (key, id) => {
-    let i = checkSessionKey(key);
-    if (i === false) return false;
-
-    let cur = UsersData[i];
-    for (i = 0; i < cur.channels.length; i++) if (cur.channels[i] === id) {
-        cur.channels[i] = false;
-        break;
-    }
-    return true;
+module.exports.create_channel = (user_id, channel_name) => {
+	for (let i = 1; i < UsersChannels.length; i++) {
+		if (UsersChannels[i].name === channel_name) {
+			return { success: false, err_code: 3, err_cause: "Channel with this name already exists" };
+		}
+	}
+	UsersData[user_id].channels.push(UsersChannels.length);
+	let newChannel = {
+		id: UsersChannels.length,
+		name: channel_name,
+		owner_id: user_id,
+		listeners_ids: [user_id],
+		last_message_id: undefined,
+		last_message_time: undefined,
+		meta: {}
+	};
+	UsersChannels.push(newChannel);
+	messages[newChannel.id] = [];
+	return { success: true };
 }
 
-//Creating new channel (available for (almost)any user)
-module.exports.channels_create = (key, name) => {
-    let i = checkSessionKey(key);
-    if (i === false) return false;
-
-    UsersChannels.push({id: UsersChannels.length, name: name, messages: []});
-    return UsersChannels.length - 1;
+module.exports.channels_delete = (channel_id) => {
+	if (UsersChannels[channel_id] === undefined) {
+		return ERR_CHANNEL_NO_EXIST;
+	}
+	for (let i = 0; i < UsersChannels[channel_id].listeners_ids.length; i++) {
+		for (let j = 0; j < UsersData[i].channels.length; j++) {
+			if (UsersData[i].channels[j].id === channel_id) {
+				UsersData[i].channels[j] = false;
+				break;
+			}
+		}
+	}
+	UsersChannels[channel_id] = false;
+	return { success: true };
 }
 
-//Deleting channel for ALL users
-module.exports.channels_delete = (key, id) => {
-    let i = checkSessionKey(key);
-    if (i === false) return false;
 
-    UsersChannels[id] = false;
-	return true;
+module.exports.chat_history = (channel_id, offset, count) => {
+	if (UsersChannels[channel_id] === undefined) {
+		return ERR_CHANNEL_NO_EXIST;
+	}
+	let start = 0;
+	let end = 0;
+	let len = messages[channel_id].length;
+	if (offset < len) {
+		end = len - offset;
+		if (offset + count < len)
+			start = len - offset - count;
+	}
+	return {
+		success: true,
+		count: end - start,
+		messages: messages[channel_id].slice(start, end)
+	};
 }
 
-//Returns chat history for a channel
-module.exports.chat_history = (key, id, count, offset) => {
-    let i = checkSessionKey(key);
-    if (i === false) return false;
-
-    let start = 0;
-    let end = 0;
-    len = UsersChannels[id].messages.length;
-    if (offset < len) {
-        end = len - offset;
-        if (offset + count < len) start = len - offset - count;
-    }
-    //Returning number of messages and themselves messages
-    return [end - start, UsersChannels[id].messages.slice(start, end)];
+module.exports.send_message = (channel_id, message, author_id, broadcast) => {
+	if (UsersChannels[channel_id] === undefined) {
+		return ERR_CHANNEL_NO_EXIST;
+	}
+	let newMsg = {
+		message_id: messages[channel_id].length,
+		author_id: author_id,
+		author_name: this.get_user(author_id).user.nickname,
+		message: message,
+		time: new Date().getTime(),
+		channel_id: channel_id
+	};
+	messages[channel_id].push(newMsg);
+	broadcast(channel_id, newMsg);
+	return { success: true };
 }
 
-//Sending message for a channel
-module.exports.send_message = (key, id, message) => {
-    let i = checkSessionKey(key);
-    if (i === false) return false;
-
-    UsersChannels[id].messages.push({message_id: UsersChannels[id].messages.length, author_id: UsersData[i].id, author_name: UsersData[i].author_name, message: message});
-    return UsersChannels[id].messages[UsersChannels[id].messages.length - 1];
-}
 
 //Information inside UsersData and UsersChannels, which accumulates during server's session,
 //saves into UsersData.json and UsersChannels.json accordingly
-module.exports.save = () => {
-    if (UsersData.length > 0) {
-		fs.writeFileSync("./Data/UsersData.json", JSON.stringify(UsersData[0]));
-		fs.appendFileSync("./Data/UsersData.json", "\n");
-	}
-    for (let i = 1; i < UsersData.length; i++) {
-        fs.appendFileSync("./Data/UsersData.json", JSON.stringify(UsersData[i]));
-		if (i < UsersData.length - 1) fs.appendFileSync("./Data/UsersData.json", "\n");
-    }
-    if (UsersChannels.length > 0) {
-		fs.writeFileSync("./Data/UsersChannels.json", JSON.stringify(UsersChannels[0]));
-		fs.appendFileSync("./Data/UsersChannels.json", "\n");
-	}
-    for (let i = 1; i < UsersChannels.length; i++) {
-        fs.appendFileSync("./Data/UsersChannels.json", JSON.stringify(UsersChannels[i]));
-		if (i < UsersChannels.length - 1) fs.appendFileSync("./Data/UsersChannels.json", "\n");
-    }
+module.exports.save = async () => {
+	return new Promise((resolve, reject) => {
+		fs.writeFile("./Data/users.json", JSON.stringify(UsersData), {}, (err) => {
+			if (err)
+				return reject(err);
+			fs.writeFile("./Data/channels.json", JSON.stringify(UsersChannels), (err) => {
+				if (err)
+					return reject(err);
+				for (let i in UsersChannels) {
+					if (UsersChannels[i]) {
+						fs.writeFileSync(
+							`./Data/messages/${UsersChannels[i].id}.json`,
+							JSON.stringify(messages[UsersChannels[i].id]));
+					}
+				}
+				return resolve();
+			});
+		});
+	});
 }
 
 //Loading information, that had been recording during previous server's sessions,
 //from UsersData.json and UsersChannels.json to UsersData and UsersChannels respectively
-module.exports.load = (callback) => {
-    let current = readline.createInterface({input: fs.createReadStream("./Data/UsersData.json")});
-    current.on('line', (line) => {
-        if (line.length > 5) UsersData.push(JSON.parse(line));
-    });
-    current.on('close', () => {
-        let current_1 = readline.createInterface({input: fs.createReadStream("./Data/UsersChannels.json")});
-        current_1.on('line', (line) => {
-            if (line.length > 5) UsersChannels.push(JSON.parse(line));
-        });
-        current_1.on('close', () => {
-            callback();
-        });
-    });
+module.exports.load = async () => {
+	return new Promise((resolve, reject) => {
+		fs.readFile("./Data/users.json", (err, raw) => {
+			if (err)
+				return reject(err);
+			if (raw.length === 0)
+				return resolve();
+			UsersData = JSON.parse(raw);
+			fs.readFile("./Data/channels.json", (err, raw) => {
+				if (raw.length === 0)
+					return resolve();
+				UsersChannels = JSON.parse(raw);
+				for (let i in UsersChannels) {
+					if (UsersChannels[i]) {
+						let raw = fs.readFileSync(`./Data/messages/${UsersChannels[i].id}.json`);
+						if (raw.length === 0)
+							messages[UsersChannels[i].id] = [];
+						else
+							messages[UsersChannels[i].id] = JSON.parse(raw);
+					}
+				}
+				return resolve();
+			});
+		});
+	});
 }

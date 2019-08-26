@@ -1,79 +1,104 @@
 'use strict'
 
-/*
-    message {
-        id: 1,                  //Integer, starts from 1
-        author_id: 42,          //Dont know
-        author_name: "Alice",   //Nickname
-        message: "Hello hell!"  //Text of message
-    }
-*/
+const ws = require("ws");
 
-let listeners = [];
-let channels = []; //This contains only messages sended in current session
+const PING_INTERVAL = 30; //In seconds
+const WS_PATH = "/chatSocket"
 
-const broadcast = (channelId) => {
-    const nextMsg = (lastMsg) => { //Get a message following the message with id=lastMsg or false
-        let messages = channels[channelId];
-        if (messages === undefined)
-            return false;
-        if (messages.length !== 0 && lastMsg < messages[messages.length - 1].id) {
-            let t = messages.length - 1;
-            while (t >= 0 && messages[t].id != lastMsg)
-                t--;
-            t++;
-            return messages[t];
-        }
-        else
-            return false;
-    }
+let auth, db;
+let wss;
+let aliveCheckerId = undefined;
 
-    if (listeners[channelId] === undefined)
-        return;
-    let waiters = []; //Array for connections that didnt get response in this broadcast
-    for (let i = 0; i < listeners[channelId].length; i++) {
-        let msg = nextMsg(listeners[channelId][i].lastMsg);
-        if (msg) { //If new message exist
-            listeners[channelId][i].response.
-                status(200).
-                send(JSON.stringify({
-                    id: msg.id,
-                    message: {
-                        message_id: msg.id,
-                        author_id: msg.author_id,
-                        author_name: msg.author_name,
-                        message: msg.message
-                    }
-                }));
-            listeners[channelId][i].response.end();
-        }
-        else {
-            waiters.push(listeners[channelId][i]);
-        }
-    }
-    listeners[channelId] = waiters; //Leave in the array only opened connections
+const ERR_AUTH_FAILED = { success: false, err_code: 5, err_cause: "Authorization failed" };
+const ERR_NO_PERMISSIONS = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+
+const checkPerm = (user, check) => {
+    return (user.permissions & (check | 1)) !== 0; // 1 - admin
 }
 
-//Add a new listener to the channel
-module.exports.addListener = (channelId, response, lastMsg) => {
-    if (listeners[channelId] === undefined)
-        listeners[channelId] = [];
-    listeners[channelId].push({
-        response: response,
-        lastMsg: lastMsg
+module.exports.broadcast = (channel_id, msg) => {
+    wss.clients.forEach((e) => {
+        if (e.readyState === ws.OPEN && e.channel_id == channel_id) {
+            e.send(JSON.stringify({
+                success: true,
+                type: "new_message",
+                data: msg
+            }));
+        }
+    })
+}
+
+module.exports.init = (server, authModule, dbModule) => {
+    auth = authModule;
+    db = dbModule;
+    wss = new ws.Server({
+        server,
+        path: WS_PATH
     });
-    broadcast(channelId);
+
+    wss.on('connection', (ws) => {
+        ws.isAlive = true;
+        ws.on('pong', () => { ws.isAlive = true; });
+
+        ws.on('message', (message) => {
+            let res = JSON.parse(message);
+            let user;
+            if (res.token !== undefined) {
+                let authId = auth.getUser(res.token).userID;
+                user = db.get_user(authId);
+                user = user.success ? user.user : undefined;
+            }
+
+            if (res.type === "send_message") {
+                if (user === undefined) {
+                    ws.send(JSON.stringify(ERR_AUTH_FAILED));
+                }
+                else if (checkPerm(user, 1) || user.channels.includes(res.channel_id)) { //TODO: permission
+                    db.send_message(res.channel_id, res.message, user.id, this.broadcast);
+                }
+                else {
+                    ws.send(JSON.stringify(ERR_NO_PERMISSIONS));
+                }
+            }
+
+            else if (res.type === "set_channel") {
+                let channel = dbModule.get_channel(res.channel_id);
+                if (!channel.success) {
+                    ws.send(JSON.stringify({ success: false, err_code: 3, err_cause: "Channel does not exist" }));
+                }
+                else if (!channel.channel) {
+                    ws.channel_id = undefined;
+                }
+                else if (channel.channel.meta.public) {
+                    ws.channel_id = res.channel_id;
+                }
+                else if (user === undefined) {
+                    ws.send(JSON.stringify(ERR_AUTH_FAILED));
+                }
+                else if (checkPerm(user, 1) || user.channels.includes(res.channel_id)) { //TODO: permission
+                    ws.channel_id = res.channel_id;
+                }
+                else {
+                    ws.send(JSON.stringify(ERR_NO_PERMISSIONS));
+                }
+            }
+        });
+    });
+
+    aliveCheckerId = setInterval(() => {
+        wss.clients.forEach((ws) => {
+            if (!ws.isAlive)
+                return ws.terminate();
+            ws.isAlive = false;
+            ws.ping(null, false, true);
+        });
+    }, PING_INTERVAL * 1000);
 }
 
-//Add a new message to the broadcast list
-module.exports.newMessage = (channelId, msg) => {
-    if (channels[channelId] === undefined)
-        channels[channelId] = [];
-    channels[channelId].push(msg); //Warning: messages in the array must be sorted by id in ascending order!
-    broadcast(channelId);
-}
-
-//Manually check the listeners in the channel for new messages
-module.exports.checkListeners = (channelId) => {
-    broadcast(channelId);
+module.exports.stop = () => {
+    if (aliveCheckerId !== undefined)
+        clearInterval(aliveCheckerId);
+    wss.clients.forEach((e) => {
+        e.close(1000, "Server is closing");
+    });
 }

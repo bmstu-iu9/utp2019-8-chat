@@ -1,8 +1,16 @@
 {
   "name": "utp2019-8-chat",
   "version": "1.0.0",
+  "main": "server.js",
+  "homepage": "https://github.com/bmstu-iu9/utp2019-8-chat",
+  "repository": "github:bmstu-iu9/utp2019-8-chat",
+  "license": "MIT",
+  "private": true,
   "dependencies": {
     "body-parser": "^1.19.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "minimist": "^1.2.0",
+    "mysql": "^2.17.1",
+    "ws": "^7.1.2"
   }
 }
