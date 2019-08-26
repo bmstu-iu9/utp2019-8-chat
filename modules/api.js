@@ -370,7 +370,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         }
         let user = dbModule.get_user(auth.userID).user;
 
-        if (data.cmd === "Join1") {
+        if (req.data === "Join1") {
             let resp = dbModule.add_to_channel(user.id, 1);
             response.status(200).send(JSON.stringify(resp));
             return;

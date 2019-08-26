@@ -44,7 +44,7 @@ module.exports.add_to_channel = (user_id, channel_id) => {
 	if (channel === undefined)
 		return ERR_CHANNEL_NO_EXIST;
 
-	if (!user.channel.includes(+channel_id))
+	if (!user.channels.includes(+channel_id))
 		user.channels.push(+channel_id);
 	if (!channel.listeners_ids.includes(+user_id))
 		channel.listeners_ids.push(+user_id);

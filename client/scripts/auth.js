@@ -23,9 +23,9 @@ const process = () => {
         auth(login, password)
             .then((res) => {
                 setCookie("accessToken", res);
-                request("api/feature", { data: { cmd: "Join1", id: 1 } }) //TODO: TEMP FEATURE
-                    .then(() => { window.location.replace('/index.html'); }) //TODO: TEMP FEATURE
-                    .catch(() => { window.location.replace('/index.html'); }); //TODO: TEMP FEATURE
+                request("/api/feature", { token: getCookie("accessToken"), data: "Join1" })     //TODO: TEMP FEATURE
+                    .then(() => { window.location.replace('/index.html'); })                    //TODO: TEMP FEATURE
+                    .catch(() => { window.location.replace('/index.html'); });                  //TODO: TEMP FEATURE
             })
             .catch((err) => {
                 alert(err);
