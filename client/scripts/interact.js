@@ -67,57 +67,64 @@ const init = () => {
 }
 
 const addMessage = (message) => {
-    sendRequest("/api/get_user", { id: message.author_id }, (response, status) => {
-        response = JSON.parse(response);
-        if (response.success) {
-            const author = response.user;
-            const d = new Date(message.time);
-            const msgID = `${message.channel_id}_${message.time}`;
-            const text = message.message.
-                replace(/</g, "&lt;").
-                replace(/>/g, "&gt;").
-                replace(/"/g, "&quot;");
-            document.getElementById("chat_flow").innerHTML +=
-                `<div class="msg_box" id=${msgID}>
-                    <div class="msg_info_zone">
-                        <div class="msg_icon">
-                            <img src="${author.avatar}">
-                        </div>            
-                    </div>
-                    <div class="msg_message_zone">
-                        <div class="name">${author.nickname}</div>
-                        <div class="msg_time">${d.getHours()}:${d.getMinutes()}</div>
-                        <div class="msg">${text}</div>
-                    </div>
-                </div>`
-            document.getElementById("chat_flow").scrollTop = 9999;
-        }
-        else {
-            console.warn(response);
-        }
+    return new Promise((resolve, reject) => {
+        sendRequest("/api/get_user", { id: message.author_id }, (response, status) => {
+            response = JSON.parse(response);
+            if (response.success) {
+                const author = response.user;
+                const d = new Date(message.time);
+                const msgID = `${message.channel_id}_${message.time}`;
+                const text = message.message.
+                    replace(/</g, "&lt;").
+                    replace(/>/g, "&gt;").
+                    replace(/"/g, "&quot;");
+                const node =
+                    `<div class="msg_box" id=${msgID}>
+                        <div class="msg_info_zone">
+                            <div class="msg_icon">
+                                <img src="${author.avatar}">
+                            </div>            
+                        </div>
+                        <div class="msg_message_zone">
+                            <div class="name">${author.nickname}</div>
+                            <div class="msg_time">${d.getHours()}:${d.getMinutes()}</div>
+                            <div class="msg">${text}</div>
+                        </div>
+                    </div>`
+                return resolve(node);
+            }
+            else {
+                console.warn(response);
+                return reject(response);
+            }
+        });
     });
 }
 
 const loadMessages = (id) => {
-    sendRequest("/api/get_messages",
-        { token: getCookie("accessToken"), channel_id: id, offset: 0, count: 250 },
-        (response, status) => {
-            response = JSON.parse(response);
-            if (response.success) {
-                for (let i = 0; i < response.count; i++) {
-                    const cur = response.messages[i];
-                    addMessage(cur, "default.png");
+    return new Promise((resolve, reject) => {
+        sendRequest("/api/get_messages", { token: getCookie("accessToken"), channel_id: id, offset: 0, count: 250 },
+            async (response, status) => {
+                response = JSON.parse(response);
+                if (response.success && response.count > 0) {
+                    let builder = "";
+                    for (let i = 0; i < response.count; i++) {
+                        builder += await addMessage(response.messages[i]);
+                    }
+                    resolve(builder);
                 }
-            }
-            else {
-                console.warn(response);
-            }
-        });
+                else {
+                    console.warn(response);
+                    reject(response);
+                }
+            });
+    });
 }
 
-const selectChannel = (id) => {
+const selectChannel = async (id) => {
     socketSelectChannel(0); //Exit to the neutral channel
     document.getElementById("chat_flow").innerHTML = "";
-    loadMessages(id);
+    document.getElementById("chat_flow").innerHTML = await loadMessages(id);
+    document.getElementById("chat_flow").scrollTop = 9999;
     socketSelectChannel(id);
 }
