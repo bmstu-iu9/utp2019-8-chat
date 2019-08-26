@@ -2,49 +2,49 @@
 
 let usersCache = new Map();
 
-const checkAuth = async (accessToken) => {
-    return new Promise((resolve, reject) => {
-        if (accessToken === undefined) {
-            return resolve({ success: false, cause: "Access token did not found" });
-        }
-        sendRequest("/api/check_token", { token: accessToken }, (response, status) => {
-            response = JSON.parse(response);
-            if (!response.success)
-                return resolve({ success: false, cause: `Wrong access token: ${response.err_cause}` });
-            else {
-                return resolve({ success: true, userID: response.userID });
-            }
-        });
-    });
-}
-
-const getUser = async (userID) => {
-    return new Promise((resolve, reject) => {
-        sendRequest("/api/get_user", { id: userID }, (response, status) => {
-            response = JSON.parse(response);
-            if (!response.success)
-                return resolve({ success: false, cause: `Error: ${response.err_cause}` });
-            else {
-                return resolve({ success: true, user: response.user });
-            }
-        });
-    });
-}
-
-const getChannel = async (channelID) => {
-    return new Promise((resolve, reject) => {
-        sendRequest("/api/get_channel", { id: channelID }, (response, status) => {
-            response = JSON.parse(response);
-            if (!response.success)
-                return resolve({ success: false, cause: `Error: ${response.err_cause}` });
-            else {
-                return resolve({ success: true, channel: response.channel });
-            }
-        });
-    });
-}
-
+//Load and return data about the user and his channels
 const init = () => {
+    const checkAuth = async (accessToken) => {
+        return new Promise((resolve, reject) => {
+            if (accessToken === undefined) {
+                return resolve({ success: false, cause: "Access token did not found" });
+            }
+            sendRequest("/api/check_token", { token: accessToken }, (response, status) => {
+                response = JSON.parse(response);
+                if (!response.success)
+                    return resolve({ success: false, cause: `Wrong access token: ${response.err_cause}` });
+                else {
+                    return resolve({ success: true, userID: response.userID });
+                }
+            });
+        });
+    }
+
+    const getUser = async (userID) => {
+        return new Promise((resolve, reject) => {
+            sendRequest("/api/get_user", { id: userID }, (response, status) => {
+                response = JSON.parse(response);
+                if (!response.success)
+                    return resolve({ success: false, cause: `Error: ${response.err_cause}` });
+                else {
+                    return resolve({ success: true, user: response.user });
+                }
+            });
+        });
+    }
+
+    const getChannel = async (channelID) => {
+        return new Promise((resolve, reject) => {
+            sendRequest("/api/get_channel", { id: channelID }, (response, status) => {
+                response = JSON.parse(response);
+                if (!response.success)
+                    return resolve({ success: false, cause: `Error: ${response.err_cause}` });
+                else {
+                    return resolve({ success: true, channel: response.channel });
+                }
+            });
+        });
+    }
     return new Promise(async (resolve, reject) => {
         const token = getCookie("accessToken");
         const authRes = await checkAuth(token);
@@ -59,15 +59,16 @@ const init = () => {
             console.error(`Error (${userInfo.err_cause})`);
             return reject("User loading failed");
         }
-        const channelsPromises = [];
+        let channels = [];
         for (let i in userInfo.user.channels)
-            if (userInfo.user.channels[i]) //I have no words...
-                channelsPromises.push(getChannel(userInfo.user.channels[i]));
-        const channels = await Promise.all(channelsPromises);
+            if (userInfo.user.channels[i])
+                channels.push(getChannel(userInfo.user.channels[i]));
+        channels = await Promise.all(channels);
         return resolve({ success: true, user: userInfo.user, channels: channels });
     });
 }
 
+//Create new message div
 const createMessage = (message) => {
     const getAuthor = (id) => {
         return new Promise((resolve, reject) => {
@@ -113,27 +114,26 @@ const createMessage = (message) => {
     });
 }
 
-const loadMessages = (id) => {
-    return new Promise((resolve, reject) => {
-        sendRequest("/api/get_messages", { token: getCookie("accessToken"), channel_id: id, offset: 0, count: 250 },
-            async (response, status) => {
-                response = JSON.parse(response);
-                if (response.success && response.count > 0) {
-                    let builder = "";
-                    for (let i = 0; i < response.count; i++) {
-                        builder += await createMessage(response.messages[i]);
-                    }
-                    return resolve(builder);
-                }
-                else {
-                    console.warn(response);
-                    return reject(response);
-                }
-            });
-    });
-}
-
+//Change channel
 const selectChannel = async (id) => {
+    const loadMessages = (id) => {
+        return new Promise((resolve, reject) => {
+            sendRequest("/api/get_messages", { token: getCookie("accessToken"), channel_id: id, offset: 0, count: 250 },
+                async (response, status) => {
+                    response = JSON.parse(response);
+                    if (response.success && response.count > 0) {
+                        let builder = "";
+                        for (let i = 0; i < response.count; i++)
+                            builder += await createMessage(response.messages[i]);
+                        return resolve(builder);
+                    }
+                    else {
+                        console.warn(response);
+                        return reject(response);
+                    }
+                });
+        });
+    }
     socketSelectChannel(0); //Exit to the neutral channel
     document.getElementById("chat_flow").innerHTML = "Loading";
     console.time("Messages loading");
