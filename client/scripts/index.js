@@ -160,6 +160,7 @@ var observe;
 			observe(text, 'paste',   delayedResize);
 			observe(text, 'drop',    delayedResize);
 			observe(text, 'keydown', delayedResize);
+			observe(text, 'keyup', delayedResize);
 
 			text.focus();
 			text.select();
