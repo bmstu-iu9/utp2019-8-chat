@@ -61,6 +61,7 @@
 | 5   | Неверный токен (мог истечь срок действия)                 | Wrong access token                                          |
 | 6   | Доступ запрещен (не хватает прав)                         | Access denied                                               |
 | 7   | Искомый объект не существует                              | User with id 1 does not exist                               |
+| 8   | Логин или пароль не соответствуют нормам                  | Password must have only latin characters and numbers        |
 
 ## Методы авторизации ##
 ### Регистрация ###
