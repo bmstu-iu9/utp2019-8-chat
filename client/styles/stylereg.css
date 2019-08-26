@@ -3,12 +3,13 @@
   align-items: center;
   justify-content: center;
   height: 100%;
+  flex-direction: column;
 }
 
 body{
-color: green;
+  color: green;
 }
 
 label{
-cursor: pointer;
+  cursor: pointer;
 }
