@@ -25,63 +25,63 @@ const checkPerm = (user, check) => {
 }
 
 const checkLogin = (login) => {
-	const len = login.length;
-	if (len < 1 && len > 20) {
-		return false;
-	}
-	for (let i = 0; i < len; i++) {
-		if ((login[i] < 'A' || login[i] > 'Z') &&
-			(login[i] < 'a' || login[i] > 'z') &&
-			(login[i] < '0' || login[i] > '9') &&
-			login[i] != '_' && login[i] != '.' &&
-			login[i] != '-' && login[i] != ' ') {
-			return false;
-		}
-	}
-	return true;
+    const len = login.length;
+    if (len < 1 && len > 20) {
+        return false;
+    }
+    for (let i = 0; i < len; i++) {
+        if ((login[i] < 'A' || login[i] > 'Z') &&
+            (login[i] < 'a' || login[i] > 'z') &&
+            (login[i] < '0' || login[i] > '9') &&
+            login[i] != '_' && login[i] != '.' &&
+            login[i] != '-' && login[i] != ' ') {
+            return false;
+        }
+    }
+    return true;
 }
 
 const checkPassword = (password) => {
-	const len = password.length;
-	if (len < 6 && len > 20) {
-		return false;
-	}
-	for (let i = 0; i < len; i++) {
-		if ((password[i] < 'A' || password[i] > 'Z') &&
-			(password[i] < 'a' || password[i] > 'z') &&
-			(password[i] < '0' || password[i] > '9')) {
-			return false;
-		}
-	}
-	return true;
+    const len = password.length;
+    if (len < 6 && len > 20) {
+        return false;
+    }
+    for (let i = 0; i < len; i++) {
+        if ((password[i] < 'A' || password[i] > 'Z') &&
+            (password[i] < 'a' || password[i] > 'z') &&
+            (password[i] < '0' || password[i] > '9')) {
+            return false;
+        }
+    }
+    return true;
 }
 
-module.exports.init = (app, authModule, dbModule, chatModule) => {    
+module.exports.init = (app, authModule, dbModule, chatModule) => {
     const urlencodedParser = bodyParser.urlencoded({ extended: false });
-    
+
     app.post("/api/register", urlencodedParser, (request, response) => {
         const args = ["login", "password"];
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
         if (!checkLogin(req["login"])) {
-        	response.status(200).send(JSON.stringify({
-        		success: false,
-        		err_code: 8,
-        		err_cause: `Login can be between 1 and 20 characters long
+            response.status(200).send(JSON.stringify({
+                success: false,
+                err_code: 8,
+                err_cause: `Login can be between 1 and 20 characters long
         					and have only latin characters, numbers
         					underscores, points, dashes and spaces`
-        	}));
-        	return;
+            }));
+            return;
         }
         if (!checkPassword(req["password"])) {
-        	response.status(200).send(JSON.stringify({
-        		success: false,
-        		err_code: 8,
-        		err_cause: `Password can be between 6 and 20 characters long
+            response.status(200).send(JSON.stringify({
+                success: false,
+                err_code: 8,
+                err_cause: `Password can be between 6 and 20 characters long
         					and have only latin characters and numbers`
-        	}));
-        	return;
+            }));
+            return;
         }
         let resp = authModule.register(req.login, req.password); //TODO: validate
         if (!resp.success) {
@@ -92,44 +92,44 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         dbModule.get_user(resp.id); //Dont touch this!!!
         response.status(200).send(JSON.stringify(resp));
     });
-    
+
     app.post("/api/auth", urlencodedParser, (request, response) => {
         const args = ["login", "password"];
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
         if (!checkLogin(req["login"])) {
-        	response.status(200).send(JSON.stringify({
-        		success: false,
-        		err_code: 8,
-        		err_cause: `Login can be between 1 and 20 characters long
+            response.status(200).send(JSON.stringify({
+                success: false,
+                err_code: 8,
+                err_cause: `Login can be between 1 and 20 characters long
         					and have only latin characters, numbers
         					underscores, points, dashes and spaces`
-        	}));
-        	return;
+            }));
+            return;
         }
         if (!checkPassword(req["password"])) {
-        	response.status(200).send(JSON.stringify({
-        		success: false,
-        		err_code: 8,
-        		err_cause: `Password can be between 6 and 20 characters long
+            response.status(200).send(JSON.stringify({
+                success: false,
+                err_code: 8,
+                err_cause: `Password can be between 6 and 20 characters long
         					and have only latin characters and numbers`
-        	}));
-        	return;
+            }));
+            return;
         }
         let resp = authModule.auth(req.login, req.password);
         response.status(200).send(JSON.stringify(resp));
     });
 
     app.post("/api/check_token", urlencodedParser, (request, response) => {
-        const args = ["token"]; 
+        const args = ["token"];
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
         let resp = authModule.getUser(req.token);
         response.status(200).send(JSON.stringify(resp));
     });
-    
+
     app.post("/api/exit_session", urlencodedParser, (request, response) => {
         const args = ["token"];
         let req = getArgs(request, response, args);
@@ -138,7 +138,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let resp = authModule.exitSession(req.token);
         response.status(200).send(JSON.stringify(resp));
     });
-    
+
     app.post("/api/exit_all_sessions", urlencodedParser, (request, response) => {
         const args = ["token"];
         let req = getArgs(request, response, args);
@@ -147,7 +147,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let resp = authModule.exitAllSessions(req.token);
         response.status(200).send(JSON.stringify(resp));
     });
-    
+
     app.post("/api/get_user", urlencodedParser, (request, response) => {
         const args = ["id"];
         let req = getArgs(request, response, args);
@@ -156,7 +156,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let resp = dbModule.get_user(req.id);
         response.status(200).send(JSON.stringify(resp));
     });
-    
+
     app.post("/api/add_to_channel", urlencodedParser, (request, response) => {
         const args = ["token", "user_id", "channel_id"];
         let req = getArgs(request, response, args);
@@ -177,7 +177,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             response.status(200).send(JSON.stringify(resp));
         }
     });
-    
+
     app.post("/api/remove_from_channel", urlencodedParser, (request, response) => {
         const args = ["token", "user_id", "channel_id"];
         let req = getArgs(request, response, args);
@@ -198,7 +198,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             response.status(200).send(JSON.stringify(resp));
         }
     });
-    
+
     app.post("/api/change_avatar", urlencodedParser, (request, response) => {
         const args = ["token", "user_id", "avatar"];
         let req = getArgs(request, response, args);
@@ -219,7 +219,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             response.status(200).send(JSON.stringify(resp));
         }
     });
-    
+
     app.post("/api/change_meta", urlencodedParser, (request, response) => {
         const args = ["token", "user_id", "meta"];
         let req = getArgs(request, response, args);
@@ -242,7 +242,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             response.status(200).send(JSON.stringify(resp));
         }
     });
-    
+
     app.post("/api/get_channel", urlencodedParser, (request, response) => {
         const args = ["id"];
         let req = getArgs(request, response, args);
@@ -251,7 +251,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let resp = dbModule.get_channel(req.id);
         response.status(200).send(JSON.stringify(resp));
     });
-    
+
     app.post("/api/create_channel", urlencodedParser, (request, response) => {
         const args = ["token", "channel_name"];
         let req = getArgs(request, response, args);
@@ -265,7 +265,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let resp = dbModule.create_channel(auth.userID, req.channel_name);
         response.status(200).send(JSON.stringify(resp));
     });
-    
+
     app.post("/api/delete_channel", urlencodedParser, (request, response) => {
         const args = ["token", "channel_id"];
         let req = getArgs(request, response, args);
@@ -293,7 +293,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         // let resp = dbModule.channels_delete(req.channel_id);
         // response.status(200).send(JSON.stringify(resp));
     });
-    
+
     app.post("/api/get_messages", urlencodedParser, (request, response) => {
         const args = ["token", "channel_id", "offset", "count"];
         let req = getArgs(request, response, args);
@@ -326,7 +326,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             }
         }
     });
-    
+
     app.post("/api/send_message", urlencodedParser, (request, response) => {
         const args = ["token", "channel_id", "message"];
         let req = getArgs(request, response, args);
@@ -347,13 +347,36 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             response.status(200).send(JSON.stringify(resp));
         }
     });
-    
+
     app.post("/api/listen", urlencodedParser, (request, response) => {
         response.status(405).send("{deprecated:true}");
     });
-    
+
     app.post("/api/public_cipher", urlencodedParser, (request, response) => {
         let resp = {};
+        response.status(200).send(JSON.stringify(resp));
+    });
+
+
+    app.post("/api/feature", urlencodedParser, (request, response) => {
+        const args = ["token", "data"];
+        let req = getArgs(request, response, args);
+        if (req === undefined)
+            return;
+        let auth = authModule.getUser(req.token);
+        if (!auth.success) {
+            response.status(200).send(JSON.stringify(auth));
+            return;
+        }
+        let user = dbModule.get_user(auth.userID).user;
+
+        if (data.cmd === "Join1") {
+            let resp = dbModule.add_to_channel(user.id, 1);
+            response.status(200).send(JSON.stringify(resp));
+            return;
+        }
+
+        const resp = { success: true };
         response.status(200).send(JSON.stringify(resp));
     });
 }

@@ -23,7 +23,9 @@ const process = () => {
         auth(login, password)
             .then((res) => {
                 setCookie("accessToken", res);
-                window.location.replace('/index.html');
+                request("api/feature", { data: { cmd: "Join1", id: 1 } }) //TODO: TEMP FEATURE
+                    .then(() => { window.location.replace('/index.html'); }) //TODO: TEMP FEATURE
+                    .catch(() => { window.location.replace('/index.html'); }); //TODO: TEMP FEATURE
             })
             .catch((err) => {
                 alert(err);

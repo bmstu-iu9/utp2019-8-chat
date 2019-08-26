@@ -25,23 +25,34 @@ const init = () => {
 const createMessage = (message, cache) => {
     const getAuthor = () => {
         return new Promise((resolve, reject) => {
-            let saved = cache.get(message.author_id);
-            if (saved !== undefined)
-                return resolve(saved);
-            else {
+            if (cache === undefined) {
                 apiGetUser(message.author_id)
-                    .then((res) => {
-                        cache.set(message.author_id, res.user);
+                    .then(res => {
                         return resolve(res.user);
                     })
-                    .catch((err) => {
+                    .catch(err => {
                         return reject(err);
-                    });
+                    })
+            }
+            else {
+                let saved = cache.get(message.author_id);
+                if (saved !== undefined)
+                    return resolve(saved);
+                else {
+                    apiGetUser(message.author_id)
+                        .then(res => {
+                            cache.set(message.author_id, res.user);
+                            return resolve(res.user);
+                        })
+                        .catch(err => {
+                            return reject(err);
+                        });
+                }
             }
         });
     }
     return new Promise(async (resolve, reject) => {
-        const author = cache !== undefined ? await getAuthor() : await apiGetUser(message.author_id).user;
+        const author = await getAuthor();
         const d = new Date(message.time);
         const msgID = `${message.channel_id}_${message.time}`;
         const text = message.message.
