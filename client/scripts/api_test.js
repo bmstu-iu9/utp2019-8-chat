@@ -16,7 +16,7 @@ const sendRequest = (dest, params, callback) => {
 	}
 	let xhr = new XMLHttpRequest();
     xhr.onreadystatechange = () => {
-        if (xhr.readyState != 4) 
+        if (xhr.readyState != 4)
             return;
 		callback(xhr.responseText, xhr.status);
     }

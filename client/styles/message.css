@@ -1,0 +1,17 @@
+.msg_hide {
+  display: none;
+}
+
+.msg_show {
+  display: block;
+}
+
+.msg_error {
+  color: red;
+  font-size: 3vw;
+}
+
+.msg_ok {
+  color: green;
+  font-size: 2.5vw;
+}

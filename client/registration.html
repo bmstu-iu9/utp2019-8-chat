@@ -1,28 +1,32 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-    <meta charset="utf-8" />
-    <title>Регистрация пользователя</title>
-    <link rel="stylesheet" href="styles/stylereg.css">
-</head>
-<body>
-    <div class="container">
-        <div>
-            <h3>Добро пожаловать!</h3>
-            <p>
-                <label for="login">ЛОГИН: </label>
-                <input type="text" id="login" name="login" placeholder="не меньше 10 символов" required>
-            </p>
-            <label for="password">ПАРОЛЬ:</label>
-            <input type="password" id="password" name="password" placeholder="не меньше 10 символов" required>
-            <p>
-                <button id="btnSend">РЕГИСТРАЦИЯ</button>
-                <input type="reset" value="Очистить">
-            </p>
-            <p>Уже зарегистрированы?</p>
-            Тогда вам сюда: <a href="zxc.html">Клик</a>
-        </div>
-    </div>
-    <script type="text/javascript" src="functionTest.js"></script>
-</body>
+  <head>
+      <meta charset="utf-8" />
+      <title>Регистрация пользователя</title>
+      <link rel="stylesheet" href="styles/stylereg.css">
+      <link rel="stylesheet" href="styles/message.css">
+  </head>
+  <body>
+      <div class="container">
+          <div>
+              <h3>Добро пожаловать!</h3>
+              <p>
+                  <label for="login">ЛОГИН: </label>
+                  <input type="text" id="login" name="login" placeholder="не меньше 10 символов" required>
+              </p>
+              <label for="password">ПАРОЛЬ:</label>
+              <input type="password" id="password" name="password" placeholder="не меньше 10 символов" required>
+              <p>
+                  <button id="btnSend">РЕГИСТРАЦИЯ</button>
+                  <input type="reset" value="Очистить">
+              </p>
+              <p>Уже зарегистрированы?</p>
+              Тогда вам сюда: <a href="auth.html">Клик</a>
+          </div>
+      </div>
+      <script src = "scripts/vars.js" defer> </script>
+      <script src = "scripts/exc.js" defer> </script>
+      <script src = "scripts/message.js" defer> </script>
+      <script src = "scripts/registration.js" defer> </script>
+  </body>
 </html>
