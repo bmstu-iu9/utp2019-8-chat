@@ -38,6 +38,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             return;
         }
         dbModule.create_user(resp.id, req.login);
+        dbModule.get_user(resp.id); //Dont touch this!!!
         response.status(200).send(JSON.stringify(resp));
     });
     
