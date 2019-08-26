@@ -62,6 +62,10 @@ module.exports.init = (server, authModule, dbModule) => {
             }
 
             else if (res.type === "set_channel") {
+                if (res.channel_id === 0) {
+                    ws.channel_id = undefined;
+                    return;
+                }
                 let channel = dbModule.get_channel(res.channel_id);
                 if (!channel.success) {
                     ws.send(JSON.stringify({ success: false, err_code: 3, err_cause: "Channel does not exist" }));
