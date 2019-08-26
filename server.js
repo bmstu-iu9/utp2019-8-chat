@@ -64,9 +64,8 @@ const argv = minimist(process.argv.slice(2), {
         'p': 'port',
         'c': 'config',
     },
-    default: {
-        'c': CONFIG_PATH,
-    },
+    boolean: ['reinit'],
+    default: { 'c': CONFIG_PATH },
     unknown: (arg) => {
         console.error('Unknown option: ', arg)
         process.exit(-1);
@@ -79,6 +78,16 @@ if (argv.help) {
 }
 if (argv.version) {
     console.log(VERSION);
+    process.exit(0);
+}
+if (argv.reinit) {
+    fs.writeFileSync("./Data/auth.json", "[]");
+    fs.writeFileSync("./Data/users.json", "[]");
+    fs.writeFileSync("./Data/channels.json", "[]");
+    const files = fs.readdirSync("./Data/messages");
+    for (let file of files)
+        fs.unlinkSync(`./Data/messages/${file}`);
+    console.log("Done");
     process.exit(0);
 }
 //#endregion
