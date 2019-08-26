@@ -19,7 +19,7 @@ module.exports.init = (local_param) => {
 module.exports.register = (login, password) => {
     for (let i = 0; i < data.length; i++) {
         if (data[i].login === login) {
-            return { success: false, err_code: 3, err_cause: "user with this login already exists" };
+            return { success: false, err_code: 3, err_cause: "User with this login already exists" };
         }
     }
     const salt = crypto.randomBytes(32).toString("base64");
@@ -48,7 +48,7 @@ module.exports.auth = (login, password) => {
     // const curHash = crypto.createHash("sha512").update(password + user.salt + localParam).digest("base64");
     const curHash = crypto.pbkdf2Sync(password, user.salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
     if (!crypto.timingSafeEqual(Buffer.from(user.hash, "base64"), curHash)) {
-        return { success: false, err_code: 4, err_cause: "wrong password" };
+        return { success: false, err_code: 4, err_cause: "Wrong password" };
     }
     let sessionKey = crypto.randomBytes(64).toString("base64");
     sessions[sessionKey] = {
@@ -75,7 +75,7 @@ module.exports.getUser = (token) => {
 }
 
 module.exports.exitSession = (token) => {
-    let auth = this.getUser(token).success;
+    let auth = this.getUser(token);
     if (!auth.success) {
         return auth;
     }
@@ -86,7 +86,7 @@ module.exports.exitSession = (token) => {
 }
 
 module.exports.exitAllSessions = (token) => {
-    let auth = this.getUser(token).success;
+    let auth = this.getUser(token);
     if (!auth.success) {
         return auth;
     }
@@ -94,26 +94,33 @@ module.exports.exitAllSessions = (token) => {
         const id = sessions[token].id;
         for (let t in sessions) {
             if (sessions[t].id === id) {
-                delete sessions[t]; //TODO: chech this
+                delete sessions[t];
             }
         }
         return { success: true };
     }
 }
 
-module.exports.save = (callback) => {
-    fs.writeFile("./Data/auth.json", JSON.stringify(data), {}, (err) => {
-        callback();
+module.exports.save = async () => {
+    return new Promise((resolve, reject) => {
+        fs.writeFile("./Data/auth.json", JSON.stringify(data), {}, (err) => {
+            if (err)
+                return reject(err);
+            else
+                return resolve();
+        });
     });
 }
 
-module.exports.load = (callback) => {
-    fs.readFile("./Data/auth.json", (err, raw) => {
-        if (raw.length === 0) {
-            callback();
-            return;
-        }
-        data = JSON.parse(raw);
-        callback();
+module.exports.load = async () => {
+    return new Promise((resolve, reject) => {
+        fs.readFile("./Data/auth.json", (err, raw) => {
+            if (err)
+                return reject(err);
+            if (raw.length === 0)
+                return resolve();
+            data = JSON.parse(raw);
+            return resolve();
+        });
     });
 }

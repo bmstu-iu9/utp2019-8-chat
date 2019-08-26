@@ -1,42 +1,5 @@
 'use strict'
 
-const msgTextbox = document.getElementById("input_msg");
-const chatFlow = document.getElementById("chat_flow");
-
-const getCookie = (name) => {
-    let matches = document.cookie.match(new RegExp(
-        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-    ));
-    return matches ? decodeURIComponent(matches[1]) : undefined;
-}
-
-const setCookie = (name, value, options = {}) => {
-    options = {
-        path: '/',
-        ...options
-    };
-    if (options.expires && options.expires.toUTCString) {
-        options.expires = options.expires.toUTCString();
-    }
-    let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
-    for (let optionKey in options) {
-        updatedCookie += "; " + optionKey;
-        let optionValue = options[optionKey];
-        if (optionValue !== true) {
-            updatedCookie += "=" + optionValue;
-        }
-    }
-    document.cookie = updatedCookie;
-}
-
-const deleteCookie = (name) => {
-    setCookie(name, "", { 'max-age': -1 });
-}
-
-if (getCookie("accessToken") === undefined) {
-    setCookie("accessToken", "123");
-}
-
 const sendRequest = (dest, params, callback) => {
     const encodeMessage = (str) => { //Replace special charasters to codes
         return str.toString().
@@ -60,110 +23,44 @@ const sendRequest = (dest, params, callback) => {
     xhr.open('POST', dest, true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     let paramStr = [];
-    for (let key in params) {
+    for (let key in params)
         paramStr.push(`${key}=${encodeMessage(params[key])}`);
-    }
     xhr.send(paramStr.join('&'));
-    return dest + "\n" + paramStr;
 }
 
-const addMessage = (author, text, time) => { //Add message to chat-flow zone
-    let d = new Date(time);
-    const prepareText = (text) => { //Prevent the html tags inserting
-        return text.
-            replace(/</g, "&lt;").
-            replace(/>/g, "&gt;").
-            replace(/"/g, "&quot;");
-    }
-    chatFlow.innerHTML +=
-        `<div class="msg_box">
-            <div class="msg_info_zone">
-                <div class="msg_icon"></div>            
-            </div>
-            <div class="msg_message_zone">
-                <div class="name">${author}</div>
-                <div class="msg_time">${d.getHours()}:${d.getMinutes()}</div>
-                <div class="msg">${prepareText(text)}</div>
-            </div>
-        </div>`
-    chatFlow.scrollTop = 9999;
-}
-
-sendRequest("/api/get_messages", {
-    token: getCookie("accessToken"),
-    channel_id: 1,
-    offset: 0,
-    count: 50
-}, (response, status) => {
-    response = JSON.parse(response);
-    if (response.success) {
-        for (let i = 0; i < response.count; i++) {
-            let cur = response.messages[i];
-            addMessage(cur.author_name, cur.message, cur.time);
-        }
-    }
-    else {
-        console.log(response);
-    }
-});
+init()
+    .then((res) => {
+        initSocket(() => {
+            console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
+            for (let i in res.channels) {
+                console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
+            }
+            selectChannel(1); //TEMP
+        });
+    })
+    .catch((err) => {
+        console.error(err);
+    });
 
 
-let socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
-
-socket.onopen = (e) => {
-    console.log("Web socket connected");
-    socket.send(JSON.stringify({
-        type: "set_channel",
-        channel_id: 1,
-        token: getCookie("accessToken")
-    }));
-};
-
-socket.onmessage = (event) => {
-    let resp = JSON.parse(event.data);
-    if (resp.success && resp.type === "new_message") {
-        addMessage(resp.data.author_name, resp.data.message, resp.data.time);
-    }
-    else {
-        console.log(resp);
-    }
-};
-
-socket.onclose = (event) => {
-    if (event.wasClean) {
-        console.log(`Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
-    } else {
-        console.log('Соединение прервано');
-    }
-};
-
-socket.onerror = (error) => {
-    alert(`[error] ${error.message}`);
-};
-
-
+let lastMsg = "";
 
 const sendMessage = () => {
+    const msgTextbox = document.getElementById("input_msg");
     if (msgTextbox.value == "")
         return;
-    let msg = msgTextbox.value;
-    socket.send(JSON.stringify({
-        type: "send_message",
-        token: getCookie("accessToken"),
-        channel_id: 1,
-        message: msg
-    }));
+    socketSendMessage(msgTextbox.value);
+    lastMsg = msgTextbox.value;
     msgTextbox.value = "";
 }
 
 document.getElementById("send_btn").addEventListener("click", (sender) => sendMessage());
-msgTextbox.addEventListener("keyup", (sender) => {
+document.getElementById("input_msg").addEventListener("keyup", (sender) => {
     if (sender.key == "Enter")
         sendMessage();
-});
-
-document.getElementById("setToken_btn").addEventListener("click", (sender) => {
-    let token = document.getElementById("tokenArea").value;
-    console.log(token);
-    setCookie("accessToken", token);
+    else if (sender.key == "ArrowUp") {
+        const msgTextbox = document.getElementById("input_msg");
+        if (msgTextbox.value === "")
+            msgTextbox.value = lastMsg;
+    }
 });
