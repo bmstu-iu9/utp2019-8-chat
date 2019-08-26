@@ -17,12 +17,12 @@ const socketSendMessage = (msg) => {
     }));
 }
 
-const initSocket = () => {
+const initSocket = (opened) => {
     socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
 
     socket.onopen = (e) => {
         console.log("Web socket connected");
-        socketSelectChannel(1); //TODO: channel selecting
+        opened();
     };
 
     socket.onmessage = (event) => {

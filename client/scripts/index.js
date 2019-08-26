@@ -28,52 +28,15 @@ const sendRequest = (dest, params, callback) => {
     xhr.send(paramStr.join('&'));
 }
 
-const addMessage = (message, avatar) => { //Add message to chat-flow zone
-    const d = new Date(message.time);
-    const msgID = `${message.channel_id}_${message.time}`;
-    const text = message.message.
-        replace(/</g, "&lt;").
-        replace(/>/g, "&gt;").
-        replace(/"/g, "&quot;");
-    document.getElementById("chat_flow").innerHTML +=
-        `<div class="msg_box" id=${msgID}>
-            <div class="msg_info_zone">
-                <div class="msg_icon">
-                    <img src="avatars/${avatar}">
-                </div>            
-            </div>
-            <div class="msg_message_zone">
-                <div class="name">${message.author_name}</div>
-                <div class="msg_time">${d.getHours()}:${d.getMinutes()}</div>
-                <div class="msg">${text}</div>
-            </div>
-        </div>`
-    document.getElementById("chat_flow").scrollTop = 9999;
-}
-
-
 init()
     .then((res) => {
-        console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
-        for (let i in res.channels) {
-            console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
-        }
-
-        sendRequest("/api/get_messages",
-            { token: getCookie("accessToken"), channel_id: 1, offset: 0, count: 50 },
-            (response, status) => {
-                response = JSON.parse(response);
-                if (response.success) {
-                    for (let i = 0; i < response.count; i++) {
-                        const cur = response.messages[i];
-                        addMessage(cur, "default.png");
-                    }
-                }
-                else {
-                    console.warn(response);
-                }
-            });
-        initSocket();
+        initSocket(() => {
+            console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
+            for (let i in res.channels) {
+                console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
+            }
+            selectChannel(1); //TEMP
+        });
     })
     .catch((err) => {
         console.error(err);

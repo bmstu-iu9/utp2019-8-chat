@@ -66,6 +66,9 @@ module.exports.init = (server, authModule, dbModule) => {
                 if (!channel.success) {
                     ws.send(JSON.stringify({ success: false, err_code: 3, err_cause: "Channel does not exist" }));
                 }
+                else if (!channel.channel) {
+                    ws.channel_id = undefined;
+                }
                 else if (channel.channel.meta.public) {
                     ws.channel_id = res.channel_id;
                 }
