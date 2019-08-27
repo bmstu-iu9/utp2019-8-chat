@@ -13,7 +13,7 @@ const dbModule = require("./modules/database");
 const chatModule = require("./modules/chat");
 const apiModule = require("./modules/api")
 
-const VERSION = "v1.0.0";
+const VERSION = "v1.1.0";
 const CONFIG_PATH = "./config.json";
 
 //#region config
