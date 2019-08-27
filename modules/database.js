@@ -10,6 +10,7 @@ let channels = new Map();
 let messages = new Map(); //channel_id -> map
 
 module.exports.create_user = (id, nickname) => {
+	//MYSQL: Добавить запись в users
 	const newUser = {
 		id: +id,
 		nickname: nickname,
@@ -22,6 +23,7 @@ module.exports.create_user = (id, nickname) => {
 }
 
 module.exports.get_user = (id) => {
+	//MYSQL: Получить запись из users по id
 	const cur = users.get(+id);
 	if (cur === undefined)
 		return ERR_USER_NO_EXIST;
@@ -29,6 +31,7 @@ module.exports.get_user = (id) => {
 }
 
 module.exports.change_avatar = (user_id, avatar) => {
+	//MYSQL: Изменить значение avatar для записи по id в users 
 	const cur = users.get(+user_id);
 	if (cur === undefined)
 		return ERR_USER_NO_EXIST;
@@ -37,6 +40,8 @@ module.exports.change_avatar = (user_id, avatar) => {
 }
 
 module.exports.add_to_channel = (user_id, channel_id) => {
+	//MYSQL: (Получить и) Изменить значение channels записи по id из users 
+	//MYSQL: (Получить и) Изменить значение listener_ids записи по id из channels 
 	const user = users.get(+user_id);
 	if (user === undefined)
 		return ERR_USER_NO_EXIST;
@@ -52,6 +57,8 @@ module.exports.add_to_channel = (user_id, channel_id) => {
 }
 
 module.exports.remove_from_channel = (user_id, channel_id) => {
+	//MYSQL: (Получить и) Изменить значение channels записи по id из users 
+	//MYSQL: (Получить и) Изменить значение listener_ids записи по id из channels 
 	const user = users.get(+user_id);
 	if (user === undefined)
 		return ERR_USER_NO_EXIST;
@@ -66,6 +73,7 @@ module.exports.remove_from_channel = (user_id, channel_id) => {
 
 
 module.exports.get_channel = (id) => {
+	//MYSQL: Получить значение по id из
 	const cur = channels.get(+id);
 	if (cur === undefined) {
 		return ERR_CHANNEL_NO_EXIST;
@@ -74,6 +82,9 @@ module.exports.get_channel = (id) => {
 }
 
 module.exports.create_channel = (user_id, channel_name) => {
+	//MYSQL: Проверить, есть ли запись с таким name в channels
+	//MYSQL: Добавить запись к channels
+	//MYSQL: Создать таблицу для сообщений из этого канала
 	for (let ch of channels.values()) {
 		if (channel_name === ch.name)
 			return { success: false, err_code: 3, err_cause: "Channel with this name already exists" };
@@ -92,6 +103,8 @@ module.exports.create_channel = (user_id, channel_name) => {
 }
 
 module.exports.channels_delete = (channel_id) => {
+	//MYSQL: Удалить запись из channels по id
+	//MYSQL: Удалить таблицу для сообщений из этого канала
 	const channel = channels.get(+channel_id);
 	if (channel === undefined)
 		return ERR_CHANNEL_NO_EXIST;
@@ -103,6 +116,7 @@ module.exports.channels_delete = (channel_id) => {
 
 
 module.exports.chat_history = (channel_id, offset, count) => {
+	//MYSQL: Получить список сообщений из данного канала
 	const channel = channels.get(+channel_id);
 	if (channel === undefined)
 		return ERR_CHANNEL_NO_EXIST;
@@ -119,6 +133,7 @@ module.exports.chat_history = (channel_id, offset, count) => {
 }
 
 module.exports.send_message = (channel_id, message, author_id, broadcast) => {
+	//MYSQL: Добавить запись в таблицу сообщений этого канала
 	const channel = channels.get(+channel_id);
 	if (channel === undefined)
 		return ERR_CHANNEL_NO_EXIST;

@@ -17,6 +17,8 @@ module.exports.init = (local_param) => {
 }
 
 module.exports.register = (login, password) => {
+    //MYSQL: Проверить, есть ли запись с таким логином в auth
+    //MYSQL: добавить запись в auth
     if (data.has(login))
         return { success: false, err_code: 3, err_cause: "User with this login already exists" };
     const salt = crypto.randomBytes(32).toString("base64");
@@ -32,6 +34,7 @@ module.exports.register = (login, password) => {
 }
 
 module.exports.auth = (login, password) => {
+    //MYSQL: Получить запись с таким логином в auth
     const user = data.get(login);
     if (user === undefined)
         return { success: false, err_code: 7, err_cause: "user doesn't exist" };
