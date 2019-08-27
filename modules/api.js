@@ -42,18 +42,22 @@ const checkLogin = (login) => {
 }
 
 const checkPassword = (password) => {
+	let b1 = false;
+    let b2 = false;
     const len = password.length;
-    if (len < 6 && len > 20) {
-        return false;
-    }
-    for (let i = 0; i < len; i++) {
-        if ((password[i] < 'A' || password[i] > 'Z') &&
-            (password[i] < 'a' || password[i] > 'z') &&
-            (password[i] < '0' || password[i] > '9')) {
-            return false;
-        }
-    }
-    return true;
+    if (len > 5) {  
+		let i = 0;
+		for (let i = 0; (!b1 || !b2) && i < len; i++) {
+			if (!b1 && (password[i] >= 'A' && password[i] <= 'Z' ||
+			 password[i] >= 'a' && password[i] <= 'z')) {
+				b1 = true;
+			}
+			else if (!b2 && password[i] >= '0' && password[i] <= '9') {
+				b2 = true;
+			}
+		}
+	}
+    return b1 && b2;
 }
 
 module.exports.init = (app, authModule, dbModule, chatModule) => {
@@ -78,8 +82,8 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             response.status(200).send(JSON.stringify({
                 success: false,
                 err_code: 8,
-                err_cause: `Password can be between 6 and 20 characters long
-        					and have only latin characters and numbers`
+                err_cause: `Password can be more than 5 characters long
+        					and have at least one latin character and one number`
             }));
             return;
         }
