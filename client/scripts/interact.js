@@ -100,3 +100,13 @@ const selectChannel = async (id) => {
     document.getElementById("chat_flow").scrollTop = 9999;
     socketSelectChannel(id);
 }
+
+const createChat = (ch_name) => {
+    return new Promise(async (resolve, reject) => {
+        const res = await apiCreateChannel(ch_name);
+        if (res.success)
+            return resolve();
+        else
+            return reject(res.err_cause);
+    });
+}

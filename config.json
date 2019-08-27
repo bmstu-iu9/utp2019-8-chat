@@ -1,5 +1,5 @@
 {
-    "http_port": 80,
+    "http_port": 3000,
     "https_port": 443,
     "saving_interval": 60,
 
@@ -11,6 +11,6 @@
 
     "mysql_host": "remotemysql.com",
     "mysql_user": "9SpT1uQOyM",
-    "mysql_pass": "",
+    "mysql_pass": "utp2019password",
     "mysql_database": "9SpT1uQOyM"
 }

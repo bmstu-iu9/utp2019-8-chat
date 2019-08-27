@@ -5,18 +5,19 @@ https://54.93.122.236.xip.io/index.html
 ## Запуск сервера ##
 
 ```sh
-    node ./server.js [-p=PORT] [-c=CONFIG_PATH]
+    node ./server.js [--init] [--reinit] [-p=PORT] [-c=CONFIG_PATH]
 ```
 
 - PORT - порт, на котором будет запущен сервер. По умолчанию будет взято значение из файла конфигурации. (Для запуска сервера на некоторых портах (<1000) могут потребоватсья привелегии суперпользователя).
 - CONFIG_PATH - путь к файлу конфигурации, по умолчанию равен `./config.json`
+- init - подготовить новую папку с данными.
+- reinit - очистить сохраненные данные
 
 ## Быстрый старт ##
 
 ```sh
     git clone https://github.com/bmstu-iu9/utp2019-8-chat.git
     cd ./utp2019-8-chat/
-    git checkout --track origin/dev #До тех пор, пока код не будет залит в мастер
     cp ./default_config.json ./config.json
     node ./server.js --init
     node ./server.js -p 3000 -c ./config.json
@@ -37,16 +38,14 @@ https://54.93.122.236.xip.io/index.html
 | ssl_key         | Строка | `./ssl/key.pem`       | Путь к сетификату                                                                              |
 | mysql_host      | Строка | `remotemysql.com`     | Хост, на котором расположена база данных                                                       |
 | mysql_user      | Строка | `9SpT1uQOyM`          | Имя пользователя базы данных                                                                   |
-| mysql_pass      | Строка | -                     | Пароль для базы данных                                                                         |
+| mysql_pass      | Строка | `utp2019password`     | Пароль для базы данных                                                                         |
 | mysql_database  | Строка | `9SpT1uQOyM`          | Название базы данных                                                                           |
 
 ## Дополнительная информация ##
 
-- [Методы API](https://github.com/bmstu-iu9/utp2019-8-chat/blob/dev/API_DESCRIPTION.md)
-- [Структура сообщений WebSockets](https://github.com/bmstu-iu9/utp2019-8-chat/blob/dev/WS_DESCRIPTION.md)
-- Структура базы данных
-
-TODO: ссылки ведут в dev ветку. Сменить на master.
+- [Методы API](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/WS_DESCRIPTION.md)
+- [Структура сообщений WebSockets](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/WS_DESCRIPTION.md)
+- [Структура базы данных](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/database/9SpT1uQOyM.sql)
 
 ## Зависимости ##
 
@@ -54,7 +53,7 @@ TODO: ссылки ведут в dev ветку. Сменить на master.
 - [body-parser](https://www.npmjs.com/package/body-parser)
 - [ws](https://www.npmjs.com/package/ws) - WebSockets
 - [mysql](https://www.npmjs.com/package/mysql)
-- [minimist](https://www.npmjs.com/package/minimist) - Парсинг аргументов коммандной строки (возможно временно)
+- [minimist](https://www.npmjs.com/package/minimist) - Парсинг аргументов коммандной строки
 
 
 ## Участники ##
