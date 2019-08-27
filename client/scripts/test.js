@@ -32,6 +32,7 @@ const loadUsersData = () => {
 const addUser = (login, hash, salt) => {
 	let post = {login: login, hash: hash, salt: salt};
 	let sql = "insert into users set ?";
+	let id = -1;
 	let query = db.query(sql, post, (err, result) =>{
 		if (err)
 			throw err;
@@ -40,7 +41,16 @@ const addUser = (login, hash, salt) => {
 	query = db.query(sql, (err, result) => {
 		if (err)
 			throw err;
-		for (let key in result[0])
-			return result[0][key];
+		for (let key in result[0]){
+			id = result[0][key];
+			break;
+		}
 	});
+	post = {id: id, nickname: login};
+	sql = "insert into users_data set ?";
+	query = db.query(sql, post, (err, result) =>{
+		if (err)
+			throw err;
+	});
+	return id;
 }
