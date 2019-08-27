@@ -49,7 +49,7 @@ init()
 
 let lastMsg = "";
 const sendMessage = () => {
-    const msgTextbox = document.getElementById("input_msg");
+    const msgTextbox = document.getElementById("text");
     if (msgTextbox.value == "")
         return;
     socketSendMessage(msgTextbox.value);

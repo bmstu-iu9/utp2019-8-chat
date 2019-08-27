@@ -4,28 +4,30 @@
 <head>
     <meta charset="utf-8">
     <title>Chats</title>
-	<link rel="SHORTCUT ICON" href="styles/favicon.ico" type="image/x-icon">
+    <link rel="SHORTCUT ICON" href="styles/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/styles/index.css">
-	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700|Raleway:300,400,700|Permanent+Marker&display=swap" rel="stylesheet">
-	
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700|Raleway:300,400,700|Permanent+Marker&display=swap"
+        rel="stylesheet">
+
 </head>
 
-<body onload="init();">
+<body>
     <h1>BMSTU-C</h1>
     <div id="chat_wrapper">
-		<div id="chat_list">
-			<div id="chat_names"></div>
-			<div id="chat_panel">
-			<button id="chat_create">+</button>
-			<button id="chat_leave">-</button>
-			<button id="chat_more">...</button>
-			</div>
-		</div>
+        <div id="chat_list">
+            <div id="chat_names"></div>
+            <div id="chat_panel">
+                <button id="chat_create">+</button>
+                <button id="chat_leave">-</button>
+                <button id="chat_more">...</button>
+            </div>
+        </div>
         <div id="chat_box">
             <div id="chat_flow"></div>
             <div id="chat_input">
                 <div id="input_box">
-				  <textarea  onkeypress="if(event.keyCode==13 && !event.shiftKey){return false;} " id="text" placeholder="Введите сообщение..."></textarea>
+                    <textarea id="text" placeholder="Введите сообщение..."></textarea>
                 </div>
                 <button id="send_btn"><img src="styles/button.png"></button>
             </div>
@@ -37,4 +39,5 @@
     <script src="/scripts/sockets.js"></script>
     <script src="/scripts/index.js"></script>
 </body>
+
 </html>
