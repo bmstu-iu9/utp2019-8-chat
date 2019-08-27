@@ -45,7 +45,7 @@ https://54.93.122.236.xip.io/index.html
 
 - [Методы API](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/WS_DESCRIPTION.md)
 - [Структура сообщений WebSockets](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/WS_DESCRIPTION.md)
-- Структура базы данных
+- [Структура базы данных](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/database/9SpT1uQOyM.sql)
 
 ## Зависимости ##
 
