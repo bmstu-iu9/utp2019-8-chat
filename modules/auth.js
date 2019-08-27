@@ -3,75 +3,110 @@
 const fs = require("fs");
 const crypto = require("crypto");
 
+const PBKDF2_ITERATIONS = 100000;
+const PBKDF2_LENGTH = 64; //In bytes
 const MAX_SESSION_TIME = 180; //In minutes
 
-let data = [];
-let sessions = [];
+let data = new Map(); //login -> user
+let sessions = new Map();
+
+let localParam;
+
+module.exports.init = (local_param) => {
+    localParam = local_param;
+}
 
 module.exports.register = (login, password) => {
-    for (let i = 0; i < data.length; i++) {
-        if (data[i].login === login) {
-            return { success: false, err_code: 3, err_cause: "user with this login already exists" };
-        }
-    }
+    if (data.has(login))
+        return { success: false, err_code: 3, err_cause: "User with this login already exists" };
     const salt = crypto.randomBytes(32).toString("base64");
-    data.push({
+    const pwdHash = crypto.pbkdf2Sync(password, salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
+    const newUser = {
         login: login,
-        id: data.length + 1,
-        hash: crypto.createHash("sha512").update(salt + password + salt).digest("base64"),
+        id: data.size + 1,
+        hash: pwdHash.toString('base64'),
         salt: salt
-    });
-    return { success: true, id: data.length };
+    };
+    data.set(login, newUser)
+    return { success: true, id: newUser.id };
 }
 
 module.exports.auth = (login, password) => {
-    let user = undefined;
-    for (let i = 0; i < data.length; i++) {
-        if (data[i].login === login) {
-            user = data[i];
-            break;
-        }
-    }
-    if (user === undefined) {
+    const user = data.get(login);
+    if (user === undefined)
         return { success: false, err_code: 7, err_cause: "user doesn't exist" };
+    const curHash = crypto.pbkdf2Sync(password, user.salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
+    if (!crypto.timingSafeEqual(Buffer.from(user.hash, "base64"), curHash)) {
+        return { success: false, err_code: 4, err_cause: "Wrong password" };
     }
-    const curHash = crypto.createHash("sha512").update(user.salt + password + user.salt).digest("base64");
-    if (!crypto.timingSafeEqual(Buffer.from(user.hash), Buffer.from(curHash))) {
-        return { success: false, err_code: 4, err_cause: "wrong password" };
-    }
-    let sessionKey = crypto.randomBytes(64).toString("base64");
-    sessions[sessionKey] = {
+    const sessionKey = crypto.randomBytes(64).toString("base64");
+    sessions.set(sessionKey, {
         token: sessionKey,
         id: user.id,
         lastUpdate: new Date().getTime()
-    };
+    });
     return { success: true, token: sessionKey };
 }
 
 module.exports.getUser = (token) => {
-    if (sessions[token] === undefined) {
+    const session = sessions.get(token);
+    if (session === undefined) {
         return { success: false, err_code: 5, err_cause: "Wrong access token. Try to authorize again." };
     }
-    if (new Date().getTime() - sessions[token].lastUpdate > MAX_SESSION_TIME * 60000) {
+    let expire = new Date().getTime() - session.lastUpdate;
+    if (expire > MAX_SESSION_TIME * 60000) {
+        sessions.delete(token);
         return { success: false, err_code: 5, err_cause: "Access token expired. Try to authorize again." };
     }
-    sessions[token].lastUpdate = new Date().getTime();
-    return { success: true, userID: sessions[token].id };
+    session.lastUpdate = new Date().getTime();
+    return { success: true, userID: session.id };
 }
 
-module.exports.save = (callback) => {
-    fs.writeFile("./Data/auth.json", JSON.stringify(data), {}, (err) => {
-        callback();
+module.exports.exitSession = (token) => {
+    let auth = this.getUser(token);
+    if (!auth.success) {
+        return auth;
+    }
+    else {
+        sessions.delete(token);
+        return { success: true };
+    }
+}
+
+module.exports.exitAllSessions = (token) => {
+    let auth = this.getUser(token);
+    if (!auth.success) {
+        return auth;
+    }
+    else {
+        const id = sessions.get(token).id;
+        for (let t in sessions.entries())
+            if (t[1].id === id)
+                sessions.delete(t[0]);
+        return { success: true };
+    }
+}
+
+module.exports.save = async () => {
+    return new Promise((resolve, reject) => {
+        fs.writeFile("./Data/auth.json", JSON.stringify(Array.from(data.entries())), {}, (err) => {
+            if (err)
+                return reject(err);
+            else
+                return resolve();
+        });
     });
 }
 
-module.exports.load = (callback) => {
-    fs.readFile("./Data/auth.json", (err, raw) => {
-        if (raw.length === 0) {
-            callback();
-            return;
-        }
-        data = JSON.parse(raw);
-        callback();
+module.exports.load = async () => {
+    return new Promise((resolve, reject) => {
+        fs.readFile("./Data/auth.json", (err, raw) => {
+            if (err)
+                return reject(err);
+            if (raw.length === 0)
+                return resolve();
+            data = new Map(JSON.parse(raw));
+            return resolve();
+        });
     });
 }

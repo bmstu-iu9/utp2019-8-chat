@@ -12,6 +12,10 @@ let aliveCheckerId = undefined;
 const ERR_AUTH_FAILED = { success: false, err_code: 5, err_cause: "Authorization failed" };
 const ERR_NO_PERMISSIONS = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
 
+const checkPerm = (user, check) => {
+    return (user.permissions & (check | 1)) !== 0; // 1 - admin
+}
+
 module.exports.broadcast = (channel_id, msg) => {
     wss.clients.forEach((e) => {
         if (e.readyState === ws.OPEN && e.channel_id == channel_id) {
@@ -49,7 +53,7 @@ module.exports.init = (server, authModule, dbModule) => {
                 if (user === undefined) {
                     ws.send(JSON.stringify(ERR_AUTH_FAILED));
                 }
-                else if (user.permissions & 1 !== 0 || user.channels.includes(res.channel_id)) {
+                else if (checkPerm(user, 1) || user.channels.includes(res.channel_id)) { //TODO: permission
                     db.send_message(res.channel_id, res.message, user.id, this.broadcast);
                 }
                 else {
@@ -58,9 +62,16 @@ module.exports.init = (server, authModule, dbModule) => {
             }
 
             else if (res.type === "set_channel") {
+                if (res.channel_id === 0) {
+                    ws.channel_id = undefined;
+                    return;
+                }
                 let channel = dbModule.get_channel(res.channel_id);
                 if (!channel.success) {
                     ws.send(JSON.stringify({ success: false, err_code: 3, err_cause: "Channel does not exist" }));
+                }
+                else if (!channel.channel) {
+                    ws.channel_id = undefined;
                 }
                 else if (channel.channel.meta.public) {
                     ws.channel_id = res.channel_id;
@@ -68,7 +79,7 @@ module.exports.init = (server, authModule, dbModule) => {
                 else if (user === undefined) {
                     ws.send(JSON.stringify(ERR_AUTH_FAILED));
                 }
-                else if (user.permissions & 1 !== 0 || user.channels.includes(res.channel_id)) {
+                else if (checkPerm(user, 1) || user.channels.includes(res.channel_id)) { //TODO: permission
                     ws.channel_id = res.channel_id;
                 }
                 else {

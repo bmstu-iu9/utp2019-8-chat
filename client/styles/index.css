@@ -152,7 +152,6 @@ img {
 	border-radius: 25px;
 }
 
-
 textarea {
 	margin-left:3px;
 	margin-top:3.5px;
@@ -163,29 +162,39 @@ textarea {
 	resize: none;
 }
 
-
-
-
 .msg_box {
 	background-color: #42373B;
 	border: 1px solid #4F4247;
 	border-radius: 25px;
 }
-.msg_box .msg_icon {
+
+.msg_box .msg_info_zone .msg_icon {
     margin: 3px 10px 5px 13px;
     border: solid 1px #873a3a;
     float: left;
     width: 50px;
     height: 50px;
-	
 }
 
+.msg_box .msg_info_zone .msg_icon {
+    margin: 3px 10px 5px 13px;
+    border: solid 1px gray;
+    float: left;
+    width: 50px;
+    height: 50px;
+}
+
+.msg_box .msg_info_zone .msg_icon img {
+    width: inherit;
+    height: inherit;
+}
 
 .msg_box .msg_message_zone {
+    padding-right: 15px;
     width: 100%;
 	background-color: #42373B;
 	color: white;
-	border: 1px solid ##4F4247;
+	border: 1px solid #4F4247;
 	border-radius: 25px;
 	overflow: hidden;
 	padding-right: 15px;

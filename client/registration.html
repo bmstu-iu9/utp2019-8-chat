@@ -1,28 +1,40 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
     <meta charset="utf-8" />
     <title>Регистрация пользователя</title>
     <link rel="stylesheet" href="styles/stylereg.css">
 </head>
+
 <body>
     <div class="container">
         <div>
             <h3>Добро пожаловать!</h3>
             <p>
                 <label for="login">ЛОГИН: </label>
-                <input type="text" id="login" name="login" placeholder="не меньше 10 символов" required>
+                <input type="text" id="login" name="login" required>
+                <!--
+                Login and password norms (add where needed):
+                    Логин должен быть длиной от 1 до 20 символов и может содержать только
+                    латинские буквы, цифры, пробелы, точки, знаки тире и нижнего подчеркивания.
+
+                    Пароль должен быть длиной не менее чем 6 символов и обязан содержать
+                    как минимум одну латинскую букву и одну цифру.
+                -->
             </p>
             <label for="password">ПАРОЛЬ:</label>
-            <input type="password" id="password" name="password" placeholder="не меньше 10 символов" required>
+            <input type="password" id="password" name="password" required>
             <p>
                 <button id="btnSend">РЕГИСТРАЦИЯ</button>
                 <input type="reset" value="Очистить">
             </p>
             <p>Уже зарегистрированы?</p>
-            Тогда вам сюда: <a href="zxc.html">Клик</a>
+            Тогда вам сюда: <a href="auth.html">Клик</a>
         </div>
     </div>
-    <script type="text/javascript" src="functionTest.js"></script>
+    <script src="scripts/util.js"></script>
+    <script src="scripts/registration.js" defer> </script>
 </body>
+
 </html>

@@ -1,53 +1,29 @@
 'use strict'
 
-const sendRequest = (dest, params, callback) => {
-	const encodeMessage = (str) => { //Replace special charasters to codes
-		return str.toString().
-			replace(/\$/g, "%24").
-			replace(/\&/g, "%26").
-			replace(/\+/g, "%2b").
-			replace(/\,/g, "%2c").
-			replace(/\//g, "%2f").
-			replace(/\:/g, "%3a").
-			replace(/\;/g, "%3b").
-			replace(/\=/g, "%3d").
-			replace(/\?/g, "%3f").
-			replace(/\@/g, "%40");
-	}
-	let xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = () => {
-        if (xhr.readyState != 4) 
-            return;
-		callback(xhr.responseText, xhr.status);
-    }
-    xhr.open('POST', dest, true);
-	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-	let paramStr = [];
-	for (let key in params) {
-		paramStr.push(`${key}=${encodeMessage(params[key])}`);
-	}
-    xhr.send(paramStr.join('&'));
-    return dest + "\n" + paramStr;
+const FIELDS_COUNT = 5;
+
+const inputDiv = document.getElementById("input");
+for (let i = 0; i < FIELDS_COUNT; i++) {
+    inputDiv.innerHTML +=
+        `<div class="param_block" style>
+            <input type="text" id="param_name_${i}" class="param_name" style="width: 150px;">
+            : <input type="text" id="param_val_${i}" class="param_val" style="width: 500px;">
+        </div><br>`
 }
 
 document.getElementById("send_btn").addEventListener('click', (sender) => {
-    let dest = document.getElementById("dest").value;
+    const dest = document.getElementById("dest").value;
     let params = {};
-    let name, val;
-    name = document.getElementById("param_name_1").value;
-    if (name !== "")
-        params[name] = document.getElementById("param_val_1").value;
-    name = document.getElementById("param_name_2").value;
-    if (name !== "")
-        params[name] = document.getElementById("param_val_2").value;
-    name = document.getElementById("param_name_3").value;
-    if (name !== "")
-        params[name] = document.getElementById("param_val_3").value;
-    name = document.getElementById("param_name_4").value;
-    if (name !== "")
-        params[name] = document.getElementById("param_val_4").value;
-    let req = sendRequest(dest, params, (response, status) => {
-        document.getElementById("response_area").innerHTML = response;
-    });
-    document.getElementById("request_area").innerHTML = req;
+    for (let i = 0; i < FIELDS_COUNT; i++) {
+        const name = document.getElementById(`param_name_${i}`).value;
+        if (name !== "")
+            params[name] = document.getElementById(`param_val_${i}`).value;
+    }
+    request(dest, params)
+        .then((res) => {
+            document.getElementById("response_area").innerHTML = res.response;
+        })
+        .catch((err) => {
+            console.warn(err);
+        });
 });

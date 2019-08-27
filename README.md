@@ -5,10 +5,10 @@ https://54.93.122.236.xip.io/index.html
 ## Запуск сервера ##
 
 ```sh
-    ./server.js [-p=PORT] [-c=CONFIG_PATH]
+    node ./server.js [-p=PORT] [-c=CONFIG_PATH]
 ```
 
-- PORT - порт, на котором будет запущен сервер. По умолчанию будет взято значение из файла конфигурации.
+- PORT - порт, на котором будет запущен сервер. По умолчанию будет взято значение из файла конфигурации. (Для запуска сервера на некоторых портах (<1000) могут потребоватсья привелегии суперпользователя).
 - CONFIG_PATH - путь к файлу конфигурации, по умолчанию равен `./config.json`
 
 ## Быстрый старт ##
@@ -18,6 +18,7 @@ https://54.93.122.236.xip.io/index.html
     cd ./utp2019-8-chat/
     git checkout --track origin/dev #До тех пор, пока код не будет залит в мастер
     cp ./default_config.json ./config.json
+    node ./server.js --init
     node ./server.js -p 3000 -c ./config.json
     sensible-browser localhost:3000 #Выполнить в отдельном терминале либо открыть в браузере
     #Ctrl + C для сохранения данных и остановки сервера
@@ -42,7 +43,7 @@ https://54.93.122.236.xip.io/index.html
 ## Дополнительная информация ##
 
 - [Методы API](https://github.com/bmstu-iu9/utp2019-8-chat/blob/dev/API_DESCRIPTION.md)
-- Структура сообщений WebSockets
+- [Структура сообщений WebSockets](https://github.com/bmstu-iu9/utp2019-8-chat/blob/dev/WS_DESCRIPTION.md)
 - Структура базы данных
 
 TODO: ссылки ведут в dev ветку. Сменить на master.

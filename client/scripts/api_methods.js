@@ -1,163 +1,119 @@
 'use strict'
-let url_reg = "http://localost:3000/api/register";
-let channels_obj = [];
-let session_key = "";
 
-let span = document.createElement("span");
-span.innerHTML = "Вы неправильно что-то сделали";
-span.style.display = "none";
-document.documentElement.children[1].appendChild(span);
-
-function test(){
-    let login = document.getElementById("login");
-    let password = document.getElementById("password");
-    let flag = true;
-    if (login && login.value.length<=10){
-        flag = false;
-   };
-   if (password && password.value.length<=10){
-    flag = false;
-   };
-   if (!flag){
-    return false;
-   }
-   //   alert("Регистрация прошла успешна!");
-    return true;
-};
-
-
-
-
-
-
-let channels_list = function(){
-    if(session_key !== ''){
-    var req = new XMLHttpRequest();
-    req.onreadystatechange = function (){
-            if(this.readyState == 4 && this.status == 200) {
-                channels_obj = this.responseText.split(',');
-                for(let a of channels_obj){
-                    a = JSON.parse(a);
-                }
-        });
-                console.log(this.responseText);
-            }
-        };
-        let json = "{\"session_key\":\"" + session_key + "\"}";
-        req.open("POST","http://localost:3000/api/channels_list",true);
-        req.send(json);
-        return channels_obj;
-    }
+const API_request = (path, params) => {
+    return new Promise((resolve, reject) => {
+        request(path, params)
+            .then((res) => {
+                const response = JSON.parse(res.response);
+                if (response.success)
+                    return resolve(response);
+                else
+                    return reject({ code: response.err_code, cause: response.err_cause });
+            })
+            .catch((err) => {
+                return reject(err);
+            });
+    });
 }
 
-
-let channels_add = function(){
-    let channels_id = document.getElementById("channels_id");
-    if(session_key !== '' && channels_id){
-    let json = "{\"session_key\":\"" + session_key  +"\",\"channels_id\":\"" + channels_id.value + "\"}";
-    var req = new XMLHttpRequest();
-    req.onreadystatechange = function (){
-             console.log('OK for channels_add');
-         }
-        };
-        req.open("POST","http://localost:3000/api/channels_add",true);
-        req.send(json);
-    }
+const apiExitSession = () => {
+    const params = { token: getCookie("accessToken"), };
+    return API_request("api/exit_session", params);
 }
 
-let channels_remove = function(){
-    let channels_id = document.getElementById("channels_id");
-    if(session_key !== '' && channels_id){
-    let json = "{\"session_key\":\"" + session_key +"\",\"channels_id\":\"" + channels_id.value + "\"}";
-    var req = new XMLHttpRequest();
-    req.onreadystatechange = function (){
-         if(this.readyState == 4 && this.status == 200){
-
-             console.log('OK for channels_remove');
-         }
-        };
-        req.open("POST","http://localost:3000/api/channels_remove",true);
-        req.send(json);
-}
+const apiExitAllSessions = () => {
+    const params = { token: getCookie("accessToken"), };
+    return API_request("api/exit_all_session", params);
 }
 
+const apiGetUser = (id) => {
+    const params = { id: id };
+    return API_request("api/get_user", params);
+}
 
-let channels_create = function(){
-    let channel_name;
-    if(session_key !== '' && (channel_name = document.getElementById("channel_name"))){
-        var req = new XMLHttpRequest();
-        req.onreadystatechange = function(){
-            if(this.readyState == 4 && this.status == 200){
-                console.log(this.responseText);
-                return this.responseText;
-            }
+const apiAddToChannel = (user_id, channel_id) => {
+    const params = {
+        token: getCookie("accessToken"),
+        user_id: user_id,
+        channel_id: channel_id
+    };
+    return API_request("api/add_to_channel", params);
+}
+
+const apiRemoveFromChannel = (user_id, channel_id) => {
+    const params = {
+        token: getCookie("accessToken"),
+        user_id: user_id,
+        channel_id: channel_id
+    };
+    return API_request("api/remove_from_channel", params);
+}
+
+const apiChangeAvatar = (user_id, avatar) => {
+    const params = {
+        token: getCookie("accessToken"),
+        user_id: user_id,
+        avatar: avatar
+    };
+    return API_request("api/change_avatar", params);
+}
+
+const apiGetChannel = (channel_id) => {
+    const params = { id: channel_id };
+    return API_request("api/get_channel", params);
+}
+
+const apiCreateChannel = (name) => {
+    const params = {
+        token: getCookie("accessToken"),
+        channel_name: name
+    };
+    return API_request("api/create_channel", params);
+}
+
+const apiDeleteChannel = (ch_id) => {
+    const params = {
+        token: getCookie("accessToken"),
+        channel_id: ch_id
+    };
+    return API_request("api/delete_channel", params);
+}
+
+const apiGetMessages = (ch_id, offset, count) => {
+    const params = {
+        token: getCookie("accessToken"),
+        channel_id: ch_id,
+        offset: offset,
+        count: count
+    };
+    return API_request("api/get_messages", params);
+}
+
+const apiSendMessage = (ch_id, msg) => {
+    const params = {
+        token: getCookie("accessToken"),
+        channel_id: ch_id,
+        message: msg,
+    };
+    return API_request("api/send_message", params);
+}
+
+const apiCheckToken = () => {
+    return new Promise((resolve, reject) => {
+        const accessToken = getCookie("accessToken");
+        if (accessToken === undefined) {
+            return reject("Access token did not found");
         }
-        let json = "{\"session_key\":\"" + session_key +"\",\"channel_name\":\"" + channel_name.value + "\"}";
-        req.open("POST","http://localost:3000/api/channels_create",true);
-        req.send(json);
-    }
+        request("api/check_token", { token: accessToken })
+            .then((res) => {
+                const response = JSON.parse(res.response);
+                if (response.success)
+                    return resolve(response.userID);
+                else
+                    return reject(`Wrong access token: ${response.err_cause}`);
+            })
+            .catch((err) => {
+                return reject(err);
+            });
+    });
 }
-
-
-let chat_history = function(){
-    let count;
-    let offset;
-    let channel_id;
-    if(session_key !== '' && (channel_id = document.getElementById("channel_id")) && (count = document.getElementById("count"))&&(offset = document.getElementById("offset"))){
-        var req = new XMLHttpRequest();
-        req.onreadystatechange = function(){
-            if(this.readyState == 4 && this.status == 200){
-                let res = JSON.parse(this.responseText);
-              res.messages = res.messages.split(',');
-                for(let a of res.messages){
-                    a = JSON.parse(a);
-                }
-                return res;
-            }
-
-        }
-        let json =  "{\"session_key\":\"" + session_key +"\",\"channel_id\":\"" + channel_id.value +"\",\"count\":\"" + count.value + "\",\"offset\":\"" + offset.value + "\"}";
-        req.open("POST","http://localost:3000/api/chat_history",true);
-        req.send(json);
-    }
-}
-
-let send_message = function(){
-    let channel_id;
-    let message;
-    if(session_key !== '' && (channel_id = document.getElementById("channel_id")) && (message = document.getElementById("message"))){
-        var req = new XMLHttpRequest();
-        req.onreadystatechange == function(){
-            if(this.readyState == 4 && this.status == 200){
-                console.log('OK for send_message');
-            }
-        }
-        let json = "{\"channel_id\":\"" + channels_id.value + "\",\"message\":\"" + message.value + "\",\"session_key\":\"" + session_key +"\"}";
-        json.open("POST","http://localost:3000/api/send_message",true);
-    }
-}
-
-let listen = function(){
-    let channel_id;
-    let last_msg;
-    let id;
-    let message;
-    if(session_key !== '' && (channel_id = document.getElementById("channel_id")) && (last_msg = document.getElementById("channel_id")) && (id = document.getElementById("id")) && (message = document.getElementById("message"))){
-        var req = new XMLHttpRequest();
-        req.onreadystatechange == function(){
-            if(this.readyState == 4 && this.status == 200){
-                let changes = JSON.parse(this.responseText);
-                changes.message = JSON.parse(changes.message);
-                return changes;
-            }
-        }
-        let json = "{\"channel_id\":\"" + channels_id.value + "\",\"last_msg\":\"" + last_msg.value + "\",\"session_key\":\"" + session_key +"\"}";
-        req.open("POST","http://localost:3000/api/lesten",true);
-        req.send(json);
-    }
-}
-
-
-
-
-document.getElementById("btnSend").addEventListener('click', register);
