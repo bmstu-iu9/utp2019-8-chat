@@ -40,7 +40,7 @@ init()
                 console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
             }
             selectChannel(1); //TEMP
-            start(); 
+            start();
         });
     })
     .catch((err) => {
@@ -66,5 +66,17 @@ document.getElementById("text").addEventListener("keyup", (sender) => {
         const msgTextbox = document.getElementById("input_msg");
         if (msgTextbox.value === "")
             msgTextbox.value = lastMsg;
+    }
+});
+
+document.getElementById("chat_create").addEventListener("click", (sender) => {
+    const ch_name = prompt("Имя канала: ");
+    if (ch_name !== "") {
+        createChat(ch_name)
+            .then(res => { location.reload(); }) //TEMP!!!
+            .catch(err => { alert(err); });
+    }
+    else {
+        alert("Следует ввести название для нового чата");
     }
 });
