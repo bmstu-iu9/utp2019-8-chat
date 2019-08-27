@@ -30,7 +30,7 @@ const defaultConfig = {
 
     "mysql_host": "remotemysql.com",
     "mysql_user": "9SpT1uQOyM",
-    "mysql_pass": "",
+    "mysql_pass": "utp2019password",
     "mysql_database": "9SpT1uQOyM"
 }
 
