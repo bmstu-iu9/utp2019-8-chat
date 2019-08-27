@@ -1,0 +1,116 @@
+#chat_wrapper { /*This style used for change outer chat properties (like sizes)*/
+    display: block;
+    width: 70%;
+    height: 700px;
+    min-width: 500px; 
+    margin-left: 100px;
+    border: 1px solid black; 
+}
+
+
+
+#chat_box {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+
+#chat_input {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+#input_box {
+    width: 100%;
+    margin-right: 10px;
+}
+
+#input_msg {
+    width: 100%;
+}
+
+#send_btn {
+    margin-left: 10px;
+}
+
+
+
+
+#chat_flow {
+    height: 100%;
+    overflow-y: auto;
+    border: 1px solid black; 
+    background-color: lightcyan;
+}
+
+.msg_box {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 3px;
+    min-height: 60px;
+    margin: 10px;
+    margin-right: 25px;
+    border: 1px solid black;
+    background-color: white;
+}
+
+.msg_box .msg_info_zone {
+    min-width: 80px;
+    width: 80px;
+    border-right: 1px solid black;
+}
+
+.msg_box .msg_info_zone .msg_icon {
+    margin: 3px 10px 5px 13px;
+    border: solid 1px red;
+    float: left;
+    width: 50px;
+    height: 50px;
+}
+
+.msg_box .msg_info_zone .msg_icon {
+    margin: 3px 10px 5px 13px;
+    border: solid 1px gray;
+    float: left;
+    width: 50px;
+    height: 50px;
+}
+
+.msg_box .msg_info_zone .msg_icon img {
+    width: inherit;
+    height: inherit;
+}
+
+.msg_box .msg_message_zone {
+    padding-right: 15px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.msg_box .name {
+    display: inline;
+    margin: 6px 5px 6px 10px;
+    
+}
+
+.msg_box .msg_time {
+    display: inline;
+    margin: 5px 5px 6px 0x; 
+    color: gray;
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+.msg_box .msg {
+    margin: 6px 5px 6px 10px;
+    width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
