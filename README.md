@@ -43,11 +43,9 @@ https://54.93.122.236.xip.io/index.html
 
 ## Дополнительная информация ##
 
-- [Методы API](https://github.com/bmstu-iu9/utp2019-8-chat/blob/dev/API_DESCRIPTION.md)
-- [Структура сообщений WebSockets](https://github.com/bmstu-iu9/utp2019-8-chat/blob/dev/WS_DESCRIPTION.md)
+- [Методы API](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/WS_DESCRIPTION.md)
+- [Структура сообщений WebSockets](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/WS_DESCRIPTION.md)
 - Структура базы данных
-
-TODO: ссылки ведут в dev ветку. Сменить на master.
 
 ## Зависимости ##
 
@@ -55,7 +53,7 @@ TODO: ссылки ведут в dev ветку. Сменить на master.
 - [body-parser](https://www.npmjs.com/package/body-parser)
 - [ws](https://www.npmjs.com/package/ws) - WebSockets
 - [mysql](https://www.npmjs.com/package/mysql)
-- [minimist](https://www.npmjs.com/package/minimist) - Парсинг аргументов коммандной строки (возможно временно)
+- [minimist](https://www.npmjs.com/package/minimist) - Парсинг аргументов коммандной строки
 
 
 ## Участники ##
