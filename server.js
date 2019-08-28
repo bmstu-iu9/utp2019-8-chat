@@ -85,17 +85,21 @@ if (argv.init) {
     fs.mkdirSync("./Data/messages");
     fs.writeFileSync("./Data/auth.json", "[]");
     fs.writeFileSync("./Data/users.json", "[]");
-    fs.writeFileSync("./Data/channels.json", "[]");
+    fs.writeFileSync("./Data/channels.json",
+        "[[1,{\"id\":1,\"name\":\"Global channel\",\"owner_id\":1,\"listeners_ids\":[1],\"meta\":{}}]]");
+    fs.writeFileSync("./Data/messages/1.json", "[]");
     console.log("Done");
     process.exit(0);
 }
 if (argv.reinit) {
     fs.writeFileSync("./Data/auth.json", "[]");
     fs.writeFileSync("./Data/users.json", "[]");
-    fs.writeFileSync("./Data/channels.json", "[]");
+    fs.writeFileSync("./Data/channels.json",
+        "[[1,{\"id\":1,\"name\":\"Global channel\",\"owner_id\":1,\"listeners_ids\":[1],\"meta\":{}}]]");
     const files = fs.readdirSync("./Data/messages");
     for (let file of files)
         fs.unlinkSync(`./Data/messages/${file}`);
+    fs.writeFileSync("./Data/messages/1.json", "[]");
     console.log("Done");
     process.exit(0);
 }

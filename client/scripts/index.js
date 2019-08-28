@@ -39,7 +39,7 @@ init()
             for (let i in res.channels) {
                 console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
             }
-            selectChannel(1); //TEMP
+            selectChannel(1); //TEMP (NOT???)
             start();
         });
     })

@@ -23,9 +23,10 @@ const process = () => {
         auth(login, password)
             .then((res) => {
                 setCookie("accessToken", res);
-                request("/api/feature", { token: getCookie("accessToken"), data: "Join1" })     //TODO: TEMP FEATURE
-                    .then(() => { window.location.replace('/index.html'); })                    //TODO: TEMP FEATURE
-                    .catch(() => { window.location.replace('/index.html'); });                  //TODO: TEMP FEATURE
+                window.location.replace('/index.html');
+                // request("/api/feature", { token: getCookie("accessToken"), data: "Join1" })     //TODO: TEMP FEATURE
+                //     .then(() => { window.location.replace('/index.html'); })                    //TODO: TEMP FEATURE
+                //     .catch(() => { window.location.replace('/index.html'); });                  //TODO: TEMP FEATURE
             })
             .catch((err) => {
                 alert(err);
