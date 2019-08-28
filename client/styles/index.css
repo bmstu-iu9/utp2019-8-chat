@@ -1,12 +1,12 @@
 #chat_wrapper { /*This style used for change outer chat properties (like sizes)*/
     display: block;
-    width: 90%;
-    height: 750px;
+	width: 90%;
+	height: 700px;
     min-width: 500px; 
     margin-left: 5%;
 	margin-right: 5%;
     border: 1px solid black; 
-	background-color: #313138
+	background-color: #313138;
 	
 }
 #chat_list{
