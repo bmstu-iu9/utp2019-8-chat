@@ -97,23 +97,3 @@ const apiSendMessage = (ch_id, msg) => {
     };
     return API_request("api/send_message", params);
 }
-
-const apiCheckToken = () => {
-    return new Promise((resolve, reject) => {
-        const accessToken = getCookie("accessToken");
-        if (accessToken === undefined) {
-            return reject("Access token did not found");
-        }
-        request("api/check_token", { token: accessToken })
-            .then((res) => {
-                const response = JSON.parse(res.response);
-                if (response.success)
-                    return resolve(response.userID);
-                else
-                    return reject(`Wrong access token: ${response.err_cause}`);
-            })
-            .catch((err) => {
-                return reject(err);
-            });
-    });
-}
