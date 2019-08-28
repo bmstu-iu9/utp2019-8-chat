@@ -1,0 +1,57 @@
+h3{
+	margin-top: 10%;
+	font-family: 'Raleway', sans-serif;
+	font-weight: 300;
+	color: white;
+	font-size: 250%;
+	text-align: center;
+}
+
+.container {
+	margin: auto;
+	width: 180px;
+}
+body {
+	background-color: #26262b;
+}
+
+label {
+	font-family: 'Raleway', sans-serif;
+	font-weight: 400;
+	color: white;
+}
+#authBtn {
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 16px;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+input{
+	outline: none;
+}
+#authBtn:hover {
+	background-color: white;
+	color: black;
+}
+#signup:hover {
+	background-color: white;
+	color: black;
+}
+
+#signup {
+	margin-left: 19%;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 16px;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
