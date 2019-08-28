@@ -73,7 +73,7 @@ document.getElementById("chat_create").addEventListener("click", (sender) => {
     const ch_name = prompt("Имя канала: ");
     if (ch_name !== "") {
         createChat(ch_name)
-            .then(res => { location.reload(); }) //TEMP!!!
+            .then(res => { location.reload(); /* reload channels */ }) //TEMP!!!
             .catch(err => { alert(err); });
     }
     else {

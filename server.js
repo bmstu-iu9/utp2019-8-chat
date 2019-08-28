@@ -99,7 +99,7 @@ if (argv.init) {
         fs.writeFileSync("./Data/auth.json", "[]");
         fs.writeFileSync("./Data/users.json", "[]");
         fs.writeFileSync("./Data/channels.json",
-            "[[1,{\"id\":1,\"name\":\"Global channel\",\"owner_id\":1,\"listeners_ids\":[1],\"meta\":{}}]]");
+            "[[1,{\"id\":1,\"name\":\"Global channel\",\"owner_id\":0,\"listeners_ids\":[],\"meta\":{}}]]");
         for (let file of fs.readdirSync("./Data/messages"))
             fs.unlinkSync(`./Data/messages/${file}`);
         fs.writeFileSync("./Data/messages/1.json", "[]");
