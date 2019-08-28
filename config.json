@@ -1,6 +1,6 @@
 {
-    "http_port": 80,
-    "https_port": 443,
+    "http_port": 3000,
+    "https_port": 83,
     "saving_interval": 60,
 
     "local_param": "HOImvA9jBnyU36uuex2QNIhtRoOPnpr5Bv+S65Qb8CE=",

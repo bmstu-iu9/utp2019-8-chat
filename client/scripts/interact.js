@@ -68,7 +68,7 @@ const createMessage = (message, cache) => {
                 </div>
                 <div class="msg_message_zone">
                     <div class="name">${author.nickname}</div>
-                    <div class="msg_time">${d.getHours()}:${d.getMinutes()}</div>
+                     <div class="msg_time">${d.getHours()}:${(d.getMinutes()<10?'0':'') + d.getMinutes()}</div>
                     <div class="msg">${text}</div>
                 </div>
             </div>`

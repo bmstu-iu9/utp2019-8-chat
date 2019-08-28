@@ -202,7 +202,7 @@ textarea {
 
 .msg_box .name {
     display: inline;
-    margin: 6px 5px 6px 10px;
+    margin: 6px 5px 6px 15px;
 	font-weight: 700;
     
 }
@@ -216,7 +216,7 @@ textarea {
 }
 
 .msg_box .msg {
-    margin: 6px 5px 6px 10px;
+    margin: 6px 5px 6px 15px;
     width: 100%;
     word-wrap: break-word;
     overflow-wrap: break-word;
