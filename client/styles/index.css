@@ -267,8 +267,7 @@ textarea {
 .channel_select {
 	margin-top: 7px;
 	height: 60px;
-	min-width:240px;
-	max-width:240px;
+	width:80%;
 	background-color: transparent;
 	border: none;
 	outline: none;
