@@ -111,10 +111,32 @@ const createChat = (ch_name) => {
     });
 }
 
+const addToChannel = (ch_id) => {
+    const us_id = prompt("Введите id пользователя");
+    if (us_id === "" || +us_id === NaN) {
+        alert("Неверный id");
+        return;
+    }
+    apiAddToChannel(us_id, ch_id)
+        .then(res => {
+            console.log("Success");
+        })
+        .catch(err => {
+            alert(err.cause);
+        });
+}
+
 const createChannelDiv = (id, name) => {
     document.getElementById("chat_names").innerHTML +=
-        `<button class="channel_div" id="chdiv_${id}" onclick="selectChannel(${id});">
-            ${name}
-        </button>
-        <br>`
+        `<div class="chaneel_pan">
+            <span class="channel_pan_holder"></span>
+            <button class="channel_select" id="chdiv_${id}" onclick="selectChannel(${id});">
+                ${name}
+            </button>
+            <button class="channel_addu" id="chaddu_${id}" onclick="addToChannel(${id});">
+                +
+            </button>
+            <br>
+            <span class="channel_pan_holder"></span>
+        </div>`;
 }
