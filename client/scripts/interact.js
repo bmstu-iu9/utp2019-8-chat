@@ -107,8 +107,18 @@ const selectChannel = async (id) => {
     document.getElementById("chat_flow").innerHTML = await loadMessages(id);
     document.getElementById("chat_flow").scrollTop = 9999;
     socketSelectChannel(id);
+    apiGetChannel(id)
+        .then(res => {
+        document.getElementById("curChat").innerHTML = 
+            `<div class="curChatN">Current chat: ${res.channel.name}</div>`
+        }
+        )
+        .catch(err => {
+            document.getElementById("curChat").innerHTML = 
+            `<div class="curChatN">No such chat</div>`
+        }
+        )
 }
-
 const createChat = (ch_name) => {
     return new Promise(async (resolve, reject) => {
         const res = await apiCreateChannel(ch_name);
@@ -133,7 +143,6 @@ const addToChannel = (ch_id) => {
             alert(err.cause);
         });
 }
-
 const createChannelDiv = (id, name) => {
     document.getElementById("chat_names").innerHTML +=
         `<div class="chaneel_pan">
