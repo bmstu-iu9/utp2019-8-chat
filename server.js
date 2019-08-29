@@ -25,8 +25,8 @@ const defaultConfig = {
     "local_param": "HOImvA9jBnyU36uuex2QNIhtRoOPnpr5Bv+S65Qb8CE=",
 
     "use_https": false,
-    "ssl_cert": "./crt.pem",
-    "ssl_key": "./key.pem",
+    "ssl_cert": "./ssl/crt.pem",
+    "ssl_key": "./ssl/key.pem",
 
     "mysql_host": "remotemysql.com",
     "mysql_user": "9SpT1uQOyM",
