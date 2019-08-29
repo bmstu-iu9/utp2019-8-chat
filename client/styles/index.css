@@ -235,6 +235,7 @@ textarea {
 }
 
 .channel_addu {
+	max-width:80px;
 	min-width:80px;
 	background-color: transparent;
 	border: none;
@@ -257,6 +258,7 @@ textarea {
 .channel_select {
 	height: 60px;
 	min-width:240px;
+	max-width:240px;
 	background-color: transparent;
 	border: none;
 	outline: none;
