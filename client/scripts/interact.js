@@ -56,6 +56,9 @@ const createMessage = (message, cache) => {
       raw = raw.replace(/(?:\r\n|\r|\n)/g, '<br />');
       raw = raw.trim();
       raw = raw.replace(/^(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+(.*)(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+$/gmi, '$2');
+      raw = raw.replace(/</g, "&lt;");
+      raw = raw.replace(/>/g, "&gt;");
+      raw = raw.replace(/"/g, "&quot;");
       return raw;
 
     }
@@ -64,10 +67,7 @@ const createMessage = (message, cache) => {
         const author = await getAuthor();
         const d = new Date(message.time);
         const msgID = `${message.channel_id}_${message.time}`;
-        const text = message.message.
-            replace(/</g, "&lt;").
-            replace(/>/g, "&gt;").
-            replace(/"/g, "&quot;");
+        const text = prepareText(message.message);
         const node =
             `<div class="msg_box" id=${msgID}>
                 <div class="msg_info_zone">
