@@ -115,9 +115,10 @@ body {
 
 
 
-img {
+#im {
 	width: 20px;
 	height: 20px;
+	transform: rotate(270deg);
 }
 
 
