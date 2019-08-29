@@ -94,6 +94,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         }
         dbModule.create_user(resp.id, req.login);
         dbModule.get_user(resp.id); //Dont touch this!!!
+        dbModule.add_to_channel(resp.id, 1); //Global chat
         response.status(200).send(JSON.stringify(resp));
     });
 
@@ -172,7 +173,8 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.id === +req.user_id) {
+        let channel = dbModule.get_channel(req.channel_id).channel;
+        if (checkPerm(user, 1) || user.id === channel.owner_id) {
             let resp = dbModule.add_to_channel(req.user_id, req.channel_id);
             response.status(200).send(JSON.stringify(resp));
         }
@@ -193,7 +195,8 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.id === +req.user_id) {
+        let channel = dbModule.get_channel(req.channel_id);
+        if (checkPerm(user, 1) || user.id === channel.owner_id) {
             let resp = dbModule.remove_from_channel(req.user_id, req.channel_id);
             response.status(200).send(JSON.stringify(resp));
         }

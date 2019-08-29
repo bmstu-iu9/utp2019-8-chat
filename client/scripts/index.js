@@ -32,20 +32,27 @@ const start = () => { //Раньше называлась init
     resize();
 }
 
-init()
-    .then((res) => {
-        initSocket(() => {
-            console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
-            for (let i in res.channels) {
-                console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
-            }
-            selectChannel(1); //TEMP
-            start();
+const reload = () => {
+    init()
+        .then((res) => {
+            initSocket(() => {
+                console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
+                document.getElementById("chat_names").innerHTML = "";
+                for (let i in res.channels) {
+                    // console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
+                    const id = res.channels[i].channel.id;
+                    const name = res.channels[i].channel.name;
+                    createChannelDiv(id, name);
+                }
+                selectChannel(1); //TEMP (NOT???)
+                start();
+            });
+        })
+        .catch((err) => {
+            console.error(err);
         });
-    })
-    .catch((err) => {
-        console.error(err);
-    });
+}
+reload();
 
 let lastMsg = "";
 const sendMessage = () => {
@@ -73,7 +80,7 @@ document.getElementById("chat_create").addEventListener("click", (sender) => {
     const ch_name = prompt("Имя канала: ");
     if (ch_name !== "") {
         createChat(ch_name)
-            .then(res => { location.reload(); }) //TEMP!!!
+            .then(res => { reload(); })
             .catch(err => { alert(err); });
     }
     else {

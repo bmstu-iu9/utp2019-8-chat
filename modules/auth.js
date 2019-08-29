@@ -34,10 +34,10 @@ module.exports.register = (login, password) => {
 module.exports.auth = (login, password) => {
     const user = data.get(login);
     if (user === undefined)
-        return { success: false, err_code: 7, err_cause: "user doesn't exist" };
+        return { success: false, err_code: 7, err_cause: "Wrong login or password" };
     const curHash = crypto.pbkdf2Sync(password, user.salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
     if (!crypto.timingSafeEqual(Buffer.from(user.hash, "base64"), curHash)) {
-        return { success: false, err_code: 4, err_cause: "Wrong password" };
+        return { success: false, err_code: 4, err_cause: "Wrong login or password" };
     }
     const sessionKey = crypto.randomBytes(64).toString("base64");
     sessions.set(sessionKey, {

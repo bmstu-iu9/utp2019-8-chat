@@ -1,12 +1,12 @@
 #chat_wrapper { /*This style used for change outer chat properties (like sizes)*/
     display: block;
-    width: 90%;
-    height: 750px;
+	width: 90%;
+	height: 700px;
     min-width: 500px; 
     margin-left: 5%;
 	margin-right: 5%;
     border: 1px solid black; 
-	background-color: #313138
+	background-color: #313138;
 	
 }
 #chat_list{
@@ -20,8 +20,10 @@
 #chat_names{
 	overflow-y: auto;
 	display: flex;
+	flex-direction: column;
 	width: 100%;
 	height: 100%;
+	padding-top: 5px;
 }
 #chat_panel{
 	border-top: 1px solid black; 
@@ -202,7 +204,7 @@ textarea {
 
 .msg_box .name {
     display: inline;
-    margin: 6px 5px 6px 10px;
+    margin: 6px 5px 6px 15px;
 	font-weight: 700;
     
 }
@@ -216,8 +218,27 @@ textarea {
 }
 
 .msg_box .msg {
-    margin: 6px 5px 6px 10px;
+    margin: 6px 5px 6px 15px;
     width: 100%;
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+
+.chaneel_pan {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+}
+
+.channel_pan_holder {
+	width: 5px;
+}
+
+.channel_addu {
+	width: 40px;
+}
+
+.channel_select {
+	width: 100%;
 }
