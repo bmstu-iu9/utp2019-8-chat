@@ -68,7 +68,7 @@ const createMessage = (message, cache) => {
                 </div>
                 <div class="msg_message_zone">
                     <div class="name">${author.nickname}</div>
-                     <div class="msg_time">${d.getHours()}:${(d.getMinutes()<10?'0':'') + d.getMinutes()}</div>
+                     <div class="msg_time">${d.getHours()}:${(d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}</div>
                     <div class="msg">${text}</div>
                 </div>
             </div>`
@@ -109,4 +109,12 @@ const createChat = (ch_name) => {
         else
             return reject(res.err_cause);
     });
+}
+
+const createChannelDiv = (id, name) => {
+    document.getElementById("chat_names").innerHTML +=
+        `<button class="channel_div" id="chdiv_${id}" onclick="selectChannel(${id});">
+            ${name}
+        </button>
+        <br>`
 }
