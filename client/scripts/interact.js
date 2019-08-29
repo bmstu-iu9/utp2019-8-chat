@@ -53,12 +53,12 @@ const createMessage = (message, cache) => {
     }
 
     const prepareText = (raw) => {
-      raw = raw.replace(/(?:\r\n|\r|\n)/g, '<br />');
-      raw = raw.trim();
-      raw = raw.replace(/^(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+(.*)(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+$/gmi, '$2');
-      raw = raw.replace(/</g, "&lt;");
-      raw = raw.replace(/>/g, "&gt;");
-      raw = raw.replace(/"/g, "&quot;");
+        raw = raw.trim();
+        raw = raw.replace(/^(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+(.*)(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+$/gmi, '$2');
+        raw = raw.replace(/</g, "&lt;");
+        raw = raw.replace(/>/g, "&gt;");
+        raw = raw.replace(/"/g, "&quot;");
+        raw = raw.replace(/(?:\r\n|\r|\n)/g, '<br />');
       return raw;
 
     }
