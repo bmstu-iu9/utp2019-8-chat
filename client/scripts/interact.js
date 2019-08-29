@@ -51,6 +51,15 @@ const createMessage = (message, cache) => {
             }
         });
     }
+
+    const prepareText = (raw) => {
+      raw = raw.replace(/(?:\r\n|\r|\n)/g, '<br />');
+      raw = raw.trim();
+      raw = raw.replace(/^(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+(.*)(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+$/gmi, '$2');
+      return raw;
+
+    }
+
     return new Promise(async (resolve, reject) => {
         const author = await getAuthor();
         const d = new Date(message.time);
@@ -64,7 +73,7 @@ const createMessage = (message, cache) => {
                 <div class="msg_info_zone">
                     <div class="msg_icon">
                         <img src="${author.avatar}">
-                    </div>            
+                    </div>
                 </div>
                 <div class="msg_message_zone">
                     <div class="name">${author.nickname}</div>
