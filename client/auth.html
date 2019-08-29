@@ -2,25 +2,31 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Аутентификация пользователя</title>
+    <title>Authorization</title>
+	<link rel="stylesheet" href="/styles/auth.css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700|Raleway:300,400,700|Permanent+Marker&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
+	<h3>Authorization</h3>
     <div class="container">
-        <h3>Авторизация</h3>
         <p>
-            <label for="login">ЛОГИН: </label>
+            <label for="login">Login:</label>
+			<p>
             <input id="login" type="text">
+			</p>
         </p>
-        <label for="password">ПАРОЛЬ:</label>
+        <label for="password">Password:</label>
+		<p>
         <input id="password" type="password">
+		</p>
         <p>
-            <button type="button" id="authBtn">Войти</button>
+            <button  id="authBtn">Sign In</button>
+			<button id="signup" onclick="window.location='/registration.html'">Sign Up</button>
         </p>
     </div>
-    <a href="/index.html">Main page</a>
-    <br>
-    <a href="/registration.html">Register</a>
     <script src="scripts/util.js"></script>
     <script src="scripts/auth.js"></script>
 </body>

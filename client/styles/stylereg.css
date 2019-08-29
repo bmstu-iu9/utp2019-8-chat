@@ -1,15 +1,43 @@
-.container{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  flex-direction: column;
+.container {
+	margin: auto;
+	width: 180px;
 }
-
-body{
-  color: green;
+h3{
+	margin-top: 10%;
+	font-family: 'Raleway', sans-serif;
+	font-weight: 300;
+	color: white;
+	font-size: 250%;
+	text-align: center;
 }
-
-label{
-  cursor: pointer;
+body {
+	background-color: #26262b;
+}
+#btnSend {
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 16px;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+	margin-left: 28%;
+}
+#btnSend:hover {
+	background-color: white;
+	color: black;
+}
+a {
+	color: white;
+	margin-left: 13%;
+}
+label {
+	font-family: 'Raleway', sans-serif;
+	font-weight: 400;
+	color: white;
+}
+input{
+	outline: none;
 }

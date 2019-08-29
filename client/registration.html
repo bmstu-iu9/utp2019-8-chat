@@ -3,17 +3,20 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Регистрация пользователя</title>
+    <title>Registration</title>
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700|Raleway:300,400,700|Permanent+Marker&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles/stylereg.css">
 </head>
 
 <body>
+	<h3>Registration</h3>
     <div class="container">
         <div>
-            <h3>Добро пожаловать!</h3>
             <p>
-                <label for="login">ЛОГИН: </label>
-                <input type="text" id="login" name="login" required>
+                <label for="login">Login: </label>
+                <p><input type="text" id="login" name="login" required></p>
                 <!--
                 Login and password norms (add where needed):
                     Логин должен быть длиной от 1 до 20 символов и может содержать только
@@ -23,14 +26,12 @@
                     как минимум одну латинскую букву и одну цифру.
                 -->
             </p>
-            <label for="password">ПАРОЛЬ:</label>
-            <input type="password" id="password" name="password" required>
+            <label for="password">Password: </label>
+            <p><input type="password" id="password" name="password" required></p>
             <p>
-                <button id="btnSend">РЕГИСТРАЦИЯ</button>
-                <input type="reset" value="Очистить">
+                <button id="btnSend">Sign Up</button>
             </p>
-            <p>Уже зарегистрированы?</p>
-            Тогда вам сюда: <a href="auth.html">Клик</a>
+			<a href="auth.html">Already signed up?</a>
         </div>
     </div>
     <script src="scripts/util.js"></script>

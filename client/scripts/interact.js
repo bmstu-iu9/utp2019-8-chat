@@ -68,7 +68,7 @@ const createMessage = (message, cache) => {
                 </div>
                 <div class="msg_message_zone">
                     <div class="name">${author.nickname}</div>
-                    <div class="msg_time">${d.getHours()}:${d.getMinutes()}</div>
+                     <div class="msg_time">${d.getHours()}:${(d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}</div>
                     <div class="msg">${text}</div>
                 </div>
             </div>`
@@ -109,4 +109,34 @@ const createChat = (ch_name) => {
         else
             return reject(res.err_cause);
     });
+}
+
+const addToChannel = (ch_id) => {
+    const us_id = prompt("Введите id пользователя");
+    if (us_id === "" || +us_id === NaN) {
+        alert("Неверный id");
+        return;
+    }
+    apiAddToChannel(us_id, ch_id)
+        .then(res => {
+            console.log("Success");
+        })
+        .catch(err => {
+            alert(err.cause);
+        });
+}
+
+const createChannelDiv = (id, name) => {
+    document.getElementById("chat_names").innerHTML +=
+        `<div class="chaneel_pan">
+            <span class="channel_pan_holder"></span>
+            <button class="channel_select" id="chdiv_${id}" onclick="selectChannel(${id});">
+                ${name}
+            </button>
+            <button class="channel_addu" id="chaddu_${id}" onclick="addToChannel(${id});">
+                +
+            </button>
+            <br>
+            <span class="channel_pan_holder"></span>
+        </div>`;
 }
