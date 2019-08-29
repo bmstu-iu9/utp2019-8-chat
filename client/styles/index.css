@@ -232,6 +232,7 @@ textarea {
 }
 
 .chaneel_pan {
+	justify-content:center;
 	width: 100%;
 	display: flex;
 	flex-direction: row;
