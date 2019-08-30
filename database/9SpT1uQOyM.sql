@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Авг 30 2019 г., 13:48
+-- Время создания: Авг 30 2019 г., 14:11
 -- Версия сервера: 8.0.13-4
 -- Версия PHP: 7.2.19-0ubuntu0.18.04.2
 
@@ -54,9 +54,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `login`, `hash`, `salt`) VALUES
-(1, 'lol', '123', '123'),
+(1, 'admin', 'U8KucL4QJA0Gy/RN/GqjV9l1rSdocrrZqTKYKGUYd3mwINQ3H9ki05o6vmJMR5nWArpfZuDptIsiNFzjCsoXkg==', 'aW3xPSJcSg5XkymbJBsHLNBAMq1+B19AWEtBmQ92xy8='),
 (2, 'kek', '567', '567'),
-(21, 'admin', 'U8KucL4QJA0Gy/RN/GqjV9l1rSdocrrZqTKYKGUYd3mwINQ3H9ki05o6vmJMR5nWArpfZuDptIsiNFzjCsoXkg==', 'aW3xPSJcSg5XkymbJBsHLNBAMq1+B19AWEtBmQ92xy8='),
+(5, 'lol', '123', '123'),
 (32, 'maxiklk', 'UQJgmd5ZouOevGOIAHJ0Al+L6xaUV/09Kw0ad0M+yXdfe/Pl0ieCEEhrc+4etvNYiPQvtzeij9RF0I2OEkFHvw==', 'RGBmb30dLqRTbosbinhh9RGrqSluSpsh09GQQ6jOPv0=');
 
 -- --------------------------------------------------------
@@ -79,9 +79,9 @@ CREATE TABLE `users_data` (
 --
 
 INSERT INTO `users_data` (`id`, `nickname`, `permissions`, `avatar`, `channels`, `meta`) VALUES
-(21, 'admin', 1, NULL, NULL, NULL),
+(1, 'admin', 1, NULL, NULL, NULL),
 (2, 'kek', 0, NULL, NULL, NULL),
-(1, 'lol', 0, NULL, NULL, NULL),
+(5, 'lol', 0, NULL, NULL, NULL),
 (32, 'maxiklk', 0, NULL, NULL, NULL);
 
 --
