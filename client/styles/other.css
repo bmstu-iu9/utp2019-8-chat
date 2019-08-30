@@ -1,0 +1,22 @@
+body {
+    background-color: #26262b;
+    color: white;
+    font-family: 'Raleway', sans-serif;
+}
+
+h1{
+	text-align: center;
+	font-weight: 300;
+}
+
+.links {
+    font-size: 1.3em;
+}
+
+a {
+    color: white;
+}
+
+.text_field {
+    background-color: lightgrey;
+}

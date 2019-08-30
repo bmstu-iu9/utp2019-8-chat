@@ -6,8 +6,8 @@ const inputDiv = document.getElementById("input");
 for (let i = 0; i < FIELDS_COUNT; i++) {
     inputDiv.innerHTML +=
         `<div class="param_block" style>
-            <input type="text" id="param_name_${i}" class="param_name" style="width: 150px;">
-            : <input type="text" id="param_val_${i}" class="param_val" style="width: 500px;">
+            <input class="text_field" type="text" id="param_name_${i}" class="param_name" style="width: 150px;">
+            : <input class="text_field" type="text" id="param_val_${i}" class="param_val" style="width: 500px;">
         </div><br>`
 }
 

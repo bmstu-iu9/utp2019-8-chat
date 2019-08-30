@@ -1,8 +1,12 @@
 'use strict'
 
 const bodyParser = require("body-parser");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 
 const ERR_NO_PERMISSIONS = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
+const ERR_FILE_NO_UPLOADED = { success: false, err_code: -2, err_cause: "File not loaded" };
 
 const getArgs = (request, response, args) => {
     let req = {};
@@ -59,6 +63,19 @@ const checkPassword = (password) => {
     }
     return b1 && b2;
 }
+
+const uploadImg = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 1048576 }, //1MB
+    fileFilter(req, file, cb) {
+        if (["image/png", "image/jpg", "image/jpeg"].includes(file.mimetype)) {
+            cb(null, true);
+        }
+        else {
+            cb(null, false);
+        }
+    }
+});
 
 module.exports.init = (app, authModule, dbModule, chatModule) => {
     const urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -206,9 +223,11 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         }
     });
 
-    app.post("/api/change_avatar", urlencodedParser, (request, response) => {
-        const args = ["token", "user_id", "avatar"];
+    app.post("/api/change_avatar", uploadImg.single("filedata"), (request, response) => {
+        const args = ["token", "user_id"];
         let req = getArgs(request, response, args);
+        if (!request.file)
+            response.status(200).send(JSON.stringify(ERR_FILE_NO_UPLOADED));
         if (req === undefined)
             return;
         let auth = authModule.getUser(req.token);
@@ -218,31 +237,15 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         }
         let user = dbModule.get_user(auth.userID).user;
         if (checkPerm(user, 1) || user.id === +req.user_id) {
-            let resp = dbModule.change_avatar(req.user_id, req.avatar);
-            response.status(200).send(JSON.stringify(resp));
-        }
-        else {
-            let resp = ERR_NO_PERMISSIONS;
-            response.status(200).send(JSON.stringify(resp));
-        }
-    });
-
-    app.post("/api/change_meta", urlencodedParser, (request, response) => {
-        const args = ["token", "user_id", "meta"];
-        let req = getArgs(request, response, args);
-        if (req === undefined)
-            return;
-        let auth = authModule.getUser(req.token);
-        if (!auth.success) {
-            response.status(200).send(JSON.stringify(auth));
-            return;
-        }
-        let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.id === +req.user_id) {
-            // NOT IMPLEMENTED
-            // let resp = dbModule.(req.user_id, req.avatar);
-            // response.status(200).send(JSON.stringify(resp));
-            response.status(200).send(JSON.stringify({ success: false, err_code: -2, err_cause: "Not implemented" }));
+            const filename = `/avatars/${user.nickname}${path.extname(request.file.originalname)}`;
+            fs.writeFile('./client' + filename, request.file.buffer, (err) => {
+                if (err)
+                    response.status(200).send(JSON.stringify({ success: false, err_code: -1, err_cause: err }));
+                else {
+                    let resp = dbModule.change_avatar(req.user_id, filename);
+                    response.status(200).send(JSON.stringify({ success: resp }));
+                }
+            });
         }
         else {
             let resp = ERR_NO_PERMISSIONS;
@@ -297,8 +300,6 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             let resp = ERR_NO_PERMISSIONS;
             response.status(200).send(JSON.stringify(resp));
         }
-        // let resp = dbModule.channels_delete(req.channel_id);
-        // response.status(200).send(JSON.stringify(resp));
     });
 
     app.post("/api/get_all_channels", urlencodedParser, (request, response) => {
@@ -374,37 +375,5 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             let resp = ERR_NO_PERMISSIONS;
             response.status(200).send(JSON.stringify(resp));
         }
-    });
-
-    app.post("/api/listen", urlencodedParser, (request, response) => {
-        response.status(405).send("{deprecated:true}");
-    });
-
-    app.post("/api/public_cipher", urlencodedParser, (request, response) => {
-        let resp = {};
-        response.status(200).send(JSON.stringify(resp));
-    });
-
-
-    app.post("/api/feature", urlencodedParser, (request, response) => {
-        const args = ["token", "data"];
-        let req = getArgs(request, response, args);
-        if (req === undefined)
-            return;
-        let auth = authModule.getUser(req.token);
-        if (!auth.success) {
-            response.status(200).send(JSON.stringify(auth));
-            return;
-        }
-        let user = dbModule.get_user(auth.userID).user;
-
-        if (req.data === "Join1") {
-            let resp = dbModule.add_to_channel(user.id, 1);
-            response.status(200).send(JSON.stringify(resp));
-            return;
-        }
-
-        const resp = { success: true };
-        response.status(200).send(JSON.stringify(resp));
     });
 }

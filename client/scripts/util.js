@@ -30,6 +30,42 @@ const deleteCookie = (name) => {
     setCookie(name, "", { 'max-age': -1 });
 }
 
+const checkLogin = (login) => {
+    const len = login.length;
+    if (len < 1 && len > 20) {
+        return false;
+    }
+    for (let i = 0; i < len; i++) {
+        if ((login[i] < 'A' || login[i] > 'Z') &&
+            (login[i] < 'a' || login[i] > 'z') &&
+            (login[i] < '0' || login[i] > '9') &&
+            login[i] != '_' && login[i] != '.' &&
+            login[i] != '-' && login[i] != ' ') {
+            return false;
+        }
+    }
+    return true;
+}
+
+const checkPassword = (password) => {
+    let b1 = false;
+    let b2 = false;
+    const len = password.length;
+    if (len > 5) {  
+        let i = 0;
+        for (let i = 0; (!b1 || !b2) && i < len; i++) {
+            if (!b1 && (password[i] >= 'A' && password[i] <= 'Z' ||
+             password[i] >= 'a' && password[i] <= 'z')) {
+                b1 = true;
+            }
+            else if (!b2 && password[i] >= '0' && password[i] <= '9') {
+                b2 = true;
+            }
+        }
+    }
+    return b1 && b2;
+}
+
 const request = (dest, params) => {
     return new Promise((resolve, reject) => {
         const encodeMessage = (str) => { //Replace special charasters to codes
@@ -79,40 +115,4 @@ const apiCheckToken = () => {
                 return reject(err);
             });
     });
-}
-
-const checkLogin = (login) => {
-    const len = login.length;
-    if (len < 1 && len > 20) {
-        return false;
-    }
-    for (let i = 0; i < len; i++) {
-        if ((login[i] < 'A' || login[i] > 'Z') &&
-            (login[i] < 'a' || login[i] > 'z') &&
-            (login[i] < '0' || login[i] > '9') &&
-            login[i] != '_' && login[i] != '.' &&
-            login[i] != '-' && login[i] != ' ') {
-            return false;
-        }
-    }
-    return true;
-}
-
-const checkPassword = (password) => {
-    let b1 = false;
-    let b2 = false;
-    const len = password.length;
-    if (len > 5) {  
-        let i = 0;
-        for (let i = 0; (!b1 || !b2) && i < len; i++) {
-            if (!b1 && (password[i] >= 'A' && password[i] <= 'Z' ||
-             password[i] >= 'a' && password[i] <= 'z')) {
-                b1 = true;
-            }
-            else if (!b2 && password[i] >= '0' && password[i] <= '9') {
-                b2 = true;
-            }
-        }
-    }
-    return b1 && b2;
 }

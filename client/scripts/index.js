@@ -36,12 +36,14 @@ const reload = (callback) => {
     init()
         .then((res) => {
             initSocket(() => {
-                console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
+                document.getElementById("cur_user_img").src = res.user.avatar;
+                document.getElementById("cur_user_name").innerText = res.user.nickname;
+                document.getElementById("cur_user_id").innerText = "id " + res.user.id;
                 document.getElementById("chat_names").innerHTML = "";
                 for (let i in res.channels) {
                     const id = res.channels[i].id;
                     const name = res.channels[i].name;
-                    createChannelDiv(id, name); 
+                    createChannelDiv(id, name);
                 }
                 start();
                 if (callback !== undefined)
@@ -86,4 +88,32 @@ document.getElementById("chat_create").addEventListener("click", (sender) => {
     else {
         alert("Следует ввести название для нового чата");
     }
+});
+
+document.getElementById("changeAvatarBtn").addEventListener('click', (sender) => {
+    window.location.replace("/avatar_upload.html");
+});
+
+document.getElementById("exitBtn").addEventListener('click', (sender) => {
+    apiExitSession()
+        .then(res => {
+            location.reload();
+        })
+        .catch(err => {
+            alert(err.err_cause);
+        });
+});
+
+document.getElementById("exitAllBtn").addEventListener('click', (sender) => {
+    apiExitAllSessions()
+        .then(res => {
+            location.reload();
+        })
+        .catch(err => {
+            alert(err.err_cause);
+        });
+});
+
+document.getElementById("siteMapBtn").addEventListener('click', (sender) => {
+    window.location.replace("/site_map.html");
 });

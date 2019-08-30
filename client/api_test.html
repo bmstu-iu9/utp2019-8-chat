@@ -3,21 +3,22 @@
 <head>
     <meta charset="utf-8">
     <title>API test</title>
+    <link rel="stylesheet" href="/styles/other.css">
 </head>
 
 <body>
     <h1>API methods test</h1>
     <a href="/index.html">Back</a>
     <br>
-    <!-- <h3 id="method_name">Send message</h3> -->
+    <br>
     <span>Method name:&nbsp;&nbsp;</span>
-    <input type="text" id="dest" value="api/auth">
+    <input class="text_field" type="text" id="dest" value="api/auth">
     <h4>Params:</h4>
     <div id="input"></div>
-    <button id="send_btn">Send</button>
+    <button class="text_field" id="send_btn">Send</button>
     <div id="response_block">
         <h4>Response:</h4>
-        <textarea id="response_area" style="width: 500px; height: 250px;">{}</textarea>
+        <textarea class="text_field" id="response_area" style="width: 500px; height: 250px;">{}</textarea>
     </div>
     <script src="scripts/util.js"></script>
     <script src="scripts/api_test.js"></script>

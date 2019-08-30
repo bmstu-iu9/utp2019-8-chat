@@ -286,3 +286,29 @@ textarea {
 	color: greenyellow;
 	font-weight: bold;
 }
+
+footer {
+	margin-top: 30px;
+}
+
+#cur_user_info {
+	margin-top: 10px;
+	width: 250px;
+	border: solid darkblue 1px;
+}
+
+#cur_user_img {
+	margin: 7px 10px 7px 7px;
+	width: 50px;
+	height: 50px;
+	border: solid 1px gray;
+}
+
+#cur_user_name {
+	color: white;
+}
+
+#cur_user_id {
+	margin-left: 5px;
+	color: gray;
+}
