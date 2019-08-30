@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Авг 27 2019 г., 13:02
+-- Время создания: Авг 30 2019 г., 13:48
 -- Версия сервера: 8.0.13-4
 -- Версия PHP: 7.2.19-0ubuntu0.18.04.2
 
@@ -55,7 +55,9 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `login`, `hash`, `salt`) VALUES
 (1, 'lol', '123', '123'),
-(2, 'kek', '567', '567');
+(2, 'kek', '567', '567'),
+(21, 'admin', 'U8KucL4QJA0Gy/RN/GqjV9l1rSdocrrZqTKYKGUYd3mwINQ3H9ki05o6vmJMR5nWArpfZuDptIsiNFzjCsoXkg==', 'aW3xPSJcSg5XkymbJBsHLNBAMq1+B19AWEtBmQ92xy8='),
+(32, 'maxiklk', 'UQJgmd5ZouOevGOIAHJ0Al+L6xaUV/09Kw0ad0M+yXdfe/Pl0ieCEEhrc+4etvNYiPQvtzeij9RF0I2OEkFHvw==', 'RGBmb30dLqRTbosbinhh9RGrqSluSpsh09GQQ6jOPv0=');
 
 -- --------------------------------------------------------
 
@@ -77,8 +79,10 @@ CREATE TABLE `users_data` (
 --
 
 INSERT INTO `users_data` (`id`, `nickname`, `permissions`, `avatar`, `channels`, `meta`) VALUES
+(21, 'admin', 1, NULL, NULL, NULL),
 (2, 'kek', 0, NULL, NULL, NULL),
-(1, 'lol', 0, NULL, NULL, NULL);
+(1, 'lol', 0, NULL, NULL, NULL),
+(32, 'maxiklk', 0, NULL, NULL, NULL);
 
 --
 -- Индексы сохранённых таблиц
@@ -118,7 +122,7 @@ ALTER TABLE `channels`
 -- AUTO_INCREMENT для таблицы `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
