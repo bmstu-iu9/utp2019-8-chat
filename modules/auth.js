@@ -14,10 +14,10 @@ let sessions = new Map();
 let localParam;
 
 const db = mysql.createConnection({
-    host     : 'remotemysql.com',
-    user     : '9SpT1uQOyM',
-    password : 'utp2019password',
-    database : '9SpT1uQOyM'
+    host: 'remotemysql.com',
+    user: '9SpT1uQOyM',
+    password: 'utp2019password',
+    database: '9SpT1uQOyM'
 });
 
 db.connect((err) => {
@@ -31,24 +31,25 @@ db.connect((err) => {
 module.exports.init = (local_param, database) => {
     localParam = local_param;
 
-    this.register = register = (login, password) => {
+    this.register = register = async (login, password) => {
         //MYSQL: Проверить, есть ли запись с таким логином в auth
         //MYSQL: добавить запись в auth
         const salt = crypto.randomBytes(32).toString("base64");
         const pwdHash = crypto.pbkdf2Sync(password, salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
-        if (!database.doesUserExist(login))
+        console.log(await database.doesUserExist(login))
+        if (!await database.doesUserExist(login)) 
             console.log("lol");
 
-        // if (data.has(login))
-        //     return { success: false, err_code: 3, err_cause: "User with this login already exists" };
-        // const newUser = {
-        //     login: login,
-        //     id: data.size + 1,
-        //     hash: pwdHash.toString('base64'),
-        //     salt: salt
-        // };
-        // data.set(login, newUser)
-        // return { success: true, id: newUser.id };
+        if (data.has(login))
+            return { success: false, err_code: 3, err_cause: "User with this login already exists" };
+        const newUser = {
+            login: login,
+            id: data.size + 1,
+            hash: pwdHash.toString('base64'),
+            salt: salt
+        };
+        data.set(login, newUser)
+        return { success: true, id: newUser.id };
     };
 
     this.auth = (login, password) => {

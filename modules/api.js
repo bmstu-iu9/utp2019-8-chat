@@ -42,21 +42,21 @@ const checkLogin = (login) => {
 }
 
 const checkPassword = (password) => {
-	let b1 = false;
+    let b1 = false;
     let b2 = false;
     const len = password.length;
-    if (len > 5) {  
-		let i = 0;
-		for (let i = 0; (!b1 || !b2) && i < len; i++) {
-			if (!b1 && (password[i] >= 'A' && password[i] <= 'Z' ||
-			 password[i] >= 'a' && password[i] <= 'z')) {
-				b1 = true;
-			}
-			else if (!b2 && password[i] >= '0' && password[i] <= '9') {
-				b2 = true;
-			}
-		}
-	}
+    if (len > 5) {
+        let i = 0;
+        for (let i = 0; (!b1 || !b2) && i < len; i++) {
+            if (!b1 && (password[i] >= 'A' && password[i] <= 'Z' ||
+                password[i] >= 'a' && password[i] <= 'z')) {
+                b1 = true;
+            }
+            else if (!b2 && password[i] >= '0' && password[i] <= '9') {
+                b2 = true;
+            }
+        }
+    }
     return b1 && b2;
 }
 
@@ -87,14 +87,17 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             }));
             return;
         }
-        let resp = authModule.register(req.login, req.password); //TODO: validate
-        if (!resp.success) {
-            response.status(200).send(JSON.stringify(resp));
-            return;
-        }
-        dbModule.create_user(resp.id, req.login);
-        dbModule.get_user(resp.id); //Dont touch this!!!
-        response.status(200).send(JSON.stringify(resp));
+
+        authModule.register(req.login, req.password)
+            .then(resp => {
+                if (!resp.success) {
+                    response.status(200).send(JSON.stringify(resp));
+                }
+                else {
+                    dbModule.create_user(resp.id, req.login); //SYNC!
+                    response.status(200).send(JSON.stringify(resp));
+                }
+            });
     });
 
     app.post("/api/auth", urlencodedParser, (request, response) => {
