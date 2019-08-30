@@ -11,7 +11,7 @@ let messages = new Map(); //channel_id -> map
 
 module.exports.init = (database) => {
 	this.create_user = async (id, nickname) => {
-		//MYSQL: Добавить запись в users
+		//MYSQL: Удаляем
 		const newUser = {
 			id: +id,
 			nickname: nickname,
@@ -32,7 +32,7 @@ module.exports.init = (database) => {
 	}
 
 	this.change_avatar = async (user_id, avatar) => {
-		//MYSQL: Изменить значение avatar для записи по id в users 
+		//MYSQL: Изменить значение avatar для записи по id в users
 		const cur = users.get(+user_id);
 		if (cur === undefined)
 			return ERR_USER_NO_EXIST;
@@ -41,8 +41,8 @@ module.exports.init = (database) => {
 	}
 
 	this.add_to_channel = async (user_id, channel_id) => {
-		//MYSQL: (Получить и) Изменить значение channels записи по id из users 
-		//MYSQL: (Получить и) Изменить значение listener_ids записи по id из channels 
+		//MYSQL: Изменить значение channels записи по id из users 
+		//MYSQL: Изменить значение в party
 		const user = users.get(+user_id);
 		if (user === undefined)
 			return ERR_USER_NO_EXIST;
@@ -58,8 +58,8 @@ module.exports.init = (database) => {
 	}
 
 	this.remove_from_channel = async (user_id, channel_id) => {
-		//MYSQL: (Получить и) Изменить значение channels записи по id из users 
-		//MYSQL: (Получить и) Изменить значение listener_ids записи по id из channels 
+		//MYSQL: Изменить значение channels записи по id из users
+		//MYSQL: Изменить значение в party 
 		const user = users.get(+user_id);
 		if (user === undefined)
 			return ERR_USER_NO_EXIST;
@@ -74,7 +74,9 @@ module.exports.init = (database) => {
 
 
 	this.get_channel = async (id) => {
-		//MYSQL: Получить значение по id из
+		//MYSQL: Получить значение по id из chats
+		//MYSQL: Получить значение по id из party
+		//Объединить их в один объект: {id,name,owner_id,listeners_ids,meta}
 		const cur = channels.get(+id);
 		if (cur === undefined) {
 			return ERR_CHANNEL_NO_EXIST;
@@ -83,9 +85,8 @@ module.exports.init = (database) => {
 	}
 
 	this.create_channel = async (user_id, channel_name) => {
-		//MYSQL: Проверить, есть ли запись с таким name в channels
-		//MYSQL: Добавить запись к channels
-		//MYSQL: Создать таблицу для сообщений из этого канала
+		//MYSQL: Проверить, есть ли запись с таким name в chats
+		//MYSQL: Добавить запись к chats
 		for (let ch of channels.values()) {
 			if (channel_name === ch.name)
 				return { success: false, err_code: 3, err_cause: "Channel with this name already exists" };
@@ -104,8 +105,8 @@ module.exports.init = (database) => {
 	}
 
 	this.channels_delete = async (channel_id) => {
-		//MYSQL: Удалить запись из channels по id
-		//MYSQL: Удалить таблицу для сообщений из этого канала
+		//MYSQL: Удалить запись из chats по id
+		//MYSQL: Пройтись по messages и удалить все сообщения по channel_id
 		const channel = channels.get(+channel_id);
 		if (channel === undefined)
 			return ERR_CHANNEL_NO_EXIST;
@@ -117,7 +118,10 @@ module.exports.init = (database) => {
 
 
 	this.chat_history = async (channel_id, offset, count) => {
-		//MYSQL: Получить список сообщений из данного канала
+		//MYSQL: Получить список сообщений из messages
+		//Формируется последовательность сообщений отсортированных по времени отправления
+		//Потом, начиная с сообщения offset возвращается не более count сообщений
+		//Сейчас в коде ошибка - offset не учитывается
 		const channel = channels.get(+channel_id);
 		if (channel === undefined)
 			return ERR_CHANNEL_NO_EXIST;
@@ -134,7 +138,7 @@ module.exports.init = (database) => {
 	}
 
 	this.send_message = async (channel_id, message, author_id, broadcast) => {
-		//MYSQL: Добавить запись в таблицу сообщений этого канала
+		//MYSQL: Добавить запись в таблицу messages
 		const channel = channels.get(+channel_id);
 		if (channel === undefined)
 			return ERR_CHANNEL_NO_EXIST;
