@@ -18,8 +18,9 @@ const socketSendMessage = (msg) => {
 }
 
 const initSocket = (opened) => {
+    if(socket !== undefined)
+        socket.close();
     socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
-
     socket.onopen = (e) => {
         console.log("Web socket connected");
         opened();
