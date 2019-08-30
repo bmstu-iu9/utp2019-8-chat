@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Авг 30 2019 г., 18:19
+-- Время создания: Авг 30 2019 г., 23:09
 -- Версия сервера: 8.0.13-4
 -- Версия PHP: 7.2.19-0ubuntu0.18.04.2
 
@@ -35,6 +35,14 @@ CREATE TABLE `chat` (
   `meta` json DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+--
+-- Дамп данных таблицы `chat`
+--
+
+INSERT INTO `chat` (`chat_id`, `name`, `user_id`, `meta`) VALUES
+(1, 'test1', 1, NULL),
+(2, 'test2', 5, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -46,8 +54,15 @@ CREATE TABLE `messages` (
   `chat_id` bigint(20) NOT NULL,
   `user_id` int(11) NOT NULL,
   `content` text COLLATE utf8_unicode_ci NOT NULL,
-  `date_create` date NOT NULL
+  `date_create` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Дамп данных таблицы `messages`
+--
+
+INSERT INTO `messages` (`message_id`, `chat_id`, `user_id`, `content`, `date_create`) VALUES
+(7, 1, 1, 'SOSAT', '2019-08-31 01:41:34');
 
 -- --------------------------------------------------------
 
@@ -59,6 +74,17 @@ CREATE TABLE `party` (
   `chat_id` bigint(20) NOT NULL,
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Дамп данных таблицы `party`
+--
+
+INSERT INTO `party` (`chat_id`, `user_id`) VALUES
+(1, 1),
+(1, 2),
+(1, 33),
+(2, 5),
+(2, 33);
 
 -- --------------------------------------------------------
 
@@ -156,13 +182,13 @@ ALTER TABLE `users_data`
 -- AUTO_INCREMENT для таблицы `chat`
 --
 ALTER TABLE `chat`
-  MODIFY `chat_id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `chat_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT для таблицы `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `message_id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `message_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT для таблицы `users`

@@ -24,98 +24,65 @@ module.exports.init = (database) => {
 	}
 
 	this.get_user = async (id) => {
-		//MYSQL: Получить запись из users по id
-		const cur = users.get(+id);
-		if (cur === undefined)
+		if (!await database.doesUserIdExist(id))
 			return ERR_USER_NO_EXIST;
+		const cur = await database.getUsersMeta(id);	
 		return { success: true, user: cur };
 	}
 
+
 	this.change_avatar = async (user_id, avatar) => {
-		//MYSQL: Изменить значение avatar для записи по id в users
-		const cur = users.get(+user_id);
-		if (cur === undefined)
+		if (!await database.doesUserIdExist(user_id))
 			return ERR_USER_NO_EXIST;
-		cur.avatar = avatar;
+		await database.updateAvatar(user_id, avatar);
 		return { success: true };
 	}
 
 	this.add_to_channel = async (user_id, channel_id) => {
-		//MYSQL: Изменить значение channels записи по id из users 
-		//MYSQL: Изменить значение в party
-		const user = users.get(+user_id);
-		if (user === undefined)
+		if (!await database.doesUserIdExist(user_id))
 			return ERR_USER_NO_EXIST;
-		const channel = channels.get(+channel_id);
-		if (channel === undefined)
+		if (!await database.doesChannelIdExist(channel_id))
 			return ERR_CHANNEL_NO_EXIST;
-
-		if (!user.channels.includes(+channel_id))
-			user.channels.push(+channel_id);
-		if (!channel.listeners_ids.includes(+user_id))
-			channel.listeners_ids.push(+user_id);
+		await database.addUserToChannel(user_id, channel_id);
 		return { success: true };
 	}
 
 	this.remove_from_channel = async (user_id, channel_id) => {
-		//MYSQL: Изменить значение channels записи по id из users
-		//MYSQL: Изменить значение в party 
-		const user = users.get(+user_id);
-		if (user === undefined)
+		if (!await database.doesUserIdExist(user_id))
 			return ERR_USER_NO_EXIST;
-		const channel = channels.get(+channel_id);
-		if (channel === undefined)
+		if (!await database.doesChannelIdExist(channel_id))
 			return ERR_CHANNEL_NO_EXIST;
-
-		user.channels = user.channels.filter(e => e !== +channel_id);
-		channel.listeners_ids = channel.listeners_ids.filter(e => e !== +user_id);
+		if (await database.isUserOwner(user_id, channel_id))
+			return { success: false, err_code: -2, err_cause: "You can't leave your own channel" };
+		database.removeUserFromChannel(user_id, channel_id);
 		return { success: true };
 	}
 
 
 	this.get_channel = async (id) => {
-		//MYSQL: Получить значение по id из chats
-		//MYSQL: Получить значение по id из party
-		//Объединить их в один объект: {id,name,owner_id,listeners_ids,meta}
-		const cur = channels.get(+id);
-		if (cur === undefined) {
+		//Возвращаемый объект: {id,name,owner_id,listeners_ids,meta}
+		if (!await database.doesChannelIdExist(channel_id))
 			return ERR_CHANNEL_NO_EXIST;
-		}
-		return { success: true, channel: cur };
+		const channel = await database.getChannelMeta(id);
+		return channel
+
 	}
 
 	this.create_channel = async (user_id, channel_name) => {
-		//MYSQL: Проверить, есть ли запись с таким name в chats
-		//MYSQL: Добавить запись к chats
-		for (let ch of channels.values()) {
-			if (channel_name === ch.name)
-				return { success: false, err_code: 3, err_cause: "Channel with this name already exists" };
-		}
-		const newChannel = {
-			id: channels.size + 1,
-			name: channel_name,
-			owner_id: user_id,
-			listeners_ids: [user_id],
-			meta: {}
-		};
-		channels.set(newChannel.id, newChannel);
-		messages.set(newChannel.id, new Map());
-		users.get(user_id).channels.push(newChannel.id);
+		if (!await database.doesUserIdExist(user_id))
+			return ERR_USER_NO_EXIST;
+		if (await database.doesChannelNameExist(channel_name))
+			return { success: false, err_code: 3, err_cause: "Channel with this name already exists" };
+		await database.addChannel(user_id, channel_name);
 		return { success: true };
 	}
 
 	this.channels_delete = async (channel_id) => {
-		//MYSQL: Удалить запись из chats по id
-		//MYSQL: Пройтись по messages и удалить все сообщения по channel_id
-		const channel = channels.get(+channel_id);
-		if (channel === undefined)
+		if (!await database.doesChannelIdExist(channel_id))
 			return ERR_CHANNEL_NO_EXIST;
-		for (let e of channel.listeners_ids)
-			users.get(e).channels.filter(e => e !== +channel_id);
-		channels.delete(+channel_id);
+		await database.removeChannel(channel_id);
 		return { success: true };
 	}
-
 
 	this.chat_history = async (channel_id, offset, count) => {
 		//MYSQL: Получить список сообщений из messages
@@ -138,28 +105,14 @@ module.exports.init = (database) => {
 	}
 
 	this.send_message = async (channel_id, message, author_id, broadcast) => {
-		//MYSQL: Добавить запись в таблицу messages
 		const channel = channels.get(+channel_id);
 		if (channel === undefined)
 			return ERR_CHANNEL_NO_EXIST;
-		this.get_user(+author_id).then(user => {
-			let newMsg = {
-				message_id: messages.get(+channel_id).size,
-				author_id: +author_id,
-				author_name: user.user.nickname,
-				message: message,
-				time: new Date().getTime(),
-				channel_id: +channel_id
-			};
-			messages.get(+channel_id).set(newMsg.message_id, newMsg);
-			broadcast(+channel_id, newMsg);
-			return { success: true };
-		});
+		let msg = await database.addMessage(channel_id, author_id, message);
+		broadcast(channel_id, msg);
+		return { success: true };
 	}
 }
-
-
-
 
 //Information inside UsersData and UsersChannels, which accumulates during server's session,
 //saves into UsersData.json and UsersChannels.json accordingly
