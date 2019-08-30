@@ -73,6 +73,7 @@ const createMessage = (message, cache) => {
         const d = new Date(message.time);
         const msgID = `${message.channel_id}_${message.time}`;
         const text = prepareText(message.message);
+        const colored = (author.permissions & 4) !== 0 ? "colored_nickname" : "common_nickname";
         const node =
             `<div class="msg_box" id=${msgID}>
                 <div class="msg_info_zone">
@@ -81,8 +82,8 @@ const createMessage = (message, cache) => {
                     </div>
                 </div>
                 <div class="msg_message_zone">
-                    <div class="name">${author.nickname}</div>
-                     <div class="msg_time">${d.getHours()}:${(d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}</div>
+                    <span class=${colored}><div class="name">${author.nickname}</div></span>
+                    <div class="msg_time">${d.getHours()}:${(d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}</div>
                     <div class="msg">${text}</div>
                 </div>
             </div>`

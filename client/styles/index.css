@@ -281,3 +281,8 @@ textarea {
 	border: 1px solid white;
 	transition-duration: 0.4s;
 }
+
+.colored_nickname {
+	color: greenyellow;
+	font-weight: bold;
+}

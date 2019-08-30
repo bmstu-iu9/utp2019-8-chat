@@ -312,7 +312,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 3)) {
+        if (checkPerm(user, 2)) {
             let resp = dbModule.get_all_channels();
             response.status(200).send(JSON.stringify(resp));
         }
