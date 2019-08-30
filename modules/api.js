@@ -174,7 +174,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         }
         let user = dbModule.get_user(auth.userID).user;
         let channel = dbModule.get_channel(req.channel_id).channel;
-        if (checkPerm(user, 1) || user.id === channel.owner_id) {
+        if (checkPerm(user, 1) || channel.listeners_ids.includes(user.id)) {
             let resp = dbModule.add_to_channel(req.user_id, req.channel_id);
             response.status(200).send(JSON.stringify(resp));
         }
