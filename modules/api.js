@@ -227,29 +227,6 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         }
     });
 
-    app.post("/api/change_meta", urlencodedParser, (request, response) => {
-        const args = ["token", "user_id", "meta"];
-        let req = getArgs(request, response, args);
-        if (req === undefined)
-            return;
-        let auth = authModule.getUser(req.token);
-        if (!auth.success) {
-            response.status(200).send(JSON.stringify(auth));
-            return;
-        }
-        let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.id === +req.user_id) {
-            // NOT IMPLEMENTED
-            // let resp = dbModule.(req.user_id, req.avatar);
-            // response.status(200).send(JSON.stringify(resp));
-            response.status(200).send(JSON.stringify({ success: false, err_code: -2, err_cause: "Not implemented" }));
-        }
-        else {
-            let resp = ERR_NO_PERMISSIONS;
-            response.status(200).send(JSON.stringify(resp));
-        }
-    });
-
     app.post("/api/get_channel", urlencodedParser, (request, response) => {
         const args = ["id"];
         let req = getArgs(request, response, args);
@@ -297,8 +274,6 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             let resp = ERR_NO_PERMISSIONS;
             response.status(200).send(JSON.stringify(resp));
         }
-        // let resp = dbModule.channels_delete(req.channel_id);
-        // response.status(200).send(JSON.stringify(resp));
     });
 
     app.post("/api/get_all_channels", urlencodedParser, (request, response) => {
@@ -374,37 +349,5 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             let resp = ERR_NO_PERMISSIONS;
             response.status(200).send(JSON.stringify(resp));
         }
-    });
-
-    app.post("/api/listen", urlencodedParser, (request, response) => {
-        response.status(405).send("{deprecated:true}");
-    });
-
-    app.post("/api/public_cipher", urlencodedParser, (request, response) => {
-        let resp = {};
-        response.status(200).send(JSON.stringify(resp));
-    });
-
-
-    app.post("/api/feature", urlencodedParser, (request, response) => {
-        const args = ["token", "data"];
-        let req = getArgs(request, response, args);
-        if (req === undefined)
-            return;
-        let auth = authModule.getUser(req.token);
-        if (!auth.success) {
-            response.status(200).send(JSON.stringify(auth));
-            return;
-        }
-        let user = dbModule.get_user(auth.userID).user;
-
-        if (req.data === "Join1") {
-            let resp = dbModule.add_to_channel(user.id, 1);
-            response.status(200).send(JSON.stringify(resp));
-            return;
-        }
-
-        const resp = { success: true };
-        response.status(200).send(JSON.stringify(resp));
     });
 }
