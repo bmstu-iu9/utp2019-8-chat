@@ -7,9 +7,15 @@ const init = () => {
             .then(async (userID) => {
                 const userInfo = await apiGetUser(userID);
                 let channels = [];
-                for (let i in userInfo.user.channels)
-                    if (userInfo.user.channels[i])
-                        channels.push(await apiGetChannel(userInfo.user.channels[i]));
+                if ((userInfo.user.permissions & 2) == 0) {
+                    for (let i in userInfo.user.channels)
+                        if (userInfo.user.channels[i])
+                            channels.push(await apiGetChannel(userInfo.user.channels[i]));
+                    channels = channels.map(e => e.channel);
+                }
+                else {
+                    channels = (await apiGetAllChannels()).channels;
+                }
                 return resolve({ success: true, user: userInfo.user, channels: channels });
             })
             .catch((err) => {

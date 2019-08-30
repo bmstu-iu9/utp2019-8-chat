@@ -42,21 +42,21 @@ const checkLogin = (login) => {
 }
 
 const checkPassword = (password) => {
-	let b1 = false;
+    let b1 = false;
     let b2 = false;
     const len = password.length;
-    if (len > 5) {  
-		let i = 0;
-		for (let i = 0; (!b1 || !b2) && i < len; i++) {
-			if (!b1 && (password[i] >= 'A' && password[i] <= 'Z' ||
-			 password[i] >= 'a' && password[i] <= 'z')) {
-				b1 = true;
-			}
-			else if (!b2 && password[i] >= '0' && password[i] <= '9') {
-				b2 = true;
-			}
-		}
-	}
+    if (len > 5) {
+        let i = 0;
+        for (let i = 0; (!b1 || !b2) && i < len; i++) {
+            if (!b1 && (password[i] >= 'A' && password[i] <= 'Z' ||
+                password[i] >= 'a' && password[i] <= 'z')) {
+                b1 = true;
+            }
+            else if (!b2 && password[i] >= '0' && password[i] <= '9') {
+                b2 = true;
+            }
+        }
+    }
     return b1 && b2;
 }
 
@@ -242,7 +242,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             // NOT IMPLEMENTED
             // let resp = dbModule.(req.user_id, req.avatar);
             // response.status(200).send(JSON.stringify(resp));
-            response.status(200).send(JSON.stringify({ not_implemented: true }));
+            response.status(200).send(JSON.stringify({ success: false, err_code: -2, err_cause: "Not implemented" }));
         }
         else {
             let resp = ERR_NO_PERMISSIONS;
@@ -299,6 +299,27 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         }
         // let resp = dbModule.channels_delete(req.channel_id);
         // response.status(200).send(JSON.stringify(resp));
+    });
+
+    app.post("/api/get_all_channels", urlencodedParser, (request, response) => {
+        const args = ["token"];
+        let req = getArgs(request, response, args);
+        if (req === undefined)
+            return;
+        let auth = authModule.getUser(req.token);
+        if (!auth.success) {
+            response.status(200).send(JSON.stringify(auth));
+            return;
+        }
+        let user = dbModule.get_user(auth.userID).user;
+        if (checkPerm(user, 3)) {
+            let resp = dbModule.get_all_channels();
+            response.status(200).send(JSON.stringify(resp));
+        }
+        else {
+            let resp = ERR_NO_PERMISSIONS;
+            response.status(200).send(JSON.stringify(resp));
+        }
     });
 
     app.post("/api/get_messages", urlencodedParser, (request, response) => {

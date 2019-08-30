@@ -32,27 +32,27 @@ const start = () => { //Раньше называлась init
     resize();
 }
 
-const reload = () => {
+const reload = (callback) => {
     init()
         .then((res) => {
             initSocket(() => {
                 console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
                 document.getElementById("chat_names").innerHTML = "";
                 for (let i in res.channels) {
-                    // console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
-                    const id = res.channels[i].channel.id;
-                    const name = res.channels[i].channel.name;
-                    createChannelDiv(id, name);
+                    const id = res.channels[i].id;
+                    const name = res.channels[i].name;
+                    createChannelDiv(id, name); 
                 }
-                selectChannel(1); //TEMP (NOT???)
                 start();
+                if (callback !== undefined)
+                    callback();
             });
         })
         .catch((err) => {
             console.error(err);
         });
 }
-reload();
+reload(() => { selectChannel(1); });
 
 let lastMsg = "";
 const sendMessage = () => {

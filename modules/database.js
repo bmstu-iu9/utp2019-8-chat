@@ -101,6 +101,11 @@ module.exports.channels_delete = (channel_id) => {
 	return { success: true };
 }
 
+module.exports.get_all_channels = () => {
+	const t = JSON.stringify(Array.from(channels.values()));
+	return { success: true, channels: Array.from(channels.values()) };
+}
+
 
 module.exports.chat_history = (channel_id, offset, count) => {
 	const channel = channels.get(+channel_id);
