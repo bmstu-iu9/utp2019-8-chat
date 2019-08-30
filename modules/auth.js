@@ -34,7 +34,7 @@ module.exports.init = (local_param, database) => {
     this.register = register = async (login, password) => {
         const salt = crypto.randomBytes(32).toString("base64");
         const pwdHash = crypto.pbkdf2Sync(password, salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
-        if (!await database.doesUserExist(login)){
+        if (await database.doesUserExist(login)){
             return { success: false, err_code: 3, err_cause: "User with this login already exists" };
         } else{
             let id = await database.addUser(login, pwdHash.toString('base64'), salt);
