@@ -36,7 +36,9 @@ const reload = (callback) => {
     init()
         .then((res) => {
             initSocket(() => {
-                console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
+                document.getElementById("cur_user_img").src = res.user.avatar;
+                document.getElementById("cur_user_name").innerText = res.user.nickname;
+                document.getElementById("cur_user_id").innerText = "id " + res.user.id;
                 document.getElementById("chat_names").innerHTML = "";
                 for (let i in res.channels) {
                     const id = res.channels[i].id;
