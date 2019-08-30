@@ -10,7 +10,6 @@ const MAX_SESSION_TIME = 180; //In minutes
 
 let data = new Map(); //login -> user
 let sessions = new Map();
-let database;
 
 let localParam;
 
@@ -22,56 +21,55 @@ const db = mysql.createConnection({
 });
 
 db.connect((err) => {
-    if(err){
+    if (err) {
         console.log("Connection error");
         throw err;
     }
     console.log("Connected");
 });
 
-module.exports.init = (local_param, databaseModule) => {
+module.exports.init = (local_param, database) => {
     localParam = local_param;
-    database = databaseModule;
-}
 
-module.exports.register = (login, password) => {
-    //MYSQL: Проверить, есть ли запись с таким логином в auth
-    //MYSQL: добавить запись в auth
-    const salt = crypto.randomBytes(32).toString("base64");
-    const pwdHash = crypto.pbkdf2Sync(password, salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
-    if (!database.doesUserExist(login))
-        console.log("lol");
+    this.register = register = (login, password) => {
+        //MYSQL: Проверить, есть ли запись с таким логином в auth
+        //MYSQL: добавить запись в auth
+        const salt = crypto.randomBytes(32).toString("base64");
+        const pwdHash = crypto.pbkdf2Sync(password, salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
+        if (!database.doesUserExist(login))
+            console.log("lol");
 
-    // if (data.has(login))
-    //     return { success: false, err_code: 3, err_cause: "User with this login already exists" };
-    // const newUser = {
-    //     login: login,
-    //     id: data.size + 1,
-    //     hash: pwdHash.toString('base64'),
-    //     salt: salt
-    // };
-    // data.set(login, newUser)
-    // return { success: true, id: newUser.id };
-}
+        // if (data.has(login))
+        //     return { success: false, err_code: 3, err_cause: "User with this login already exists" };
+        // const newUser = {
+        //     login: login,
+        //     id: data.size + 1,
+        //     hash: pwdHash.toString('base64'),
+        //     salt: salt
+        // };
+        // data.set(login, newUser)
+        // return { success: true, id: newUser.id };
+    };
 
-module.exports.register('admin', 'azerty1');
-
-module.exports.auth = (login, password) => {
-    //MYSQL: Получить запись с таким логином в auth
-    const user = data.get(login);
-    if (user === undefined)
-        return { success: false, err_code: 7, err_cause: "user doesn't exist" };
-    const curHash = crypto.pbkdf2Sync(password, user.salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
-    if (!crypto.timingSafeEqual(Buffer.from(user.hash, "base64"), curHash)) {
-        return { success: false, err_code: 4, err_cause: "Wrong password" };
+    this.auth = (login, password) => {
+        //MYSQL: Получить запись с таким логином в auth
+        const user = data.get(login);
+        if (user === undefined)
+            return { success: false, err_code: 7, err_cause: "user doesn't exist" };
+        const curHash = crypto.pbkdf2Sync(password, user.salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
+        if (!crypto.timingSafeEqual(Buffer.from(user.hash, "base64"), curHash)) {
+            return { success: false, err_code: 4, err_cause: "Wrong password" };
+        }
+        const sessionKey = crypto.randomBytes(64).toString("base64");
+        sessions.set(sessionKey, {
+            token: sessionKey,
+            id: user.id,
+            lastUpdate: new Date().getTime()
+        });
+        return { success: true, token: sessionKey };
     }
-    const sessionKey = crypto.randomBytes(64).toString("base64");
-    sessions.set(sessionKey, {
-        token: sessionKey,
-        id: user.id,
-        lastUpdate: new Date().getTime()
-    });
-    return { success: true, token: sessionKey };
+
+    module.exports.register('admin', 'azerty1');
 }
 
 module.exports.getUser = (token) => {
