@@ -52,7 +52,7 @@ module.exports.init = (local_param, database) => {
         return { success: true, id: newUser.id };
     };
 
-    this.auth = (login, password) => {
+    this.auth = async (login, password) => {
         //MYSQL: Получить запись с таким логином в auth
         const user = data.get(login);
         if (user === undefined)

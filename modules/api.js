@@ -124,8 +124,10 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             }));
             return;
         }
-        let resp = authModule.auth(req.login, req.password);
-        response.status(200).send(JSON.stringify(resp));
+        authModule.auth(req.login, req.password)
+            .then(resp => {
+                response.status(200).send(JSON.stringify(resp));
+            });
     });
 
     app.post("/api/check_token", urlencodedParser, (request, response) => {
