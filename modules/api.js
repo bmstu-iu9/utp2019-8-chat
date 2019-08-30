@@ -10,7 +10,7 @@ const getArgs = (request, response, args) => {
         req[args[i]] = request.body[args[i]];
         if (req[args[i]] === undefined) {
             response.status(200).send(JSON.stringify({
-                success: false,
+                success: false, 
                 err_code: 1,
                 err_cause: `Argument not found (${args[i]})`
             }));
@@ -87,17 +87,16 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             }));
             return;
         }
-
-        authModule.register(req.login, req.password)
-            .then(resp => {
-                if (!resp.success) {
+        authModule.register(req.login, req.password).then(resp => {
+            if (!resp.success) {
+                response.status(200).send(JSON.stringify(resp));
+            }
+            else {
+                dbModule.create_user(resp.id, req.login).then(resp => {
                     response.status(200).send(JSON.stringify(resp));
-                }
-                else {
-                    dbModule.create_user(resp.id, req.login); //SYNC!
-                    response.status(200).send(JSON.stringify(resp));
-                }
-            });
+                });
+            }
+        });
     });
 
     app.post("/api/auth", urlencodedParser, (request, response) => {
@@ -124,10 +123,9 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
             }));
             return;
         }
-        authModule.auth(req.login, req.password)
-            .then(resp => {
-                response.status(200).send(JSON.stringify(resp));
-            });
+        authModule.auth(req.login, req.password).then(resp => {
+            response.status(200).send(JSON.stringify(resp));
+        });
     });
 
     app.post("/api/check_token", urlencodedParser, (request, response) => {
@@ -135,7 +133,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let resp = authModule.getUser(req.token);
+        let resp = authModule.getUser(req.token); //SYNC
         response.status(200).send(JSON.stringify(resp));
     });
 
@@ -144,7 +142,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let resp = authModule.exitSession(req.token);
+        let resp = authModule.exitSession(req.token); //SYNC
         response.status(200).send(JSON.stringify(resp));
     });
 
@@ -153,7 +151,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let resp = authModule.exitAllSessions(req.token);
+        let resp = authModule.exitAllSessions(req.token); //SYNC
         response.status(200).send(JSON.stringify(resp));
     });
 
@@ -162,8 +160,9 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let resp = dbModule.get_user(req.id);
-        response.status(200).send(JSON.stringify(resp));
+        dbModule.get_user(req.id).then(resp => {
+            response.status(200).send(JSON.stringify(resp));
+        });
     });
 
     app.post("/api/add_to_channel", urlencodedParser, (request, response) => {
@@ -171,19 +170,19 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let auth = authModule.getUser(req.token);
+        let auth = authModule.getUser(req.token); //SYNC
         if (!auth.success) {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
         if (checkPerm(user, 1) || user.id === +req.user_id) {
-            let resp = dbModule.add_to_channel(req.user_id, req.channel_id);
-            response.status(200).send(JSON.stringify(resp));
+            dbModule.add_to_channel(req.user_id, req.channel_id).then(resp => {
+                response.status(200).send(JSON.stringify(resp));
+            });
         }
         else {
-            let resp = ERR_NO_PERMISSIONS;
-            response.status(200).send(JSON.stringify(resp));
+            response.status(200).send(JSON.stringify(ERR_NO_PERMISSIONS));
         }
     });
 
@@ -192,19 +191,19 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let auth = authModule.getUser(req.token);
+        let auth = authModule.getUser(req.token); //SYNC
         if (!auth.success) {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
         let user = dbModule.get_user(auth.userID).user;
         if (checkPerm(user, 1) || user.id === +req.user_id) {
-            let resp = dbModule.remove_from_channel(req.user_id, req.channel_id);
-            response.status(200).send(JSON.stringify(resp));
+            dbModule.remove_from_channel(req.user_id, req.channel_id).then(resp => {
+                response.status(200).send(JSON.stringify(resp));
+            });
         }
         else {
-            let resp = ERR_NO_PERMISSIONS;
-            response.status(200).send(JSON.stringify(resp));
+            response.status(200).send(JSON.stringify(ERR_NO_PERMISSIONS));
         }
     });
 
@@ -213,43 +212,22 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let auth = authModule.getUser(req.token);
+        let auth = authModule.getUser(req.token); //SYNC
         if (!auth.success) {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.id === +req.user_id) {
-            let resp = dbModule.change_avatar(req.user_id, req.avatar);
-            response.status(200).send(JSON.stringify(resp));
-        }
-        else {
-            let resp = ERR_NO_PERMISSIONS;
-            response.status(200).send(JSON.stringify(resp));
-        }
-    });
-
-    app.post("/api/change_meta", urlencodedParser, (request, response) => {
-        const args = ["token", "user_id", "meta"];
-        let req = getArgs(request, response, args);
-        if (req === undefined)
-            return;
-        let auth = authModule.getUser(req.token);
-        if (!auth.success) {
-            response.status(200).send(JSON.stringify(auth));
-            return;
-        }
-        let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.id === +req.user_id) {
-            // NOT IMPLEMENTED
-            // let resp = dbModule.(req.user_id, req.avatar);
-            // response.status(200).send(JSON.stringify(resp));
-            response.status(200).send(JSON.stringify({ not_implemented: true }));
-        }
-        else {
-            let resp = ERR_NO_PERMISSIONS;
-            response.status(200).send(JSON.stringify(resp));
-        }
+        dbModule.get_user(auth.userID)
+            .then(res => {
+                if (checkPerm(res.user, 1) || res.user.id === +req.user_id) {
+                    dbModule.change_avatar(req.user_id, req.avatar).then(resp => {
+                        response.status(200).send(JSON.stringify(resp));
+                    });
+                }
+                else {
+                    response.status(200).send(JSON.stringify(ERR_NO_PERMISSIONS));
+                }
+            });
     });
 
     app.post("/api/get_channel", urlencodedParser, (request, response) => {
@@ -257,8 +235,9 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let resp = dbModule.get_channel(req.id);
-        response.status(200).send(JSON.stringify(resp));
+        dbModule.get_channel(req.id).then(resp => {
+            response.status(200).send(JSON.stringify(resp));
+        });
     });
 
     app.post("/api/create_channel", urlencodedParser, (request, response) => {
@@ -266,13 +245,14 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let auth = authModule.getUser(req.token);
+        let auth = authModule.getUser(req.token); //SYNC
         if (!auth.success) {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        let resp = dbModule.create_channel(auth.userID, req.channel_name);
-        response.status(200).send(JSON.stringify(resp));
+        dbModule.create_channel(auth.userID, req.channel_name).then(resp => {
+            response.status(200).send(JSON.stringify(resp));
+        });
     });
 
     app.post("/api/delete_channel", urlencodedParser, (request, response) => {
@@ -280,27 +260,27 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let auth = authModule.getUser(req.token);
+        let auth = authModule.getUser(req.token); //SYNC
         if (!auth.success) {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        let user = dbModule.get_user(auth.userID).user;
-        let channel = dbModule.get_channel(req.channel_id).channel;
-        if (channel === undefined) {
-            let resp = { success: false, err_code: 3, err_cause: "Channel does not exist" };
-            response.status(200).send(JSON.stringify(resp));
-        }
-        else if (checkPerm(user, 1) || user.id === channel.channel.owner_id) {
-            let resp = dbModule.channels_delete(req.channel_id);
-            response.status(200).send(JSON.stringify(resp));
-        }
-        else {
-            let resp = ERR_NO_PERMISSIONS;
-            response.status(200).send(JSON.stringify(resp));
-        }
-        // let resp = dbModule.channels_delete(req.channel_id);
-        // response.status(200).send(JSON.stringify(resp));
+        let user = dbModule.get_user(auth.userID);
+        let channel = dbModule.get_channel(req.channel_id);
+        Promise.all([user, channel]).then(res => {
+            if (res.channel === undefined) {
+                let resp = { success: false, err_code: 3, err_cause: "Channel does not exist" };
+                response.status(200).send(JSON.stringify(resp));
+            }
+            else if (checkPerm(user, 1) || user.id === channel.channel.owner_id) {
+                dbModule.channels_delete(req.channel_id).then(resp => {
+                    response.status(200).send(JSON.stringify(resp));
+                });
+            }
+            else {
+                response.status(200).send(JSON.stringify(ERR_NO_PERMISSIONS));
+            }
+        });
     });
 
     app.post("/api/get_messages", urlencodedParser, (request, response) => {
@@ -308,32 +288,36 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let auth = authModule.getUser(req.token);
-        let channel = dbModule.get_channel(+req.channel_id);
-        if (!channel.success) {
-            let resp = { success: false, err_code: 3, err_cause: "Channel does not exist" };
-            response.status(200).send(JSON.stringify(resp));
-        }
-        else if (!auth.success) {
-            if (channel.channel.meta.public) {
-                let resp = dbModule.chat_history(req.channel_id, req.offset, req.count);
+        let auth = authModule.getUser(req.token); //SYNC
+        dbModule.get_channel(+req.channel_id).then(channel => {
+            if (!channel.success) {
+                let resp = { success: false, err_code: 3, err_cause: "Channel does not exist" };
                 response.status(200).send(JSON.stringify(resp));
+            }
+            else if (!auth.success) {
+                if (channel.channel.meta.public) {
+                    dbModule.chat_history(req.channel_id, req.offset, req.count).then(resp => {
+                        response.status(200).send(JSON.stringify(resp));
+                    });
+                }
+                else {
+                    response.status(200).send(JSON.stringify(auth));
+                }
             }
             else {
-                response.status(200).send(JSON.stringify(auth));
+                dbModule.get_user(auth.userID).then(user => {
+                    user = user.user;
+                    if (checkPerm(user, 1) || user.channels.includes(+req.channel_id)) {
+                        dbModule.chat_history(req.channel_id, req.offset, req.count).then(resp => {
+                            response.status(200).send(JSON.stringify(resp));
+                        });
+                    }
+                    else {
+                        response.status(200).send(JSON.stringify(ERR_NO_PERMISSIONS));
+                    }
+                });
             }
-        }
-        else {
-            let user = dbModule.get_user(auth.userID).user;
-            if (checkPerm(user, 1) || channel.channel.meta.public || user.channels.includes(+req.channel_id)) {
-                let resp = dbModule.chat_history(req.channel_id, req.offset, req.count);
-                response.status(200).send(JSON.stringify(resp));
-            }
-            else {
-                let resp = ERR_NO_PERMISSIONS;
-                response.status(200).send(JSON.stringify(resp));
-            }
-        }
+        });
     });
 
     app.post("/api/send_message", urlencodedParser, (request, response) => {
@@ -341,51 +325,21 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         let req = getArgs(request, response, args);
         if (req === undefined)
             return;
-        let auth = authModule.getUser(req.token);
+        let auth = authModule.getUser(req.token); //SYNC
         if (!auth.success) {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        let user = dbModule.get_user(auth.userID).user;
-        if (checkPerm(user, 1) || user.channels.includes(+req.channel_id)) {
-            let resp = dbModule.send_message(req.channel_id, req.message, auth.userID, chatModule.broadcast);
-            response.status(200).send(JSON.stringify(resp));
-        }
-        else {
-            let resp = ERR_NO_PERMISSIONS;
-            response.status(200).send(JSON.stringify(resp));
-        }
-    });
-
-    app.post("/api/listen", urlencodedParser, (request, response) => {
-        response.status(405).send("{deprecated:true}");
-    });
-
-    app.post("/api/public_cipher", urlencodedParser, (request, response) => {
-        let resp = {};
-        response.status(200).send(JSON.stringify(resp));
-    });
-
-
-    app.post("/api/feature", urlencodedParser, (request, response) => {
-        const args = ["token", "data"];
-        let req = getArgs(request, response, args);
-        if (req === undefined)
-            return;
-        let auth = authModule.getUser(req.token);
-        if (!auth.success) {
-            response.status(200).send(JSON.stringify(auth));
-            return;
-        }
-        let user = dbModule.get_user(auth.userID).user;
-
-        if (req.data === "Join1") {
-            let resp = dbModule.add_to_channel(user.id, 1);
-            response.status(200).send(JSON.stringify(resp));
-            return;
-        }
-
-        const resp = { success: true };
-        response.status(200).send(JSON.stringify(resp));
+        dbModule.get_user(auth.userID).then(user => {
+            user = user.user;
+            if (checkPerm(user, 1) || user.channels.includes(+req.channel_id)) {
+                dbModule.send_message(req.channel_id, req.message, auth.userID, chatModule.broadcast).then(resp => {
+                    response.status(200).send(JSON.stringify(resp));
+                });
+            }
+            else {
+                response.status(200).send(JSON.stringify(ERR_NO_PERMISSIONS));
+            }
+        });
     });
 }

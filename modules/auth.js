@@ -31,7 +31,7 @@ db.connect((err) => {
 module.exports.init = (local_param, database) => {
     localParam = local_param;
 
-    this.register = register = async (login, password) => {
+    this.register = async (login, password) => {
         //MYSQL: Проверить, есть ли запись с таким логином в auth
         //MYSQL: добавить запись в auth
         const salt = crypto.randomBytes(32).toString("base64");
