@@ -23,7 +23,7 @@ const apiExitSession = () => {
 
 const apiExitAllSessions = () => {
     const params = { token: getCookie("accessToken"), };
-    return API_request("api/exit_all_session", params);
+    return API_request("api/exit_all_sessions", params);
 }
 
 const apiGetUser = (id) => {

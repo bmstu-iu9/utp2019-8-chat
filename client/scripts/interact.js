@@ -20,7 +20,6 @@ const init = () => {
             })
             .catch((err) => {
                 console.error(`Authorization failed (${err})`);
-                console.log("Redirect");
                 window.location.replace('/auth.html');
                 return reject("Unauthorized");
             });

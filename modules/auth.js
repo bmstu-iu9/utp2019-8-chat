@@ -80,7 +80,7 @@ module.exports.exitAllSessions = (token) => {
     }
     else {
         const id = sessions.get(token).id;
-        for (let t in sessions.entries())
+        for (let t of sessions.entries())
             if (t[1].id === id)
                 sessions.delete(t[0]);
         return { success: true };
