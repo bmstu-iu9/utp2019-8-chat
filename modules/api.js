@@ -92,9 +92,7 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
                 response.status(200).send(JSON.stringify(resp));
             }
             else {
-                dbModule.create_user(resp.id, req.login).then(resp => {
-                    response.status(200).send(JSON.stringify(resp));
-                });
+                 
             }
         });
     });

@@ -10,18 +10,20 @@ let channels = new Map();
 let messages = new Map(); //channel_id -> map
 
 module.exports.init = (database) => {
-	this.create_user = async (id, nickname) => {
-		//MYSQL: Добавить запись в users
-		const newUser = {
-			id: +id,
-			nickname: nickname,
-			permissions: 0,
-			avatar: "avatars/default.png",
-			channels: [],
-			meta: {}
-		};
-		users.set(id, newUser);
-	}
+
+	//Эта функция не нужна, т.к. при регистрации данные о пользователе добавляются сразу в 2 таблицы!!!
+	// this.create_user = async (id, nickname) => {
+	// 	//MYSQL: Добавить запись в users
+	// 	const newUser = {
+	// 		id: +id,
+	// 		nickname: nickname,
+	// 		permissions: 0,
+	// 		avatar: "avatars/default.png",
+	// 		channels: [],
+	// 		meta: {}
+	// 	};
+	// 	users.set(id, newUser);
+	// }
 
 	this.get_user = async (id) => {
 		//MYSQL: Получить запись из users по id
