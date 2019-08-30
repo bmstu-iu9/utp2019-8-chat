@@ -51,6 +51,7 @@ https://54.93.122.236.xip.io/index.html
 - [express](https://www.npmjs.com/package/express)
 - [body-parser](https://www.npmjs.com/package/body-parser)
 - [ws](https://www.npmjs.com/package/ws) - WebSockets
+- [multer](https://www.npmjs.com/package/multer) - Загрузка файлов на сервер (аватары)
 - [mysql](https://www.npmjs.com/package/mysql)
 - [minimist](https://www.npmjs.com/package/minimist) - Парсинг аргументов коммандной строки
 
