@@ -111,6 +111,7 @@ const server = config.use_https ? https.createServer(httpsOptions, app) : http.c
 
 apiModule.init(app, authModule, dbModule, chatModule);
 authModule.init(config.local_param, databaseModule);
+dbModule.init(databaseModule);
 chatModule.init(server, authModule, dbModule);
 
 app.get("/", (request, response) => {

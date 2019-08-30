@@ -31,7 +31,7 @@ db.connect((err) => {
 module.exports.init = (local_param, database) => {
     localParam = local_param;
 
-    this.register = register = async (login, password) => {
+    this.register = async (login, password) => {
         const salt = crypto.randomBytes(32).toString("base64");
         const pwdHash = crypto.pbkdf2Sync(password, salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
         if (await database.doesUserExist(login)){

@@ -42,50 +42,45 @@ module.exports.init = (server, authModule, dbModule) => {
 
         ws.on('message', (message) => {
             let res = JSON.parse(message);
-            let user;
-            if (res.token !== undefined) {
-                let authId = auth.getUser(res.token).userID;
-                user = db.get_user(authId);
+            let authId = auth.getUser(res.token).userID;
+            db.get_user(authId).then(user => {
                 user = user.success ? user.user : undefined;
-            }
+                if (res.type === "send_message") {
+                    if (user === undefined) {
+                        ws.send(JSON.stringify(ERR_AUTH_FAILED));
+                    }
+                    else if (checkPerm(user, 1) || user.channels.includes(res.channel_id)) { //TODO: permission
+                        db.send_message(res.channel_id, res.message, user.id, this.broadcast);
+                    }
+                    else {
+                        ws.send(JSON.stringify(ERR_NO_PERMISSIONS));
+                    }
+                }
 
-            if (res.type === "send_message") {
-                if (user === undefined) {
-                    ws.send(JSON.stringify(ERR_AUTH_FAILED));
+                else if (res.type === "set_channel") {
+                    if (res.channel_id === 0) {
+                        ws.channel_id = undefined;
+                        return;
+                    }
+                    dbModule.get_channel(res.channel_id).then(channel => {
+                        if (!channel.success) {
+                            ws.send(JSON.stringify({ success: false, err_code: 3, err_cause: "Channel does not exist" }));
+                        }
+                        else if (!channel.channel) {
+                            ws.channel_id = undefined;
+                        }
+                        else if (user === undefined) {
+                            ws.send(JSON.stringify(ERR_AUTH_FAILED));
+                        }
+                        else if (checkPerm(user, 1) || user.channels.includes(res.channel_id)) { //TODO: permission
+                            ws.channel_id = res.channel_id;
+                        }
+                        else {
+                            ws.send(JSON.stringify(ERR_NO_PERMISSIONS));
+                        }
+                    });
                 }
-                else if (checkPerm(user, 1) || user.channels.includes(res.channel_id)) { //TODO: permission
-                    db.send_message(res.channel_id, res.message, user.id, this.broadcast);
-                }
-                else {
-                    ws.send(JSON.stringify(ERR_NO_PERMISSIONS));
-                }
-            }
-
-            else if (res.type === "set_channel") {
-                if (res.channel_id === 0) {
-                    ws.channel_id = undefined;
-                    return;
-                }
-                let channel = dbModule.get_channel(res.channel_id);
-                if (!channel.success) {
-                    ws.send(JSON.stringify({ success: false, err_code: 3, err_cause: "Channel does not exist" }));
-                }
-                else if (!channel.channel) {
-                    ws.channel_id = undefined;
-                }
-                else if (channel.channel.meta.public) {
-                    ws.channel_id = res.channel_id;
-                }
-                else if (user === undefined) {
-                    ws.send(JSON.stringify(ERR_AUTH_FAILED));
-                }
-                else if (checkPerm(user, 1) || user.channels.includes(res.channel_id)) { //TODO: permission
-                    ws.channel_id = res.channel_id;
-                }
-                else {
-                    ws.send(JSON.stringify(ERR_NO_PERMISSIONS));
-                }
-            }
+            });
         });
     });
 
