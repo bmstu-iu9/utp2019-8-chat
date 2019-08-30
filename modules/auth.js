@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const crypto = require("crypto");
+const mysql = require("mysql");
 
 const PBKDF2_ITERATIONS = 100000;
 const PBKDF2_LENGTH = 64; //In bytes
@@ -9,29 +10,51 @@ const MAX_SESSION_TIME = 180; //In minutes
 
 let data = new Map(); //login -> user
 let sessions = new Map();
+let database;
 
 let localParam;
 
-module.exports.init = (local_param) => {
+const db = mysql.createConnection({
+    host     : 'remotemysql.com',
+    user     : '9SpT1uQOyM',
+    password : 'utp2019password',
+    database : '9SpT1uQOyM'
+});
+
+db.connect((err) => {
+    if(err){
+        console.log("Connection error");
+        throw err;
+    }
+    console.log("Connected");
+});
+
+module.exports.init = (local_param, databaseModule) => {
     localParam = local_param;
+    database = databaseModule;
 }
 
 module.exports.register = (login, password) => {
     //MYSQL: Проверить, есть ли запись с таким логином в auth
     //MYSQL: добавить запись в auth
-    if (data.has(login))
-        return { success: false, err_code: 3, err_cause: "User with this login already exists" };
     const salt = crypto.randomBytes(32).toString("base64");
     const pwdHash = crypto.pbkdf2Sync(password, salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
-    const newUser = {
-        login: login,
-        id: data.size + 1,
-        hash: pwdHash.toString('base64'),
-        salt: salt
-    };
-    data.set(login, newUser)
-    return { success: true, id: newUser.id };
+    if (!database.doesUserExist(login))
+        console.log("lol");
+
+    // if (data.has(login))
+    //     return { success: false, err_code: 3, err_cause: "User with this login already exists" };
+    // const newUser = {
+    //     login: login,
+    //     id: data.size + 1,
+    //     hash: pwdHash.toString('base64'),
+    //     salt: salt
+    // };
+    // data.set(login, newUser)
+    // return { success: true, id: newUser.id };
 }
+
+module.exports.register('admin', 'azerty1');
 
 module.exports.auth = (login, password) => {
     //MYSQL: Получить запись с таким логином в auth

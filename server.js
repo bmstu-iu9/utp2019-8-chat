@@ -9,9 +9,10 @@ const https = require("https");
 const express = require("express");
 
 const authModule = require("./modules/auth");
-const dbModule = require("./modules/database");
+const dbModule = require("./modules/dataRouter");
 const chatModule = require("./modules/chat");
-const apiModule = require("./modules/api")
+const apiModule = require("./modules/api");
+const databaseModule = require("./modules/database");
 
 const VERSION = "v1.1.0";
 const CONFIG_PATH = "./config.json";
@@ -109,7 +110,7 @@ const httpsOptions = config.use_https ?
 const server = config.use_https ? https.createServer(httpsOptions, app) : http.createServer(app);
 
 apiModule.init(app, authModule, dbModule, chatModule);
-authModule.init(config.local_param);
+authModule.init(config.local_param, databaseModule);
 chatModule.init(server, authModule, dbModule);
 
 app.get("/", (request, response) => {
