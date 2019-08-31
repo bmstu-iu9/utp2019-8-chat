@@ -1,6 +1,6 @@
 'use strict'
 
-let current_user;
+let current_user = undefined;
 
 let observe;
 if (window.attachEvent) {
@@ -34,6 +34,26 @@ const start = () => { //Раньше называлась init
     resize();
 }
 
+let makeNotification = undefined;
+const initNotifications = () => {
+    if (!("Notification" in window)) {
+        console.warn("Notifications is unsupported");
+        return;
+    }
+    else if (Notification.permission === "granted") {
+        makeNotification = (title, options) => {
+            let notification = new Notification(title, options);
+            notification.onclick = () => { window.parent.parent.focus(); };
+        };
+    }
+    else if (Notification.permission !== 'denied') {
+        Notification.requestPermission((permission) => {
+            if (permission === "granted")
+                initNotifications();
+        });
+    }
+}
+
 const reload = (callback) => {
     init()
         .then((res) => {
@@ -48,6 +68,7 @@ const reload = (callback) => {
                     const name = res.channels[i].name;
                     createChannelDiv(id, name);
                 }
+                initNotifications();
                 start();
                 if (callback !== undefined)
                     callback();

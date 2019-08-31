@@ -64,7 +64,7 @@ const createMessage = (message, cache, mention) => {
         raw = raw.replace(/>/g, "&gt;");
         raw = raw.replace(/"/g, "&quot;");
         raw = raw.replace(/(?:\r\n|\r|\n)/g, '<br />');
-        raw = raw.replace(new RegExp(`@${current_user.nickname}`, 'g'), `<span class="mention">@${current_user.nickname}</spanЧуть>`);
+        raw = raw.replace(new RegExp(`@${current_user.nickname}`, 'g'), `<span class="mention">@${current_user.nickname}</span>`);
         return raw;
     }
 
@@ -87,8 +87,8 @@ const createMessage = (message, cache, mention) => {
                     <div class="msg">${text}</div>
                 </div>
             </div>`;
-        if (mention !== undefined)
-            mention(text);        
+        if (mention !== undefined && text.indexOf(`@${current_user.nickname}`) >= 0)
+            mention(author.nickname, message.message);
         return resolve(node);
     });
 }
