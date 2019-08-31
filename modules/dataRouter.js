@@ -87,15 +87,14 @@ module.exports.init = (database) => {
 	this.chat_history = async (channel_id, offset, count) => {
 		//В возвращаемом массиве хранятся объекты {message_id, chat_id, user_id, content, date_create, author_name}
 		//В массие хранятся сначала новые смс, потом старые
-		if (await database.doesChannelNameExist(channel_name))
-			return { success: false, err_code: 3, err_cause: "Channel with this name already exists" };
+		if (!await database.doesChannelIdExist(channel_id))
+			return ERR_CHANNEL_NO_EXIST;
 		let msgs = await database.getMessagesHistory(channel_id, offset, count);
 		return { success: true, count: msgs.length, messages: msgs };
 	}
 
 	this.send_message = async (channel_id, message, author_id, broadcast) => {
-		const channel = channels.get(+channel_id);
-		if (channel === undefined)
+		if (!await database.doesChannelIdExist(channel_id))
 			return ERR_CHANNEL_NO_EXIST;
 		let msg = await database.addMessage(channel_id, author_id, message);
 		broadcast(channel_id, msg);
