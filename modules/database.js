@@ -40,7 +40,7 @@ const getUserName = (id) => {
 }
 
 module.exports.getUser = (login) => {
-	return new Promise((resolve, reject) =>{
+	return new Promise((resolve, reject) => {
 		let params = [login];
 		let sql = "select * from users where login = ?";
 		let query = db.query(sql, params, (err, result) => {
@@ -52,7 +52,7 @@ module.exports.getUser = (login) => {
 }
 
 module.exports.getUsersMeta = (id) => {
-	return new Promise((resolve, reject) =>{
+	return new Promise((resolve, reject) => {
 		let user_id = -1, nickname = "", permission = -1, avatar = "", channels = [], meta = {};
 		let params = [id];
 		let sql = "select * from users_data where id = ?";
@@ -64,11 +64,11 @@ module.exports.getUsersMeta = (id) => {
 			permission = result[0][`permissions`];
 			avatar = result[0][`avatar`];
 			meta = result[0][`meta`];
-		
+
 			sql = "select * from party where user_id = ?";
 			let query1 = db.query(sql, params, (err, result) => {
 				if (err)
-				return reject(err);
+					return reject(err);
 				for (let i = 0; i < result.length; i++)
 					channels[i] = result[i][`chat_id`];
 
@@ -87,7 +87,7 @@ module.exports.getUsersMeta = (id) => {
 }
 
 module.exports.getChannelMeta = (id) => {
-	return new Promise ((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		let channel_id = -1, channel_name = "", owner_id = -1, listeners = [], meta = {};
 		let sql = "select * from chat where chat_id = ?";
 		let params = [id];
@@ -110,7 +110,7 @@ module.exports.getChannelMeta = (id) => {
 					name: channel_name,
 					owner_id: owner_id,
 					listeners_ids: listeners,
-					meta: meta 
+					meta: meta
 				};
 				return resolve(channel);
 			});
@@ -119,20 +119,20 @@ module.exports.getChannelMeta = (id) => {
 }
 
 module.exports.getMessagesHistory = (channel_id, offset, count) => {
-	return new Promise ((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		let history = [];
 		let params = [channel_id];
 		let sql = "select * from messages where chat_id = ? ORDER BY `messages`.`date_create` DESC";
 		let query = db.query(sql, params, async (err, result) => {
 			if (err)
 				return reject(err);
-			for (let i = offset; history.length < count && i < result.length; i++){
+			for (let i = offset; history.length < count && i < result.length; i++) {
 				let msg = {
 					message_id: result[i][`message_id`],
 					chat_id: channel_id,
-					user_id: result[i][`user_id`],
-					content: result[i][`content`],
-					date_create: result[i][`date_create`],
+					author_id: result[i][`user_id`],
+					message: result[i][`content`],
+					time: result[i][`date_create`],
 					author_name: await getUserName(result[i][`user_id`])
 				};
 				history.push(msg);
@@ -143,7 +143,7 @@ module.exports.getMessagesHistory = (channel_id, offset, count) => {
 }
 
 module.exports.addUser = (login, hash, salt) => {
-	return new Promise((resolve, reject) =>{
+	return new Promise((resolve, reject) => {
 		let post = { login: login, hash: hash, salt: salt };
 		let sql = "insert into users set ?";
 		let id = -1;
@@ -171,8 +171,8 @@ module.exports.addUser = (login, hash, salt) => {
 }
 
 module.exports.addChannel = (user_id, name) => {
-	return new Promise ((resolve, reject) => {
-		let post = {name: name, user_id: user_id};
+	return new Promise((resolve, reject) => {
+		let post = { name: name, user_id: user_id };
 		let sql = "insert into chat set ?";
 		let query = db.query(sql, post, (err, result) => {
 			if (err)
@@ -182,11 +182,11 @@ module.exports.addChannel = (user_id, name) => {
 			let query1 = db.query(sql, (err, result) => {
 				if (err)
 					return reject(err);
-				for (let key in result[0]){
+				for (let key in result[0]) {
 					chat_id = result[0][key];
 					break;
 				}
-				post = {chat_id: chat_id, user_id: user_id};
+				post = { chat_id: chat_id, user_id: user_id };
 				sql = "insert into party set ?";
 				let query2 = db.query(sql, post, (err, result) => {
 					if (err)
@@ -197,10 +197,10 @@ module.exports.addChannel = (user_id, name) => {
 	});
 }
 
-module.exports.addMessage = (channel_id, author_id, message) =>{
+module.exports.addMessage = (channel_id, author_id, message) => {
 	return new Promise(async (resolve, reject) => {
 		let message_id = -1, author_name = await getUserName(author_id), time = new Date();
-		let post = {chat_id: channel_id, user_id: author_id, content: message, date_create: time};
+		let post = { chat_id: channel_id, user_id: author_id, content: message, date_create: time };
 		let sql = "insert into messages set ?";
 		let query = db.query(sql, post, (err, result) => {
 			if (err)
@@ -209,7 +209,7 @@ module.exports.addMessage = (channel_id, author_id, message) =>{
 			let query1 = db.query(sql, (err, result) => {
 				if (err)
 					return reject(err);
-				for (let key in result[0]){
+				for (let key in result[0]) {
 					message_id = result[0][key];
 					break;
 				}
@@ -234,13 +234,14 @@ module.exports.updateAvatar = (id, avatar) => {
 		let query = db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
+			return resolve();
 		});
 	});
 }
 
 module.exports.addUserToChannel = (user_id, channel_id) => {
 	return new Promise((resolve, reject) => {
-		let post = {chat_id: channel_id, user_id: user_id};
+		let post = { chat_id: channel_id, user_id: user_id };
 		let sql = "insert into party set ?";
 		let query = db.query(sql, post, (err, result) => {
 			if (err)
@@ -338,7 +339,7 @@ const updatePremission = (id, permission) => {
 }
 
 module.exports.doesChannelIdExist = (id) => {
-	return new Promise ((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		let sql = "select * from chat where chat_id = ?";
 		let params = [id];
 		let query = db.query(sql, params, (err, result) => {

@@ -148,15 +148,11 @@ let saverId = undefined; //Id of the saving timer
 if (config.saving_interval >= 0) {
     saverId = setInterval(async () => {
         console.log("Saving data...");
-        // await dbModule.save();
-        // await authModule.save();
         console.log("Data saved");
     }, config.saving_interval * 1000);
 }
 
 const startServer = async () => {
-    // await dbModule.load();
-    // await authModule.load();
     console.log("Data loaded");
     const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
     server.listen(port, () => {

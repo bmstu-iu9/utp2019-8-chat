@@ -19,8 +19,8 @@ const init = () => {
                 return resolve({ success: true, user: userInfo.user, channels: channels });
             })
             .catch((err) => {
-                console.error(`Authorization failed (${err})`);
-                window.location.replace('/auth.html');
+                console.error(`Authorization failed (${err.cause})`);
+                window.location.replace('/auth.html');   
                 return reject("Unauthorized");
             });
     });
@@ -98,6 +98,7 @@ const selectChannel = async (id) => {
                 .then(async (res) => {
                     let usersCache = new Map();
                     let builder = "";
+                    res.messages = res.messages.reverse();
                     for (let i = 0; i < res.count; i++)
                         builder += await createMessage(res.messages[i], usersCache);
                     return resolve(builder);

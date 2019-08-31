@@ -26,7 +26,7 @@ module.exports.init = (database) => {
 	this.get_user = async (id) => {
 		if (!await database.doesUserIdExist(id))
 			return ERR_USER_NO_EXIST;
-		const cur = await database.getUsersMeta(id);	
+		const cur = await database.getUsersMeta(id);
 		return { success: true, user: cur };
 	}
 
@@ -61,11 +61,10 @@ module.exports.init = (database) => {
 
 	this.get_channel = async (id) => {
 		//Возвращаемый объект: {id,name,owner_id,listeners_ids,meta}
-		if (!await database.doesChannelIdExist(channel_id))
+		if (!await database.doesChannelIdExist(id))
 			return ERR_CHANNEL_NO_EXIST;
 		const channel = await database.getChannelMeta(id);
-		return channel
-
+		return { success: true, channel: channel };
 	}
 
 	this.create_channel = async (user_id, channel_name) => {

@@ -2,8 +2,8 @@
 
 apiCheckToken()
     .then(res => {
-        console.log("Redirect");
-        window.location.replace('/index.html');
+        console.log("Already signed in");
+        // window.location.replace('/index.html');
     })
     .catch(err => {});
 

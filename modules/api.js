@@ -239,12 +239,12 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         dbModule.get_user(auth.userID)
             .then(res => {
                 if (checkPerm(res.user, 1) || res.user.id === +req.user_id) {
-                    const filename = `/avatars/${user.nickname}${path.extname(request.file.originalname)}`;
+                    const filename = `/avatars/${res.user.nickname}${path.extname(request.file.originalname)}`;
                     fs.writeFile(`./client${filename}`, request.file.buffer, (err) => {
                         if (err)
                             response.status(200).send(JSON.stringify({ success: false, err_code: -1, err_cause: err }));
                         else {
-                            dbModule.change_avatar(req.user_id, req.avatar).then(resp => {
+                            dbModule.change_avatar(req.user_id, filename).then(resp => {
                                 response.status(200).send(JSON.stringify(resp));
                             });
                         }
