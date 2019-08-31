@@ -3,6 +3,17 @@
 let socket = undefined;
 let curChannel = 0;
 
+const makeMention = (author, message, channel_id) => {
+    if (makeNotification !== undefined) {
+        makeNotification(`Вас упомянул ${author} в канале с ID ${channel_id}`, {
+            body: message,
+            icon: '/styles/favicon.ico',
+            dir: 'auto',
+            lang: 'RU'
+        });
+    }
+}
+
 const socketSelectChannel = (id) => {
     socket.send(JSON.stringify({ type: "set_channel", token: getCookie("accessToken"), channel_id: id }));
     curChannel = id;
@@ -18,7 +29,7 @@ const socketSendMessage = (msg) => {
 }
 
 const initSocket = (opened) => {
-    if(socket !== undefined)
+    if (socket !== undefined)
         socket.close();
     socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
     socket.onopen = (e) => {
@@ -39,7 +50,10 @@ const initSocket = (opened) => {
             alert("You don't have permissions to do that");
         }
         else if (resp.success && resp.type === "new_message") {
-            createMessage(resp.data).then((msg) => {
+            const t_mention = (author, message) => {
+                makeMention(author, message, curChannel)
+            };
+            createMessage(resp.data, undefined, t_mention).then((msg) => {
                 document.getElementById("chat_flow").innerHTML += msg;
                 document.getElementById("chat_flow").scrollTop = 9999;
             });
