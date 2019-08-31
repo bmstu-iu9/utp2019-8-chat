@@ -40,8 +40,7 @@ CREATE TABLE `chat` (
 --
 
 INSERT INTO `chat` (`chat_id`, `name`, `user_id`, `meta`) VALUES
-(1, 'test1', 1, NULL),
-(2, 'test2', 5, NULL);
+(1, 'Global chat', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -62,26 +61,7 @@ CREATE TABLE `messages` (
 --
 
 INSERT INTO `messages` (`message_id`, `chat_id`, `user_id`, `content`, `date_create`) VALUES
-(1, 1, 1, 'Message 1', '2019-08-31 10:55:23'),
-(2, 1, 1, 'Message 2', '2019-08-31 10:56:15'),
-(3, 1, 2, 'Message 3', '2019-08-31 10:56:15'),
-(4, 1, 2, 'Message 5', '2019-08-31 10:56:56'),
-(5, 1, 2, 'Message 6', '2019-08-31 10:56:56'),
-(6, 1, 1, 'Message 7', '2019-08-31 10:57:29'),
-(7, 1, 1, 'SOSAT', '2019-08-31 01:41:34'),
-(8, 1, 2, 'Message 8', '2019-08-31 10:57:29'),
-(9, 1, 1, 'Message 9', '2019-08-31 00:00:00'),
-(10, 1, 1, 'Message 10', '2019-08-31 10:58:19'),
-(11, 1, 1, 'Message 11', '2019-08-31 10:59:01'),
-(12, 1, 1, 'Message 12', '2019-08-31 10:59:01'),
-(13, 1, 1, 'Message 13', '2019-08-31 10:59:27'),
-(14, 1, 2, 'Message 14', '2019-08-31 10:59:27'),
-(15, 1, 2, 'Message 15', '2019-08-31 10:59:52'),
-(16, 1, 1, 'Message 16', '2019-08-31 10:59:52'),
-(17, 1, 2, 'Message 17', '2019-08-31 11:00:24'),
-(18, 1, 2, 'Message 18', '2019-08-31 11:00:24'),
-(19, 1, 2, 'Message 19', '2019-08-31 11:00:51'),
-(20, 1, 1, 'FINAL', '2019-08-31 11:00:51');
+(1, 1, 1, 'The first message in the world', '2019-08-31 10:55:23');
 
 -- --------------------------------------------------------
 
@@ -99,11 +79,7 @@ CREATE TABLE `party` (
 --
 
 INSERT INTO `party` (`chat_id`, `user_id`) VALUES
-(1, 1),
-(1, 2),
-(1, 33),
-(2, 5),
-(2, 33);
+(1, 1);
 
 -- --------------------------------------------------------
 
@@ -123,11 +99,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `login`, `hash`, `salt`) VALUES
-(1, 'admin', 'U8KucL4QJA0Gy/RN/GqjV9l1rSdocrrZqTKYKGUYd3mwINQ3H9ki05o6vmJMR5nWArpfZuDptIsiNFzjCsoXkg==', 'aW3xPSJcSg5XkymbJBsHLNBAMq1+B19AWEtBmQ92xy8='),
-(2, 'kek', '567', '567'),
-(5, 'lol', '123', '123'),
-(32, 'maxiklk', 'UQJgmd5ZouOevGOIAHJ0Al+L6xaUV/09Kw0ad0M+yXdfe/Pl0ieCEEhrc+4etvNYiPQvtzeij9RF0I2OEkFHvw==', 'RGBmb30dLqRTbosbinhh9RGrqSluSpsh09GQQ6jOPv0='),
-(33, 'Sokolmish', '6I2pzdINqnsiQ0/J82nZwztOPlwvWegwQ55Gnds7BEpc7O0YXXwqtVh6AtCbTkf0OYHUThM6+o6VC0DlBKdvmw==', 'X1Uj9rknO+hgvPL/ib7ARcHinRT5wjTWXSIuyJYNFGU=');
+(1, 'admin', 'x5uJGhK9K19EKCS9PtNkSmg4sLOHnEVTkmt63jBghU/D14A+z11sROgue+fZuwFewd668pC0nnjEbhzfu7uraQ==', 'HOImvA9jBnyU36uuex2QNIhtRoOPnpr5Bv+S65Qb8CE=');
 
 -- --------------------------------------------------------
 
@@ -148,11 +120,7 @@ CREATE TABLE `users_data` (
 --
 
 INSERT INTO `users_data` (`id`, `nickname`, `permissions`, `avatar`, `meta`) VALUES
-(1, 'admin', 1, 'avatars/default.png', NULL),
-(2, 'kek', 0, 'avatars/default.png', NULL),
-(5, 'lol', 0, 'avatars/default.png', NULL),
-(32, 'maxiklk', 0, 'avatars/default.png', NULL),
-(33, 'Sokolmish', 0, 'avatars/default.png', NULL);
+(1, 'admin', 1, 'avatars/default.png', NULL);
 
 --
 -- Индексы сохранённых таблиц
