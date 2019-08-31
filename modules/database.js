@@ -2,20 +2,24 @@
 
 const mysql = require("mysql");
 
-const db = mysql.createConnection({
-	host: 'remotemysql.com',
-	user: '9SpT1uQOyM',
-	password: 'utp2019password',
-	database: '9SpT1uQOyM'
-});
+let db;
 
-db.connect((err) => {
-	if (err) {
-		console.log("Connection error");
-		throw err;
-	}
-	console.log("Connected");
-});
+module.exports.init = (config) => {
+	db = mysql.createConnection({
+		host: config.mysql_host,
+		user: config.mysql_user,
+		password: config.mysql_pass,
+		database: config.mysql_database
+	});
+
+	db.connect((err) => {
+		if (err) {
+			console.log("Connection error");
+			throw err;
+		}
+		console.log("Connected");
+	});
+}
 
 const loadUsersData = () => {
 	let sql = "select * from users";

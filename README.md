@@ -20,8 +20,8 @@ https://54.93.122.236.xip.io/index.html
     cp ./default_config.json ./config.json
     node ./server.js --init
     node ./server.js -p 3000 -c ./config.json
-    sensible-browser localhost:3000 #Выполнить в отдельном терминале либо открыть в браузере
-    #Ctrl + C для сохранения данных и остановки сервера
+    sensible-browser localhost:3000 # Выполнить в отдельном терминале либо открыть в браузере
+    # Ctrl + C для сохранения данных и остановки сервера
 ```
 
 ## Файл конфигурации ##
@@ -40,11 +40,34 @@ https://54.93.122.236.xip.io/index.html
 | mysql_pass      | Строка | `utp2019password`     | Пароль для базы данных                                                                         |
 | mysql_database  | Строка | `9SpT1uQOyM`          | Название базы данных                                                                           |
 
+## Настройка базы данных ##
+
+Для подключения сервера к базе данных необходимо запустить сервер базы данных mysql, создать новую базу данных и 
+импортировать в нее [данную структуру](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/database/9SpT1uQOyM.sql).
+Для примера, рассмотрим настройку базы данных, запущенной локально, с использованием консольного клиента mysql через пользователя root.
+Возможная последовательность действий (переключение в консоль mysql произойдет автоматически):
+
+Bash:
+
+```bash
+    mysql -h localhost -u root -p # Далее ввести пароль
+```
+
+SQL:
+
+```sql
+    create database utp2019_8_chat; -- Это название нужно указать в конфиге в поле `mysql_database`
+    use utp2019_8_chat;
+    source ./database/9SpT1uQOyM.sql; -- При условии, что терминал запущен в корне проекта
+    exit; -- Выход их консоли mysql
+```
+
 ## Дополнительная информация ##
 
 - [Методы API](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/WS_DESCRIPTION.md)
 - [Структура сообщений WebSockets](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/WS_DESCRIPTION.md)
-- [Структура базы данных](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/database/9SpT1uQOyM.sql)
+- [Структура базы данных](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/DATABASE_STRUCT.md)
+- [Файл экспорта базы данных](https://github.com/bmstu-iu9/utp2019-8-chat/blob/master/database/9SpT1uQOyM.sql)
 
 ## Зависимости ##
 
