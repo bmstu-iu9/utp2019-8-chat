@@ -120,6 +120,30 @@ module.exports.getChannelMeta = (id) => {
 	});
 }
 
+module.exports.getMessagesHistory = (channel_id, offset, count) => {
+	return new Promise ((resolve, reject) => {
+		let history = [];
+		let params = [channel_id];
+		let sql = "select * from messages where chat_id = ? ORDER BY `messages`.`date_create` DESC";
+		let query = db.query(sql, params, async (err, result) => {
+			if (err)
+				return reject(err);
+			for (let i = offset; history.length < count && i < result.length; i++){
+				let msg = {
+					message_id: result[i][`message_id`],
+					chat_id: channel_id,
+					user_id: result[i][`user_id`],
+					content: result[i][`content`],
+					date_create: result[i][`date_create`],
+					author_name: await getUserName(result[i][`user_id`])
+				};
+				history.push(msg);
+			}
+			return resolve(history);
+		});
+	});
+}
+
 module.exports.addUser = (login, hash, salt) => {
 	return new Promise((resolve, reject) =>{
 		let post = { login: login, hash: hash, salt: salt };

@@ -85,23 +85,12 @@ module.exports.init = (database) => {
 	}
 
 	this.chat_history = async (channel_id, offset, count) => {
-		//MYSQL: Получить список сообщений из messages
-		//Формируется последовательность сообщений отсортированных по времени отправления
-		//Потом, начиная с сообщения offset возвращается не более count сообщений
-		//Сейчас в коде ошибка - offset не учитывается
-		const channel = channels.get(+channel_id);
-		if (channel === undefined)
-			return ERR_CHANNEL_NO_EXIST;
-		const msgMap = messages.get(+channel_id);
-		let curCount = 0;
-		let msgs = [];
-		for (let i of Array.from(msgMap.keys()).sort().reverse()) {
-			if (curCount >= count)
-				break;
-			msgs.push(msgMap.get(i));
-			curCount++;
-		}
-		return { success: true, count: curCount, messages: msgs.reverse() };
+		//В возвращаемом массиве хранятся объекты {message_id, chat_id, user_id, content, date_create, author_name}
+		//В массие хранятся сначала новые смс, потом старые
+		if (await database.doesChannelNameExist(channel_name))
+			return { success: false, err_code: 3, err_cause: "Channel with this name already exists" };
+		let msgs = await database.getMessagesHistory(channel_id, offset, count);
+		return { success: true, count: msgs.length, messages: msgs };
 	}
 
 	this.send_message = async (channel_id, message, author_id, broadcast) => {
