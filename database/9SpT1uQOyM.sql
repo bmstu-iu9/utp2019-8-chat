@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Авг 31 2019 г., 11:52
+-- Время создания: Авг 31 2019 г., 12:08
 -- Версия сервера: 8.0.13-4
 -- Версия PHP: 7.2.19-0ubuntu0.18.04.2
 
@@ -29,10 +29,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `chat` (
-  `chat_id` bigint(20) NOT NULL,
-  `name` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `meta` json DEFAULT NULL
+  `chat_id` bigint(20) NOT NULL COMMENT 'id канала',
+  `name` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'имя канала',
+  `user_id` int(11) NOT NULL COMMENT 'id пользователя, создавшего этот канал',
+  `meta` json DEFAULT NULL COMMENT 'информация о чате'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -50,11 +50,11 @@ INSERT INTO `chat` (`chat_id`, `name`, `user_id`, `meta`) VALUES
 --
 
 CREATE TABLE `messages` (
-  `message_id` bigint(20) NOT NULL,
-  `chat_id` bigint(20) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `content` text COLLATE utf8_unicode_ci NOT NULL,
-  `date_create` datetime NOT NULL
+  `message_id` bigint(20) NOT NULL COMMENT 'id сообщения',
+  `chat_id` bigint(20) NOT NULL COMMENT 'id канала',
+  `user_id` int(11) NOT NULL COMMENT 'id пользователя, отправившего это сообщение',
+  `content` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'содержание сообщения',
+  `date_create` datetime NOT NULL COMMENT 'дата отправки сообщения'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -90,8 +90,8 @@ INSERT INTO `messages` (`message_id`, `chat_id`, `user_id`, `content`, `date_cre
 --
 
 CREATE TABLE `party` (
-  `chat_id` bigint(20) NOT NULL,
-  `user_id` int(11) NOT NULL
+  `chat_id` bigint(20) NOT NULL COMMENT 'id канала',
+  `user_id` int(11) NOT NULL COMMENT 'id участника этого канала'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -112,10 +112,10 @@ INSERT INTO `party` (`chat_id`, `user_id`) VALUES
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `login` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `hash` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `salt` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL
+  `id` int(11) NOT NULL COMMENT 'id пользователя',
+  `login` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'логин пользователя',
+  `hash` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'хэш-пароль пользователя',
+  `salt` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'соль'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -136,11 +136,11 @@ INSERT INTO `users` (`id`, `login`, `hash`, `salt`) VALUES
 --
 
 CREATE TABLE `users_data` (
-  `id` int(11) NOT NULL,
-  `nickname` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `permissions` tinyint(4) NOT NULL DEFAULT '0',
-  `avatar` varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT 'avatars/default.png',
-  `meta` json DEFAULT NULL
+  `id` int(11) NOT NULL COMMENT 'id пользователя',
+  `nickname` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'ник пользователя',
+  `permissions` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'привелегии польщователя',
+  `avatar` varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT 'avatars/default.png' COMMENT 'путь к аватару пользователя',
+  `meta` json DEFAULT NULL COMMENT 'информация о пользователе'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -201,19 +201,19 @@ ALTER TABLE `users_data`
 -- AUTO_INCREMENT для таблицы `chat`
 --
 ALTER TABLE `chat`
-  MODIFY `chat_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `chat_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id канала', AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT для таблицы `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `message_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `message_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id сообщения', AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT для таблицы `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id пользователя', AUTO_INCREMENT=34;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
