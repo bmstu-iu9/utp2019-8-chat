@@ -109,25 +109,25 @@ module.exports.exitAllSessions = (token) => {
 }
 
 module.exports.save = async () => {
-    return new Promise((resolve, reject) => {
-        fs.writeFile("./Data/auth.json", JSON.stringify(Array.from(data.entries())), {}, (err) => {
-            if (err)
-                return reject(err);
-            else
-                return resolve();
-        });
-    });
+    // return new Promise((resolve, reject) => {
+    //     fs.writeFile("./Data/auth.json", JSON.stringify(Array.from(data.entries())), {}, (err) => {
+    //         if (err)
+    //             return reject(err);
+    //         else
+    //             return resolve();
+    //     });
+    // });
 }
 
 module.exports.load = async () => {
-    return new Promise((resolve, reject) => {
-        fs.readFile("./Data/auth.json", (err, raw) => {
-            if (err)
-                return reject(err);
-            if (raw.length === 0)
-                return resolve();
-            data = new Map(JSON.parse(raw));
-            return resolve();
-        });
-    });
+    // return new Promise((resolve, reject) => {
+    //     fs.readFile("./Data/auth.json", (err, raw) => {
+    //         if (err)
+    //             return reject(err);
+    //         if (raw.length === 0)
+    //             return resolve();
+    //         data = new Map(JSON.parse(raw));
+    //         return resolve();
+    //     });
+    // });
 }
