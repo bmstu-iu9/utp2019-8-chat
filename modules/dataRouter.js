@@ -83,6 +83,11 @@ module.exports.init = (database) => {
 		return { success: true };
 	}
 
+	this.get_all_channels = async () => {
+		//TODO
+		//Возвращает {success: true, channels: [1, 2, 3, ...]}
+	}
+
 	this.chat_history = async (channel_id, offset, count) => {
 		//В возвращаемом массиве хранятся объекты {message_id, chat_id, user_id, content, date_create, author_name}
 		//В массие хранятся сначала новые смс, потом старые

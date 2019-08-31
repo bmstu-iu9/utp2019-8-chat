@@ -309,6 +309,30 @@ module.exports.init = (app, authModule, dbModule, chatModule) => {
         });
     });
 
+    app.post("/api/get_all_channels", urlencodedParser, (request, response) => {
+        const args = ["token"];
+        let req = getArgs(request, response, args);
+        if (req === undefined)
+            return;
+        let auth = authModule.getUser(req.token); //SYNC
+        if (!auth.success) {
+            response.status(200).send(JSON.stringify(auth));
+            return;
+        }
+
+        dbModule.get_user(auth.userID)
+            .then(user => {
+                if (checkPerm(user, 2)) {
+                    dbModule.get_all_channels().then(resp => {
+                        response.status(200).send(JSON.stringify(resp));
+                    });
+                }
+                else {
+                    response.status(200).send(JSON.stringify(ERR_NO_PERMISSIONS));
+                }
+            });
+    });
+
     app.post("/api/get_messages", urlencodedParser, (request, response) => {
         const args = ["token", "channel_id", "offset", "count"];
         let req = getArgs(request, response, args);

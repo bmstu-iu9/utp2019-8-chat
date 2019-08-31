@@ -163,10 +163,11 @@ module.exports.addUser = (login, hash, salt) => {
 				let query2 = db.query(sql, post, (err, result) => {
 					if (err)
 						return reject(err);
+					else
+						return resolve(id);
 				});
 			});
 		});
-		return resolve(id);
 	});
 }
 
@@ -191,6 +192,7 @@ module.exports.addChannel = (user_id, name) => {
 				let query2 = db.query(sql, post, (err, result) => {
 					if (err)
 						return reject(err);
+					return resolve();
 				});
 			});
 		});
@@ -246,6 +248,7 @@ module.exports.addUserToChannel = (user_id, channel_id) => {
 		let query = db.query(sql, post, (err, result) => {
 			if (err)
 				return reject(err);
+			return resolve();
 		});
 	});
 }
@@ -257,6 +260,7 @@ module.exports.removeUserFromChannel = (user_id, channel_id) => {
 		let query = db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
+			return resolve();
 		});
 	});
 }
@@ -276,6 +280,7 @@ module.exports.removeChannel = (channel_id) => {
 				let query2 = db.query(sql, params, (err, result) => {
 					if (err)
 						return reject(err);
+					return resolve();
 				});
 			});
 
