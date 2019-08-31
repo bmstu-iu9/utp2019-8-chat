@@ -124,6 +124,7 @@ const httpsOptions = config.use_https ?
     undefined;
 const server = config.use_https ? https.createServer(httpsOptions, app) : http.createServer(app);
 
+databaseModule.init(config);
 apiModule.init(app, authModule, dbModule, chatModule);
 authModule.init(config.local_param, databaseModule);
 dbModule.init(databaseModule);
