@@ -3,9 +3,9 @@
 let socket = undefined;
 let curChannel = 0;
 
-const makeMention = (author, message) => {
+const makeMention = (author, message, channel_id) => {
     if (makeNotification !== undefined) {
-        makeNotification(`Вас упомянул ${author}`, {
+        makeNotification(`Вас упомянул ${author} в канале с ID ${channel_id}`, {
             body: message,
             icon: '/styles/favicon.ico',
             dir: 'auto',
@@ -50,7 +50,10 @@ const initSocket = (opened) => {
             alert("You don't have permissions to do that");
         }
         else if (resp.success && resp.type === "new_message") {
-            createMessage(resp.data, undefined, makeMention).then((msg) => {
+            const t_mention = (author, message) => {
+                makeMention(author, message, curChannel)
+            };
+            createMessage(resp.data, undefined, t_mention).then((msg) => {
                 document.getElementById("chat_flow").innerHTML += msg;
                 document.getElementById("chat_flow").scrollTop = 9999;
             });
