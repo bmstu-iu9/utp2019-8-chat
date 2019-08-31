@@ -1,16 +1,12 @@
 'use-strict'
 
-const fs = require("fs");
 const crypto = require("crypto");
-const mysql = require("mysql");
 
 const PBKDF2_ITERATIONS = 100000;
 const PBKDF2_LENGTH = 64; //In bytes
 const MAX_SESSION_TIME = 180; //In minutes
 
-let data = new Map(); //login -> user
 let sessions = new Map();
-
 let localParam;
 
 module.exports.init = (local_param, database) => {
@@ -91,28 +87,4 @@ module.exports.exitAllSessions = (token) => {
                 sessions.delete(t[0]);
         return { success: true };
     }
-}
-
-module.exports.save = async () => {
-    // return new Promise((resolve, reject) => {
-    //     fs.writeFile("./Data/auth.json", JSON.stringify(Array.from(data.entries())), {}, (err) => {
-    //         if (err)
-    //             return reject(err);
-    //         else
-    //             return resolve();
-    //     });
-    // });
-}
-
-module.exports.load = async () => {
-    // return new Promise((resolve, reject) => {
-    //     fs.readFile("./Data/auth.json", (err, raw) => {
-    //         if (err)
-    //             return reject(err);
-    //         if (raw.length === 0)
-    //             return resolve();
-    //         data = new Map(JSON.parse(raw));
-    //         return resolve();
-    //     });
-    // });
 }

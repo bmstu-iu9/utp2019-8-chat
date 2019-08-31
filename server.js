@@ -21,7 +21,6 @@ const CONFIG_PATH = "./config.json";
 const defaultConfig = {
     "http_port": 80,
     "https_port": 433,
-    "saving_interval": 60,
 
     "local_param": "HOImvA9jBnyU36uuex2QNIhtRoOPnpr5Bv+S65Qb8CE=",
 
@@ -65,7 +64,6 @@ const argv = minimist(process.argv.slice(2), {
         'p': 'port',
         'c': 'config',
     },
-    boolean: ['init', 'reinit'],
     default: { 'c': CONFIG_PATH },
     unknown: (arg) => {
         console.error('Unknown option: ', arg)
@@ -80,40 +78,6 @@ if (argv.help) {
 if (argv.version) {
     console.log(VERSION);
     process.exit(0);
-}
-if (argv.init) {
-    const createDir = (path) => {
-        return new Promise((resolve, reject) => {
-            fs.access(path, err => {
-                if (err)
-                    fs.mkdir(path, err => {
-                        if (err) return reject(err);
-                        else return resolve();
-                    });
-                else return resolve();
-            });
-        });
-    }
-    const initData = async () => {
-        await createDir("./Data");
-        await createDir("./Data/messages");
-        fs.writeFileSync("./Data/auth.json", "[]");
-        fs.writeFileSync("./Data/users.json", "[]");
-        fs.writeFileSync("./Data/channels.json",
-            "[[1,{\"id\":1,\"name\":\"Global channel\",\"owner_id\":0,\"listeners_ids\":[],\"meta\":{}}]]");
-        for (let file of fs.readdirSync("./Data/messages"))
-            fs.unlinkSync(`./Data/messages/${file}`);
-        fs.writeFileSync("./Data/messages/1.json", "[]");
-    }
-    initData()
-        .then(res => {
-            console.log("Done");
-            process.exit(0);
-        })
-        .catch(err => {
-            console.log(`Error: ${err}`);
-            process.exit(1);
-        });
 }
 //#endregion
 
@@ -145,35 +109,19 @@ app.post("*", (request, response) => {
     }));
 });
 
-let saverId = undefined; //Id of the saving timer
-if (config.saving_interval >= 0) {
-    saverId = setInterval(async () => {
-        console.log("Saving data...");
-        console.log("Data saved");
-    }, config.saving_interval * 1000);
-}
-
-const startServer = async () => {
-    console.log("Data loaded");
+const startServer = () => {
     const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
     server.listen(port, () => {
         console.log(`Server started on ${port} port using ${config.use_https ? "HTTPS" : "HTTP"}`);
     });
 }
 
-const stopServer = async () => {
+const stopServer = () => {
     chatModule.stop();
     app.disable();
-    if (saverId !== undefined)
-        clearInterval(saverId);
-    console.log("Saving data before app closing...");
-    await dbModule.save();
-    await authModule.save();
-    console.log("Data saved");
     process.exit(0);
 }
 
-//Saving before exit
 process.once("SIGINT", (c) => { stopServer(); });
 
 startServer();
