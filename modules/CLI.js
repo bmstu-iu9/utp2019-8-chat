@@ -9,7 +9,7 @@ const CONFIG_PATH = "./config.json";
 
 const defaultConfig = {
     "http_port": 80,
-    "https_port": 433,
+    "https_port": 443,
 
     "local_param": "HOImvA9jBnyU36uuex2QNIhtRoOPnpr5Bv+S65Qb8CE=",
 
