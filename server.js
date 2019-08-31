@@ -17,16 +17,14 @@ const cliModule = require("./modules/CLI");
 const argv = cliModule.getArgv(); //Possible exit in this method
 const config = cliModule.loadConfig(argv.config);
 const app = express();
-const httpsOptions = config.use_https ?
-    { key: fs.readFileSync(config.ssl_key), cert: fs.readFileSync(config.ssl_cert) } :
-    undefined;
+const httpsOptions = cliModule.getHttpsCert(config);
 const server = config.use_https ? https.createServer(httpsOptions, app) : http.createServer(app);
 
 databaseModule.init(config);
-apiModule.init(app, authModule, dataModule, chatModule);
 authModule.init(config.local_param, databaseModule);
 dataModule.init(databaseModule);
 chatModule.init(server, authModule, dataModule);
+apiModule.init(app, authModule, dataModule, chatModule);
 
 app.get("/", (request, response) => { response.redirect("/index.html"); });
 app.use(express.static("./client"));
@@ -47,7 +45,7 @@ app.post("*", (request, response) => {
 });
 
 const startServer = () => {
-    const port = argv.port !== undefined ? argv.port : (config.use_https ? config.https_port : config.http_port);
+    const port = cliModule.getPort(argv, config);
     server.listen(port, () => {
         console.log(`Server started on ${port} port using ${config.use_https ? "HTTPS" : "HTTP"}`);
     });

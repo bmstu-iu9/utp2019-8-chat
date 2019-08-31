@@ -57,7 +57,6 @@ module.exports.getArgv = () => {
     }
 }
 
-
 module.exports.loadConfig = (path) => {
     let config;
     try {
@@ -77,4 +76,23 @@ module.exports.loadConfig = (path) => {
         return defaultConfig;
     }
     return config;
+}
+
+module.exports.getHttpsCert = (config) => {
+    if (config.use_https)
+        return {
+            key: fs.readFileSync(config.ssl_key),
+            cert: fs.readFileSync(config.ssl_cert)
+        }
+    else
+        return undefined;
+}
+
+module.exports.getPort = (argv, config) => {
+    if (argv.port !== undefined)
+        return argv.port;
+    else if (config.use_https)
+        return config.https_port;
+    else
+        return config.http_port;
 }
