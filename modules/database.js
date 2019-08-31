@@ -18,6 +18,9 @@ module.exports.init = (config) => {
 				console.log(`Mysql connection error:`, err);
 				setTimeout(handleDisconnect, 2000);
 			}
+			else {
+				console.log("Connected to mysql");
+			}
 		});
 		db.on('error', err => {
 			console.log('Mysql error', err);
