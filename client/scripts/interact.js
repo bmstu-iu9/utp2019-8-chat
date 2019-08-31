@@ -12,7 +12,7 @@ const init = () => {
                         channels.push(await apiGetChannel(i));
                 }
                 else {
-                    for (let i of await apiGetAllChannels())
+                    for (let i of (await apiGetAllChannels()).channels)
                         channels.push(await apiGetChannel(i));
                 }
                 channels = channels.map(e => e.channel);
