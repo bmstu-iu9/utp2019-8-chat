@@ -2,8 +2,6 @@
 
 const mysql = require("mysql");
 
-let db;
-
 module.exports.init = (config) => {
 	const sql_config = {
 		host: config.mysql_host,
@@ -12,8 +10,8 @@ module.exports.init = (config) => {
 		database: config.mysql_database
 	}
 	const handleDisconnect = () => {
-		db = mysql.createConnection(sql_config);
-		db.connect(err => {
+		this.db = mysql.createConnection(sql_config);
+		this.db.connect(err => {
 			if (err) {
 				console.log(`Mysql connection error:`, err);
 				setTimeout(handleDisconnect, 2000);
@@ -22,7 +20,7 @@ module.exports.init = (config) => {
 				console.log("Connected to mysql");
 			}
 		});
-		db.on('error', err => {
+		this.db.on('error', err => {
 			console.log('Mysql error', err);
 			if (err.code === 'PROTOCOL_CONNECTION_LOST')
 				handleDisconnect();
@@ -35,7 +33,7 @@ module.exports.init = (config) => {
 
 const loadUsersData = () => {
 	let sql = "select * from users";
-	let query = db.query(sql, (err, results) => {
+	this.db.query(sql, (err, results) => {
 		if (err)
 			throw err;
 		console.log(results);
@@ -47,7 +45,7 @@ const getUserName = (id) => {
 	return new Promise((resolve, reject) => {
 		let sql = "select * from users_data where id = ?";
 		let params = [id];
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			return resolve(result[0][`nickname`]);
@@ -58,7 +56,7 @@ const getUserName = (id) => {
 module.exports.getChannels = () => {
 	return new Promise((resolve, reject) => {
 		let sql = "select * from chat";
-		let query = db.query(sql, (err, result) => {
+		this.db.query(sql, (err, result) => {
 			if (err)
 				return reject(err);
 			let channels = [];
@@ -73,7 +71,7 @@ module.exports.getUser = (login) => {
 	return new Promise((resolve, reject) => {
 		let params = [login];
 		let sql = "select * from users where login = ?";
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			return resolve(result[0]);
@@ -86,7 +84,7 @@ module.exports.getUsersMeta = (id) => {
 		let user_id = -1, nickname = "", permission = -1, avatar = "", channels = [], meta = {};
 		let params = [id];
 		let sql = "select * from users_data where id = ?";
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			user_id = result[0][`id`];
@@ -96,7 +94,7 @@ module.exports.getUsersMeta = (id) => {
 			meta = result[0][`meta`];
 
 			sql = "select * from party where user_id = ?";
-			let query1 = db.query(sql, params, (err, result) => {
+			this.db.query(sql, params, (err, result) => {
 				if (err)
 					return reject(err);
 				for (let i = 0; i < result.length; i++)
@@ -121,7 +119,7 @@ module.exports.getChannelMeta = (id) => {
 		let channel_id = -1, channel_name = "", owner_id = -1, listeners = [], meta = {};
 		let sql = "select * from chat where chat_id = ?";
 		let params = [id];
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			channel_id = result[0][`chat_id`];
@@ -130,7 +128,7 @@ module.exports.getChannelMeta = (id) => {
 			meta = result[0][`meta`];
 
 			sql = "select * from party where chat_id = ?";
-			let query1 = db.query(sql, params, (err, result) => {
+			this.db.query(sql, params, (err, result) => {
 				if (err)
 					return reject(err);
 				for (let i = 0; i < result.length; i++)
@@ -153,7 +151,7 @@ module.exports.getMessagesHistory = (channel_id, offset, count) => {
 		let history = [];
 		let params = [channel_id];
 		let sql = "select * from messages where chat_id = ? ORDER BY `messages`.`date_create` DESC";
-		let query = db.query(sql, params, async (err, result) => {
+		this.db.query(sql, params, async (err, result) => {
 			if (err)
 				return reject(err);
 			for (let i = offset; history.length < count && i < result.length; i++) {
@@ -177,11 +175,11 @@ module.exports.addUser = (login, hash, salt) => {
 		let post = { login: login, hash: hash, salt: salt };
 		let sql = "insert into users set ?";
 		let id = -1;
-		let query = db.query(sql, post, (err, result) => {
+		this.db.query(sql, post, (err, result) => {
 			if (err)
 				return reject(err);
 			sql = "select LAST_INSERT_ID()";
-			let query1 = db.query(sql, (err, result) => {
+			let query1 = this.db.query(sql, (err, result) => {
 				if (err)
 					return reject(err);
 				for (let key in result[0]) {
@@ -190,7 +188,7 @@ module.exports.addUser = (login, hash, salt) => {
 				}
 				post = { id: id, nickname: login };
 				sql = "insert into users_data set ?";
-				let query2 = db.query(sql, post, (err, result) => {
+				let query2 = this.db.query(sql, post, (err, result) => {
 					if (err)
 						return reject(err);
 					else
@@ -205,12 +203,12 @@ module.exports.addChannel = (user_id, name) => {
 	return new Promise((resolve, reject) => {
 		let post = { name: name, user_id: user_id };
 		let sql = "insert into chat set ?";
-		let query = db.query(sql, post, (err, result) => {
+		this.db.query(sql, post, (err, result) => {
 			if (err)
 				return reject(err);
 			let chat_id = -1;
 			sql = "select LAST_INSERT_ID()";
-			let query1 = db.query(sql, (err, result) => {
+			this.db.query(sql, (err, result) => {
 				if (err)
 					return reject(err);
 				for (let key in result[0]) {
@@ -219,7 +217,7 @@ module.exports.addChannel = (user_id, name) => {
 				}
 				post = { chat_id: chat_id, user_id: user_id };
 				sql = "insert into party set ?";
-				let query2 = db.query(sql, post, (err, result) => {
+				this.db.query(sql, post, (err, result) => {
 					if (err)
 						return reject(err);
 					return resolve();
@@ -234,11 +232,11 @@ module.exports.addMessage = (channel_id, author_id, message) => {
 		let message_id = -1, author_name = await getUserName(author_id), time = new Date();
 		let post = { chat_id: channel_id, user_id: author_id, content: message, date_create: time };
 		let sql = "insert into messages set ?";
-		let query = db.query(sql, post, (err, result) => {
+		this.db.query(sql, post, (err, result) => {
 			if (err)
 				return reject(err);
 			sql = "select LAST_INSERT_ID()";
-			let query1 = db.query(sql, (err, result) => {
+			this.db.query(sql, (err, result) => {
 				if (err)
 					return reject(err);
 				for (let key in result[0]) {
@@ -263,7 +261,7 @@ module.exports.updateAvatar = (id, avatar) => {
 	return new Promise((resolve, reject) => {
 		let params = [avatar, id];
 		let sql = "update users_data set avatar = ? where id = ?";
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			return resolve();
@@ -275,7 +273,7 @@ module.exports.addUserToChannel = (user_id, channel_id) => {
 	return new Promise((resolve, reject) => {
 		let post = { chat_id: channel_id, user_id: user_id };
 		let sql = "insert into party set ?";
-		let query = db.query(sql, post, (err, result) => {
+		this.db.query(sql, post, (err, result) => {
 			if (err)
 				return reject(err);
 			return resolve();
@@ -287,7 +285,7 @@ module.exports.removeUserFromChannel = (user_id, channel_id) => {
 	return new Promise((resolve, reject) => {
 		let sql = "delete from party where chat_id = ? and user_id = ?";
 		let params = [channel_id, user_id];
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			return resolve();
@@ -299,15 +297,15 @@ module.exports.removeChannel = (channel_id) => {
 	return new Promise((resolve, reject) => {
 		let sql = "delete from party where chat_id = ?";
 		let params = [channel_id];
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			sql = "delete from messages where chat_id = ?";
-			let query1 = db.query(sql, params, (err, result) => {
+			this.db.query(sql, params, (err, result) => {
 				if (err)
 					return reject(err);
 				sql = "delete from chat where chat_id = ?";
-				let query2 = db.query(sql, params, (err, result) => {
+				let query2 = this.db.query(sql, params, (err, result) => {
 					if (err)
 						return reject(err);
 					return resolve();
@@ -322,7 +320,7 @@ module.exports.isUserOwner = (user_id, channel_id) => {
 	return new Promise((resolve, reject) => {
 		let sql = "select * from chat where chat_id = ? and user_id = ?";
 		let params = [channel_id, user_id];
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			if (result.length == 0)
@@ -335,7 +333,7 @@ module.exports.isUserOwner = (user_id, channel_id) => {
 
 const updateLogin = (id, login) => {
 	let sql = "update users set login = " + "'" + login + "'" + " where id = " + id;
-	let query = db.query(sql, (err, result) => {
+	this.db.query(sql, (err, result) => {
 		if (err)
 			throw err;
 	});
@@ -343,7 +341,7 @@ const updateLogin = (id, login) => {
 
 const updateHash = (id, hash) => {
 	let sql = "update users set hash = " + "'" + hash + "'" + " where id = " + id;
-	let query = db.query(sql, (err, result) => {
+	this.db.query(sql, (err, result) => {
 		if (err)
 			throw err;
 	});
@@ -351,7 +349,7 @@ const updateHash = (id, hash) => {
 
 const updateSalt = (id, salt) => {
 	let sql = "update users set salt = " + "'" + salt + "'" + " where id = " + id;
-	let query = db.query(sql, (err, result) => {
+	this.db.query(sql, (err, result) => {
 		if (err)
 			throw err;
 	});
@@ -359,7 +357,7 @@ const updateSalt = (id, salt) => {
 
 const updateNickname = (id, nickname) => {
 	let sql = "update users_data set nickname = " + "'" + nickname + "'" + " where id = " + id;
-	let query = db.query(sql, (err, result) => {
+	this.db.query(sql, (err, result) => {
 		if (err)
 			throw err;
 	});
@@ -367,7 +365,7 @@ const updateNickname = (id, nickname) => {
 
 const updatePremission = (id, permission) => {
 	let sql = "update users_data set permission = " + permission + " where id = " + id;
-	let query = db.query(sql, (err, result) => {
+	this.db.query(sql, (err, result) => {
 		if (err)
 			throw err;
 	});
@@ -377,7 +375,7 @@ module.exports.doesChannelIdExist = (id) => {
 	return new Promise((resolve, reject) => {
 		let sql = "select * from chat where chat_id = ?";
 		let params = [id];
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			if (result.length == 0)
@@ -392,7 +390,7 @@ module.exports.doesUserIdExist = (id) => {
 	return new Promise((resolve, reject) => {
 		let sql = "select * from users where id = ?";
 		let params = [id];
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			if (result.length == 0)
@@ -407,7 +405,7 @@ module.exports.doesUserExist = (login) => {
 	return new Promise((resolve, reject) => {
 		let sql = "select * from users where login = ?";
 		let params = [login];
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			if (result.length == 0)
@@ -422,7 +420,7 @@ module.exports.doesChannelNameExist = (name) => {
 	return new Promise((resolve, reject) => {
 		let sql = "select * from chat where name = ?";
 		let params = [name];
-		let query = db.query(sql, params, (err, result) => {
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
 			if (result.length == 0)
