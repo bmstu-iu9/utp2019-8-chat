@@ -4,7 +4,7 @@ let socket = undefined;
 let curChannel = 0;
 
 const makeMention = (author, message, channel_id) => {
-    if (makeNotification !== undefined) {
+    if (makeNotification !== undefined && !isTabActive) {
         makeNotification(`Вас упомянул ${author} в канале с ID ${channel_id}`, {
             body: message,
             icon: '/styles/favicon.ico',
