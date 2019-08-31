@@ -5,8 +5,8 @@ const util = require('./util');
 
 module.exports.init = (app, modules) => {
     const authModule = modules.auth;
-    const dbModule = modules.db;
-    const chatModule = modules.chatModule;
+    const dataModule = modules.data;
+    const chatModule = modules.chat;
 
     const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -16,13 +16,13 @@ module.exports.init = (app, modules) => {
         if (req === undefined)
             return;
         const auth = authModule.getUser(req.token); //SYNC
-        dbModule.get_channel(+req.channel_id).then(channel => {
+        dataModule.get_channel(+req.channel_id).then(channel => {
             if (!channel.success) {
                 response.status(200).send(JSON.stringify(util.ERR_CHANNEL_NO_EXIST));
             }
             else if (!auth.success) {
                 if (channel.channel.meta.public) { //???
-                    dbModule.chat_history(req.channel_id, req.offset, req.count).then(resp => {
+                    dataModule.chat_history(req.channel_id, req.offset, req.count).then(resp => {
                         response.status(200).send(JSON.stringify(resp));
                     });
                 }
@@ -31,10 +31,10 @@ module.exports.init = (app, modules) => {
                 }
             }
             else {
-                dbModule.get_user(auth.userID).then(user => {
+                dataModule.get_user(auth.userID).then(user => {
                     user = user.user;
                     if (util.checkPerm(user, 1) || user.channels.includes(+req.channel_id)) {
-                        dbModule.chat_history(req.channel_id, req.offset, req.count).then(resp => {
+                        dataModule.chat_history(req.channel_id, req.offset, req.count).then(resp => {
                             response.status(200).send(JSON.stringify(resp));
                         });
                     }
@@ -56,10 +56,10 @@ module.exports.init = (app, modules) => {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        dbModule.get_user(auth.userID).then(user => {
+        dataModule.get_user(auth.userID).then(user => {
             user = user.user;
             if (util.checkPerm(user, 1) || user.channels.includes(+req.channel_id)) {
-                dbModule.send_message(req.channel_id, req.message, auth.userID, chatModule.broadcast).then(resp => {
+                dataModule.send_message(req.channel_id, req.message, auth.userID, chatModule.broadcast).then(resp => {
                     response.status(200).send(JSON.stringify(resp));
                 });
             }

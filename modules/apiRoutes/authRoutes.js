@@ -5,7 +5,7 @@ const util = require('./util');
 
 module.exports.init = (app, modules) => {
     const authModule = modules.auth;
-    const dbModule = modules.db;
+    const dataModule = modules.data;
     const chatModule = modules.chat;
 
     const urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -39,7 +39,7 @@ module.exports.init = (app, modules) => {
                 response.status(200).send(JSON.stringify(resp));
             }
             else {
-                dbModule.add_to_channel(resp.id, 1).then(resp => { //Global chat
+                dataModule.add_to_channel(resp.id, 1).then(resp => { //Global chat
                     response.status(200).send(JSON.stringify(resp));
                 });
             }

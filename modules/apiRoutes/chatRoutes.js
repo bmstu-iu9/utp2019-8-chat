@@ -5,7 +5,7 @@ const util = require('./util');
 
 module.exports.init = (app, modules) => {
     const authModule = modules.auth;
-    const dbModule = modules.db;
+    const dataModule = modules.data;
     const chatModule = modules.chat;
 
     const urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -15,7 +15,7 @@ module.exports.init = (app, modules) => {
         const req = util.getArgs(request, response, args);
         if (req === undefined)
             return;
-        dbModule.get_channel(req.id).then(resp => {
+        dataModule.get_channel(req.id).then(resp => {
             response.status(200).send(JSON.stringify(resp));
         });
     });
@@ -30,7 +30,7 @@ module.exports.init = (app, modules) => {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        dbModule.create_channel(auth.userID, req.channel_name).then(resp => {
+        dataModule.create_channel(auth.userID, req.channel_name).then(resp => {
             response.status(200).send(JSON.stringify(resp));
         });
     });
@@ -45,14 +45,14 @@ module.exports.init = (app, modules) => {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        const user = dbModule.get_user(auth.userID);
-        const channel = dbModule.get_channel(req.channel_id);
+        const user = dataModule.get_user(auth.userID);
+        const channel = dataModule.get_channel(req.channel_id);
         Promise.all([user, channel]).then(res => {
             if (res.channel === undefined) {
                 response.status(200).send(JSON.stringify(util.ERR_CHANNEL_NO_EXIST));
             }
             else if (util.checkPerm(user, 1) || user.id === channel.channel.owner_id) {
-                dbModule.channels_delete(req.channel_id).then(resp => {
+                dataModule.channels_delete(req.channel_id).then(resp => {
                     response.status(200).send(JSON.stringify(resp));
                 });
             }
@@ -72,10 +72,10 @@ module.exports.init = (app, modules) => {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        dbModule.get_user(auth.userID)
+        dataModule.get_user(auth.userID)
             .then(user => {
                 if (util.checkPerm(user.user, 2)) {
-                    dbModule.get_all_channels().then(resp => {
+                    dataModule.get_all_channels().then(resp => {
                         response.status(200).send(JSON.stringify(resp));
                     });
                 }

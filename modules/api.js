@@ -1,9 +1,9 @@
 'use strict'
 
-module.exports.init = (app, authModule, dbModule, chatModule) => {
+module.exports.init = (app, authModule, dataModule, chatModule) => {
     const modules = {
         auth: authModule,
-        db: dbModule,
+        data: dataModule,
         chat: chatModule
     }
     require("./apiRoutes/authRoutes").init(app, modules);

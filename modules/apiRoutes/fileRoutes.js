@@ -7,8 +7,8 @@ const util = require('./util');
 
 module.exports.init = (app, modules) => {
     const authModule = modules.auth;
-    const dbModule = modules.db;
-    const chatModule = modules.chatModule;
+    const dataModule = modules.data;
+    const chatModule = modules.chat;
 
     const uploadImg = multer({
         storage: multer.memoryStorage(),
@@ -35,7 +35,7 @@ module.exports.init = (app, modules) => {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        dbModule.get_user(auth.userID)
+        dataModule.get_user(auth.userID)
             .then(res => {
                 if (util.checkPerm(res.user, 1) || res.user.id === +req.user_id) {
                     const filename = `/avatars/${res.user.nickname}${path.extname(request.file.originalname)}`;
@@ -43,7 +43,7 @@ module.exports.init = (app, modules) => {
                         if (err)
                             response.status(200).send(JSON.stringify({ success: false, err_code: -1, err_cause: err }));
                         else {
-                            dbModule.change_avatar(req.user_id, filename).then(resp => {
+                            dataModule.change_avatar(req.user_id, filename).then(resp => {
                                 response.status(200).send(JSON.stringify(resp));
                             });
                         }

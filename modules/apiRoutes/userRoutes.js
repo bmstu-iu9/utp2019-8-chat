@@ -5,7 +5,7 @@ const util = require('./util');
 
 module.exports.init = (app, modules) => {
     const authModule = modules.auth;
-    const dbModule = modules.db;
+    const dataModule = modules.data;
     const chatModule = modules.chat;
 
     const urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -15,7 +15,7 @@ module.exports.init = (app, modules) => {
         const req = util.getArgs(request, response, args);
         if (req === undefined)
             return;
-        dbModule.get_user(req.id).then(resp => {
+        dataModule.get_user(req.id).then(resp => {
             response.status(200).send(JSON.stringify(resp));
         });
     });
@@ -30,9 +30,9 @@ module.exports.init = (app, modules) => {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        const user = dbModule.get_user(auth.userID).user;
+        const user = dataModule.get_user(auth.userID).user;
         if (util.checkPerm(user, 1) || channel.listeners_ids.includes(user.id)) {
-            dbModule.add_to_channel(req.user_id, req.channel_id).then(resp => {
+            dataModule.add_to_channel(req.user_id, req.channel_id).then(resp => {
                 response.status(200).send(JSON.stringify(resp));
             });
         }
@@ -51,9 +51,9 @@ module.exports.init = (app, modules) => {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        const user = dbModule.get_user(auth.userID).user;
+        const user = dataModule.get_user(auth.userID).user;
         if (util.checkPerm(user, 1) || user.id === channel.owner_id) {
-            dbModule.remove_from_channel(req.user_id, req.channel_id).then(resp => {
+            dataModule.remove_from_channel(req.user_id, req.channel_id).then(resp => {
                 response.status(200).send(JSON.stringify(resp));
             });
         }
