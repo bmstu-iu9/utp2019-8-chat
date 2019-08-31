@@ -3,7 +3,6 @@
 
 const fs = require("fs");
 const process = require("process");
-const minimist = require("minimist");
 const http = require("http");
 const https = require("https");
 const express = require("express");
@@ -29,12 +28,15 @@ authModule.init(config.local_param, databaseModule);
 dbModule.init(databaseModule);
 chatModule.init(server, authModule, dbModule);
 
-app.get("/", (request, response) => {
-    response.redirect("/index.html"); //Redirect to index page if request is empty
-});
+app.get("/", (request, response) => { response.redirect("/index.html"); });
 app.use(express.static("./client"));
 app.get("*", (request, response) => {
-    response.send(fs.readFileSync("./client/404.html").toString("utf-8")); //If page is not found
+    fs.readFile("./client/404.html", (err, res) => {
+        if (err)
+            response.send("<h1>404 Not found</h1>");
+        else
+            response.send(res.toString("utf-8"));
+    });
 });
 app.post("*", (request, response) => {
     response.send(JSON.stringify({
