@@ -5,20 +5,29 @@ const mysql = require("mysql");
 let db;
 
 module.exports.init = (config) => {
-	db = mysql.createConnection({
+	const sql_config = {
 		host: config.mysql_host,
 		user: config.mysql_user,
 		password: config.mysql_pass,
 		database: config.mysql_database
-	});
-
-	db.connect((err) => {
-		if (err) {
-			console.log("Connection error");
-			throw err;
-		}
-		console.log("Connected");
-	});
+	}
+	const handleDisconnect = () => {
+		db = mysql.createConnection(sql_config);
+		db.connect(err => {
+			if (err) {
+				console.log(`Mysql connection error:`, err);
+				setTimeout(handleDisconnect, 2000);
+			}
+		});
+		db.on('error', err => {
+			console.log('Mysql error', err);
+			if (err.code === 'PROTOCOL_CONNECTION_LOST')
+				handleDisconnect();
+			else
+				throw err;
+		});
+	}
+	handleDisconnect();
 }
 
 const loadUsersData = () => {

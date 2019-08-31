@@ -13,21 +13,6 @@ let sessions = new Map();
 
 let localParam;
 
-const db = mysql.createConnection({
-    host: 'remotemysql.com',
-    user: '9SpT1uQOyM',
-    password: 'utp2019password',
-    database: '9SpT1uQOyM'
-});
-
-db.connect((err) => {
-    if (err) {
-        console.log("Connection error");
-        throw err;
-    }
-    console.log("Connected");
-});
-
 module.exports.init = (local_param, database) => {
     localParam = local_param;
 
