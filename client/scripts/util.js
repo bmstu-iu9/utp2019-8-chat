@@ -51,11 +51,11 @@ const checkPassword = (password) => {
     let b1 = false;
     let b2 = false;
     const len = password.length;
-    if (len > 5) {  
+    if (len > 5) {
         let i = 0;
         for (let i = 0; (!b1 || !b2) && i < len; i++) {
             if (!b1 && (password[i] >= 'A' && password[i] <= 'Z' ||
-             password[i] >= 'a' && password[i] <= 'z')) {
+                password[i] >= 'a' && password[i] <= 'z')) {
                 b1 = true;
             }
             else if (!b2 && password[i] >= '0' && password[i] <= '9') {
@@ -116,3 +116,7 @@ const apiCheckToken = () => {
             });
     });
 }
+
+let isTabActive = true;
+window.onfocus = () => { isTabActive = true; }
+window.onblur = () => { isTabActive = false; }
