@@ -39,6 +39,20 @@ const getUserName = (id) => {
 	});
 }
 
+module.exports.getChannels = () => {
+	return new Promise((resolve, reject) => {
+		let sql = "select * from chat";
+		let query = db.query(sql, (err, result) => {
+			if (err)
+				return reject(err);
+			let channels = [];
+			for (let i = 0; i < result.length; i++)
+				channels.push(result[i][`chat_id`]);
+			return resolve(channels);
+		});
+	});
+}
+
 module.exports.getUser = (login) => {
 	return new Promise((resolve, reject) => {
 		let params = [login];

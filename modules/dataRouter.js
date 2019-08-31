@@ -84,8 +84,8 @@ module.exports.init = (database) => {
 	}
 
 	this.get_all_channels = async () => {
-		//TODO
-		//Возвращает {success: true, channels: [1, 2, 3, ...]}
+		let channels = await database.getChannels();
+		return {success: true, channels: channels};
 	}
 
 	this.chat_history = async (channel_id, offset, count) => {
