@@ -11,7 +11,6 @@ module.exports.init = (database) => {
 		return { success: true, user: cur };
 	}
 
-
 	this.change_avatar = async (user_id, avatar) => {
 		if (!await database.doesUserIdExist(user_id))
 			return ERR_USER_NO_EXIST;
@@ -39,7 +38,6 @@ module.exports.init = (database) => {
 		return { success: true };
 	}
 
-
 	this.get_channel = async (id) => {
 		//Возвращаемый объект: {id,name,owner_id,listeners_ids,meta}
 		if (!await database.doesChannelIdExist(id))
@@ -65,8 +63,8 @@ module.exports.init = (database) => {
 	}
 
 	this.get_all_channels = async () => {
-		let channels = await database.getChannels();
-		return {success: true, channels: channels};
+		const channels = await database.getChannels();
+		return { success: true, channels: channels };
 	}
 
 	this.chat_history = async (channel_id, offset, count) => {
@@ -81,7 +79,7 @@ module.exports.init = (database) => {
 	this.send_message = async (channel_id, message, author_id, broadcast) => {
 		if (!await database.doesChannelIdExist(channel_id))
 			return ERR_CHANNEL_NO_EXIST;
-		let msg = await database.addMessage(channel_id, author_id, message);
+		const msg = await database.addMessage(channel_id, author_id, message);
 		broadcast(channel_id, msg);
 		return { success: true };
 	}
