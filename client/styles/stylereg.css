@@ -1,15 +1,45 @@
-.container{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  flex-direction: column;
+.container {
+	margin: auto;
+	width: 250px;
+	align-items: center;
 }
-
-body{
-  color: green;
+h3{
+	margin-top: 10%;
+	font-family: 'Raleway', sans-serif;
+	font-weight: 300;
+	color: white;
+	font-size: 250%;
+	text-align: center;
 }
-
-label{
-  cursor: pointer;
+body {
+	background-color: #26262b;
+}
+#btnSend {
+	margin-left:35%;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 16px;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+#btnSend:hover {
+	background-color: white;
+	color: black;
+}
+a {
+	color: white;
+	margin-left: 25%;
+}
+label {
+	font-family: 'Raleway', sans-serif;
+	font-weight: 400;
+	color: white;
+}
+input{
+	outline: none;
+	width: 100%;
 }

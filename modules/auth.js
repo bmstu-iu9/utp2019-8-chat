@@ -50,12 +50,12 @@ module.exports.init = (local_param, database) => {
 
     this.auth = async (login, password) => {
         if (!await database.doesUserExist(login)){
-            return { success: false, err_code: 7, err_cause: "user doesn't exist" };
+            return { success: false, err_code: 7, err_cause: "Wrong login or password" };
         } else {
             const user = await database.getUser(login);
             const curHash = crypto.pbkdf2Sync(password, user.salt + localParam, PBKDF2_ITERATIONS, PBKDF2_LENGTH, "sha512");
             if (!crypto.timingSafeEqual(Buffer.from(user.hash, "base64"), curHash)) {
-                return { success: false, err_code: 4, err_cause: "Wrong password" };
+                return { success: false, err_code: 4, err_cause: "Wrong login or password" };
             } else{
                 const sessionKey = crypto.randomBytes(64).toString("base64");
                 sessions.set(sessionKey, {
@@ -101,7 +101,7 @@ module.exports.exitAllSessions = (token) => {
     }
     else {
         const id = sessions.get(token).id;
-        for (let t in sessions.entries())
+        for (let t of sessions.entries())
             if (t[1].id === id)
                 sessions.delete(t[0]);
         return { success: true };

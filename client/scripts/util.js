@@ -30,37 +30,6 @@ const deleteCookie = (name) => {
     setCookie(name, "", { 'max-age': -1 });
 }
 
-const request = (dest, params) => {
-    return new Promise((resolve, reject) => {
-        const encodeMessage = (str) => { //Replace special charasters to codes
-            return str.toString().
-                replace(/\$/g, "%24").
-                replace(/\&/g, "%26").
-                replace(/\+/g, "%2b").
-                replace(/\,/g, "%2c").
-                replace(/\//g, "%2f").
-                replace(/\:/g, "%3a").
-                replace(/\;/g, "%3b").
-                replace(/\=/g, "%3d").
-                replace(/\?/g, "%3f").
-                replace(/\@/g, "%40");
-        }
-        let xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-                return resolve({ response: xhr.responseText, status: xhr.status });
-            }
-        }
-        xhr.open('POST', dest, true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        let paramStr = [];
-        for (let key in params) {
-            paramStr.push(`${key}=${encodeMessage(params[key])}`);
-        }
-        xhr.send(paramStr.join('&'));
-    });
-}
-
 const checkLogin = (login) => {
     const len = login.length;
     if (len < 1 && len > 20) {
@@ -95,4 +64,55 @@ const checkPassword = (password) => {
         }
     }
     return b1 && b2;
+}
+
+const request = (dest, params) => {
+    return new Promise((resolve, reject) => {
+        const encodeMessage = (str) => { //Replace special charasters to codes
+            return str.toString().
+                replace(/\$/g, "%24").
+                replace(/\&/g, "%26").
+                replace(/\+/g, "%2b").
+                replace(/\,/g, "%2c").
+                replace(/\//g, "%2f").
+                replace(/\:/g, "%3a").
+                replace(/\;/g, "%3b").
+                replace(/\=/g, "%3d").
+                replace(/\?/g, "%3f").
+                replace(/\@/g, "%40");
+        }
+        let xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                return resolve({ response: xhr.responseText, status: xhr.status });
+            }
+        }
+        xhr.open('POST', dest, true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        let paramStr = [];
+        for (let key in params) {
+            paramStr.push(`${key}=${encodeMessage(params[key])}`);
+        }
+        xhr.send(paramStr.join('&'));
+    });
+}
+
+const apiCheckToken = () => {
+    return new Promise((resolve, reject) => {
+        const accessToken = getCookie("accessToken");
+        if (accessToken === undefined) {
+            return reject("Access token did not found");
+        }
+        request("api/check_token", { token: accessToken })
+            .then((res) => {
+                const response = JSON.parse(res.response);
+                if (response.success)
+                    return resolve(response.userID);
+                else
+                    return reject(`Wrong access token: ${response.err_cause}`);
+            })
+            .catch((err) => {
+                return reject(err);
+            });
+    });
 }

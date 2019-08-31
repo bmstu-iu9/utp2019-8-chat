@@ -14,7 +14,7 @@ const chatModule = require("./modules/chat");
 const apiModule = require("./modules/api");
 const databaseModule = require("./modules/database");
 
-const VERSION = "v1.1.0";
+const VERSION = "v1.3.0";
 const CONFIG_PATH = "./config.json";
 
 //#region config
@@ -26,8 +26,8 @@ const defaultConfig = {
     "local_param": "HOImvA9jBnyU36uuex2QNIhtRoOPnpr5Bv+S65Qb8CE=",
 
     "use_https": false,
-    "ssl_cert": "./crt.pem",
-    "ssl_key": "./key.pem",
+    "ssl_cert": "./ssl/crt.pem",
+    "ssl_key": "./ssl/key.pem",
 
     "mysql_host": "remotemysql.com",
     "mysql_user": "9SpT1uQOyM",
@@ -82,23 +82,38 @@ if (argv.version) {
     process.exit(0);
 }
 if (argv.init) {
-    fs.mkdirSync("./Data");
-    fs.mkdirSync("./Data/messages");
-    fs.writeFileSync("./Data/auth.json", "[]");
-    fs.writeFileSync("./Data/users.json", "[]");
-    fs.writeFileSync("./Data/channels.json", "[]");
-    console.log("Done");
-    process.exit(0);
-}
-if (argv.reinit) {
-    fs.writeFileSync("./Data/auth.json", "[]");
-    fs.writeFileSync("./Data/users.json", "[]");
-    fs.writeFileSync("./Data/channels.json", "[]");
-    const files = fs.readdirSync("./Data/messages");
-    for (let file of files)
-        fs.unlinkSync(`./Data/messages/${file}`);
-    console.log("Done");
-    process.exit(0);
+    const createDir = (path) => {
+        return new Promise((resolve, reject) => {
+            fs.access(path, err => {
+                if (err)
+                    fs.mkdir(path, err => {
+                        if (err) return reject(err);
+                        else return resolve();
+                    });
+                else return resolve();
+            });
+        });
+    }
+    const initData = async () => {
+        await createDir("./Data");
+        await createDir("./Data/messages");
+        fs.writeFileSync("./Data/auth.json", "[]");
+        fs.writeFileSync("./Data/users.json", "[]");
+        fs.writeFileSync("./Data/channels.json",
+            "[[1,{\"id\":1,\"name\":\"Global channel\",\"owner_id\":0,\"listeners_ids\":[],\"meta\":{}}]]");
+        for (let file of fs.readdirSync("./Data/messages"))
+            fs.unlinkSync(`./Data/messages/${file}`);
+        fs.writeFileSync("./Data/messages/1.json", "[]");
+    }
+    initData()
+        .then(res => {
+            console.log("Done");
+            process.exit(0);
+        })
+        .catch(err => {
+            console.log(`Error: ${err}`);
+            process.exit(1);
+        });
 }
 //#endregion
 

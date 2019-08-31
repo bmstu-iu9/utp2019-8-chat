@@ -23,7 +23,7 @@ const apiExitSession = () => {
 
 const apiExitAllSessions = () => {
     const params = { token: getCookie("accessToken"), };
-    return API_request("api/exit_all_session", params);
+    return API_request("api/exit_all_sessions", params);
 }
 
 const apiGetUser = (id) => {
@@ -79,6 +79,12 @@ const apiDeleteChannel = (ch_id) => {
     return API_request("api/delete_channel", params);
 }
 
+const apiGetAllChannels = () => {
+    const params = { token: getCookie("accessToken") };
+    return API_request("api/get_all_channels", params);
+}
+
+
 const apiGetMessages = (ch_id, offset, count) => {
     const params = {
         token: getCookie("accessToken"),
@@ -96,24 +102,4 @@ const apiSendMessage = (ch_id, msg) => {
         message: msg,
     };
     return API_request("api/send_message", params);
-}
-
-const apiCheckToken = () => {
-    return new Promise((resolve, reject) => {
-        const accessToken = getCookie("accessToken");
-        if (accessToken === undefined) {
-            return reject("Access token did not found");
-        }
-        request("api/check_token", { token: accessToken })
-            .then((res) => {
-                const response = JSON.parse(res.response);
-                if (response.success)
-                    return resolve(response.userID);
-                else
-                    return reject(`Wrong access token: ${response.err_cause}`);
-            })
-            .catch((err) => {
-                return reject(err);
-            });
-    });
 }

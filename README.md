@@ -5,13 +5,12 @@ https://54.93.122.236.xip.io/index.html
 ## Запуск сервера ##
 
 ```sh
-    node ./server.js [--init] [--reinit] [-p=PORT] [-c=CONFIG_PATH]
+    node ./server.js [--init] [-p=PORT] [-c=CONFIG_PATH]
 ```
 
 - PORT - порт, на котором будет запущен сервер. По умолчанию будет взято значение из файла конфигурации. (Для запуска сервера на некоторых портах (<1000) могут потребоватсья привелегии суперпользователя).
 - CONFIG_PATH - путь к файлу конфигурации, по умолчанию равен `./config.json`
-- init - подготовить новую папку с данными.
-- reinit - очистить сохраненные данные
+- init - удалить созраненные данные и подготовить файлы для записи новых
 
 ## Быстрый старт ##
 
@@ -52,6 +51,7 @@ https://54.93.122.236.xip.io/index.html
 - [express](https://www.npmjs.com/package/express)
 - [body-parser](https://www.npmjs.com/package/body-parser)
 - [ws](https://www.npmjs.com/package/ws) - WebSockets
+- [multer](https://www.npmjs.com/package/multer) - Загрузка файлов на сервер (аватары)
 - [mysql](https://www.npmjs.com/package/mysql)
 - [minimist](https://www.npmjs.com/package/minimist) - Парсинг аргументов коммандной строки
 

@@ -1,5 +1,3 @@
-#!/usr/bin/nodejs
-
 'use strict'
 
 const mysql = require("mysql");

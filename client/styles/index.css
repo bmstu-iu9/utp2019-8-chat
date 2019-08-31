@@ -1,12 +1,12 @@
 #chat_wrapper { /*This style used for change outer chat properties (like sizes)*/
     display: block;
-    width: 90%;
-    height: 750px;
+	width: 90%;
+	height: 700px;
     min-width: 500px; 
     margin-left: 5%;
 	margin-right: 5%;
     border: 1px solid black; 
-	background-color: #313138
+	background-color: #313138;
 	
 }
 #chat_list{
@@ -20,24 +20,32 @@
 #chat_names{
 	overflow-y: auto;
 	display: flex;
+	flex-direction: column;
 	width: 100%;
 	height: 100%;
+	padding-top: 5px;
 }
 #chat_panel{
 	border-top: 1px solid black; 
-	height:10%;
+	height:48px;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
 	justify-content: center; 
 	
 }
+#curChat{
+	width:500px;
+	color:white;
+	margin-left:5%;
+	font-family: 'Open-sans', sans-serif;
+	font-size:15px;
+}
 
 #chat_create{
-	text-align: top;
-	font-size: 300%;
+	font-size: 48px;
 	margin-right: 15%;
-	font-family: 'Permanent marker';
+	font-family: 'Raleway', sans-serif;
 	color: white;
 	background-color: transparent;
 	border: none;
@@ -46,8 +54,8 @@
 }
 
 #chat_leave{
-	font-size: 300%;
-	font-family: 'Permanent marker';
+	font-size: 48px;
+	font-family: 'Raleway', sans-serif;
 	color: white;
 	border: none;
 	background-color: transparent;
@@ -56,8 +64,8 @@
 }
 
 #chat_more{
-	font-size: 300%;
-	font-family: 'Permanent marker';
+	font-size: 48px;
+	font-family: 'Raleway', sans-serif;
 	margin-left: 15%;
 	color: white;
 	background-color: transparent;
@@ -113,9 +121,10 @@ body {
 
 
 
-img {
+#im {
 	width: 20px;
 	height: 20px;
+	transform: rotate(270deg);
 }
 
 
@@ -156,7 +165,7 @@ textarea {
 	margin-left:3px;
 	margin-top:3.5px;
 	width: 100%;
-	height: 100%;
+	height: 49px;
 	max-height: 100px;
 	outline: none;
 	resize: none;
@@ -202,7 +211,7 @@ textarea {
 
 .msg_box .name {
     display: inline;
-    margin: 6px 5px 6px 10px;
+    margin: 6px 5px 6px 15px;
 	font-weight: 700;
     
 }
@@ -216,8 +225,90 @@ textarea {
 }
 
 .msg_box .msg {
-    margin: 6px 5px 6px 10px;
+    margin: 6px 5px 6px 15px;
     width: 100%;
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+
+.chaneel_pan {
+	justify-content:center;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+}
+
+.channel_pan_holder {
+	width: 5px;
+}
+
+.channel_addu {
+	margin-top: 7px;
+	max-width:80px;
+	min-width:80px;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 45px;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+.channel_addu:hover{
+	background-color: white;
+	color: black;
+}
+.channel_select:hover{
+	background-color: white;
+	color: black;
+}
+.channel_select {
+	margin-top: 7px;
+	height: 60px;
+	width:80%;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 20px;
+	white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+
+.colored_nickname {
+	color: greenyellow;
+	font-weight: bold;
+}
+
+footer {
+	margin-top: 30px;
+}
+
+#cur_user_info {
+	margin-top: 10px;
+	width: 250px;
+	border: solid darkblue 1px;
+}
+
+#cur_user_img {
+	margin: 7px 10px 7px 7px;
+	width: 50px;
+	height: 50px;
+	border: solid 1px gray;
+}
+
+#cur_user_name {
+	color: white;
+}
+
+#cur_user_id {
+	margin-left: 5px;
+	color: gray;
 }
