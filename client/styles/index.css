@@ -312,3 +312,7 @@ footer {
 	margin-left: 5px;
 	color: gray;
 }
+
+.mention {
+	color: lightgreen;
+}

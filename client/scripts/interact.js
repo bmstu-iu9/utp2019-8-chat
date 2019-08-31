@@ -27,7 +27,7 @@ const init = () => {
 }
 
 //Create new message div
-const createMessage = (message, cache) => {
+const createMessage = (message, cache, mention) => {
     const getAuthor = () => {
         return new Promise((resolve, reject) => {
             if (cache === undefined) {
@@ -64,6 +64,7 @@ const createMessage = (message, cache) => {
         raw = raw.replace(/>/g, "&gt;");
         raw = raw.replace(/"/g, "&quot;");
         raw = raw.replace(/(?:\r\n|\r|\n)/g, '<br />');
+        raw = raw.replace(new RegExp(`@${current_user.nickname}`, 'g'), `<span class="mention">@${current_user.nickname}</spanЧуть>`);
         return raw;
     }
 
@@ -85,7 +86,9 @@ const createMessage = (message, cache) => {
                     <div class="msg_time">${d.getHours()}:${(d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}</div>
                     <div class="msg">${text}</div>
                 </div>
-            </div>`
+            </div>`;
+        if (mention !== undefined)
+            mention(text);        
         return resolve(node);
     });
 }

@@ -1,5 +1,7 @@
 'use strict'
 
+let current_user;
+
 let observe;
 if (window.attachEvent) {
     observe = (element, event, handler) => {
@@ -36,6 +38,7 @@ const reload = (callback) => {
     init()
         .then((res) => {
             initSocket(() => {
+                current_user = res.user;
                 document.getElementById("cur_user_img").src = res.user.avatar;
                 document.getElementById("cur_user_name").innerText = res.user.nickname;
                 document.getElementById("cur_user_id").innerText = "id " + res.user.id;
