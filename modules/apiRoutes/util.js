@@ -2,6 +2,7 @@
 
 module.exports.ERR_NO_PERMISSIONS = { success: false, err_code: 6, err_cause: "You don't have permissions to do that" };
 module.exports.ERR_FILE_NO_UPLOADED = { success: false, err_code: -2, err_cause: "File not loaded" };
+module.exports.ERR_CHANNEL_NO_EXIST = { success: false, err_code: 3, err_cause: "Channel does not exist" };
 
 module.exports.getArgs = (request, response, args) => {
     let req = {};
@@ -45,7 +46,6 @@ module.exports.checkPassword = (password) => {
     let b2 = false;
     const len = password.length;
     if (len > 5) {
-        let i = 0;
         for (let i = 0; (!b1 || !b2) && i < len; i++) {
             if (!b1 && (password[i] >= 'A' && password[i] <= 'Z' ||
                 password[i] >= 'a' && password[i] <= 'z')) {

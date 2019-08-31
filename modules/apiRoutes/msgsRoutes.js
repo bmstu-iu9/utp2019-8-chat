@@ -12,17 +12,16 @@ module.exports.init = (app, modules) => {
 
     app.post("/api/get_messages", urlencodedParser, (request, response) => {
         const args = ["token", "channel_id", "offset", "count"];
-        let req = util.getArgs(request, response, args);
+        const req = util.getArgs(request, response, args);
         if (req === undefined)
             return;
-        let auth = authModule.getUser(req.token); //SYNC
+        const auth = authModule.getUser(req.token); //SYNC
         dbModule.get_channel(+req.channel_id).then(channel => {
             if (!channel.success) {
-                let resp = { success: false, err_code: 3, err_cause: "Channel does not exist" };
-                response.status(200).send(JSON.stringify(resp));
+                response.status(200).send(JSON.stringify(util.ERR_CHANNEL_NO_EXIST));
             }
             else if (!auth.success) {
-                if (channel.channel.meta.public) {
+                if (channel.channel.meta.public) { //???
                     dbModule.chat_history(req.channel_id, req.offset, req.count).then(resp => {
                         response.status(200).send(JSON.stringify(resp));
                     });
@@ -49,10 +48,10 @@ module.exports.init = (app, modules) => {
 
     app.post("/api/send_message", urlencodedParser, (request, response) => {
         const args = ["token", "channel_id", "message"];
-        let req = util.getArgs(request, response, args);
+        const req = util.getArgs(request, response, args);
         if (req === undefined)
             return;
-        let auth = authModule.getUser(req.token); //SYNC
+        const auth = authModule.getUser(req.token); //SYNC
         if (!auth.success) {
             response.status(200).send(JSON.stringify(auth));
             return;

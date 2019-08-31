@@ -22,16 +22,15 @@ module.exports.init = (app, modules) => {
             }
         }
     });
-    
-    
+
     app.post("/api/change_avatar", uploadImg.single("filedata"), (request, response) => {
         const args = ["token", "user_id"];
-        let req = util.getArgs(request, response, args);
+        const req = util.getArgs(request, response, args);
         if (!request.file)
-            response.status(200).send(JSON.stringify(ERR_FILE_NO_UPLOADED));
+            response.status(200).send(JSON.stringify(util.ERR_FILE_NO_UPLOADED));
         if (req === undefined)
             return;
-        let auth = authModule.getUser(req.token); //SYNC
+        const auth = authModule.getUser(req.token); //SYNC
         if (!auth.success) {
             response.status(200).send(JSON.stringify(auth));
             return;
@@ -40,7 +39,7 @@ module.exports.init = (app, modules) => {
             .then(res => {
                 if (util.checkPerm(res.user, 1) || res.user.id === +req.user_id) {
                     const filename = `/avatars/${res.user.nickname}${path.extname(request.file.originalname)}`;
-                    fs.writeFile(`./client${filename}`, request.file.buffer, (err) => {
+                    fs.writeFile(`./client${filename}`, request.file.buffer, err => {
                         if (err)
                             response.status(200).send(JSON.stringify({ success: false, err_code: -1, err_cause: err }));
                         else {

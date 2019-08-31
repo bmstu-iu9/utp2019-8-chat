@@ -6,13 +6,13 @@ const util = require('./util');
 module.exports.init = (app, modules) => {
     const authModule = modules.auth;
     const dbModule = modules.db;
-    const chatModule = modules.chatModule;
+    const chatModule = modules.chat;
 
     const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
     app.post("/api/register", urlencodedParser, (request, response) => {
         const args = ["login", "password"];
-        let req = util.getArgs(request, response, args);
+        const req = util.getArgs(request, response, args);
         if (req === undefined)
             return;
         if (!util.checkLogin(req["login"])) {
@@ -48,7 +48,7 @@ module.exports.init = (app, modules) => {
 
     app.post("/api/auth", urlencodedParser, (request, response) => {
         const args = ["login", "password"];
-        let req = util.getArgs(request, response, args);
+        const req = util.getArgs(request, response, args);
         if (req === undefined)
             return;
         if (!util.checkLogin(req["login"])) {
@@ -77,28 +77,28 @@ module.exports.init = (app, modules) => {
 
     app.post("/api/check_token", urlencodedParser, (request, response) => {
         const args = ["token"];
-        let req = util.getArgs(request, response, args);
+        const req = util.getArgs(request, response, args);
         if (req === undefined)
             return;
-        let resp = authModule.getUser(req.token); //SYNC
+        const resp = authModule.getUser(req.token); //SYNC
         response.status(200).send(JSON.stringify(resp));
     });
 
     app.post("/api/exit_session", urlencodedParser, (request, response) => {
         const args = ["token"];
-        let req = util.getArgs(request, response, args);
+        const req = util.getArgs(request, response, args);
         if (req === undefined)
             return;
-        let resp = authModule.exitSession(req.token); //SYNC
+        const resp = authModule.exitSession(req.token); //SYNC
         response.status(200).send(JSON.stringify(resp));
     });
 
     app.post("/api/exit_all_sessions", urlencodedParser, (request, response) => {
         const args = ["token"];
-        let req = util.getArgs(request, response, args);
+        const req = util.getArgs(request, response, args);
         if (req === undefined)
             return;
-        let resp = authModule.exitAllSessions(req.token); //SYNC
+        const resp = authModule.exitAllSessions(req.token); //SYNC
         response.status(200).send(JSON.stringify(resp));
     });
 }
