@@ -8,8 +8,8 @@
     "ssl_cert": "./ssl/crt.pem",
     "ssl_key": "./ssl/key.pem",
 
-    "mysql_host": "remotemysql.com",
-    "mysql_user": "9SpT1uQOyM",
-    "mysql_pass": "utp2019password",
-    "mysql_database": "9SpT1uQOyM"
+    "mysql_host": "54.93.122.236",
+    "mysql_user": "utp2019public",
+    "mysql_pass": "utp2019public",
+    "mysql_database": "utp2019public"
 }
