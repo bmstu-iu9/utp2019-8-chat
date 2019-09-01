@@ -55,8 +55,8 @@ Bash:
 SQL:
 
 ```sql
-    create database utp2019_8_chat; -- Это название нужно указать в конфиге в поле `mysql_database`
-    use utp2019_8_chat;
+    create database utp2019_8; -- Это название нужно указать в конфиге в поле `mysql_database`
+    use utp2019_8;
     source ./database/9SpT1uQOyM.sql; -- При условии, что терминал запущен в корне проекта
     exit; -- Выход их консоли mysql
 ```
