@@ -98,6 +98,7 @@ const selectChannel = async (id) => {
         return new Promise((resolve, reject) => {
             apiGetMessages(id, 0, 500) //Show last 500 messages
                 .then(async (res) => {
+                    res.messages = res.messages.reverse();
                     let usersCache = new Map();
                     for (let i = 0; i < res.count; i++)
                         chat_flow.appendChild(await createMessage(res.messages[i], usersCache));
