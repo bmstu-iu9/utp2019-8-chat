@@ -99,7 +99,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `login`, `hash`, `salt`) VALUES
-(1, 'admin', 'x5uJGhK9K19EKCS9PtNkSmg4sLOHnEVTkmt63jBghU/D14A+z11sROgue+fZuwFewd668pC0nnjEbhzfu7uraQ==', 'HOImvA9jBnyU36uuex2QNIhtRoOPnpr5Bv+S65Qb8CE=');
+(1, 'admin', 'fOmngcsrhgmCITJhU6aLA7kWQ1/HwiU+ZMtnC6F5qnssE9sJFD5Bf04aTw/nKWrKXZ9WC6eexHifdpbJzCL4lQ==', 'HOImvA9jBnyU36uuex2QNIhtRoOPnpr5Bv+S65Qb8CE=');
 
 -- --------------------------------------------------------
 
