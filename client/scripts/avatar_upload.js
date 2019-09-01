@@ -23,7 +23,7 @@ document.getElementById("send_btn").addEventListener('click', (sender) => {
             formData.append("user_id", uesrID);
             sendFile(path, formData)
                 .then(res => {
-                    res = JSON.parse(res.response);  
+                    res = JSON.parse(res.response);
                     if (res.success) {
                         console.log("Succes");
                         window.location.replace('/index.html');
@@ -32,11 +32,9 @@ document.getElementById("send_btn").addEventListener('click', (sender) => {
                         alert(res.err_cause);
                     }
                 })
-                .catch(err => {
-                    alert(err);
-                });
+                .catch(err => { alert(err); });
         })
-        .catch((err) => {
+        .catch(err => {
             console.error(`Authorization failed (${err})`);
             console.log("Redirect");
             window.location.replace('/auth.html');

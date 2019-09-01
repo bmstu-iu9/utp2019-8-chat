@@ -17,12 +17,12 @@ const API_request = (path, params) => {
 }
 
 const apiExitSession = () => {
-    const params = { token: getCookie("accessToken"), };
+    const params = { token: getCookie("accessToken") };
     return API_request("api/exit_session", params);
 }
 
 const apiExitAllSessions = () => {
-    const params = { token: getCookie("accessToken"), };
+    const params = { token: getCookie("accessToken") };
     return API_request("api/exit_all_sessions", params);
 }
 
