@@ -41,9 +41,8 @@ const initSocket = (opened) => {
         let resp = JSON.parse(event.data);
         if (!resp.success && resp.err_code === 5) { //UNAUTHODRIZED
             console.warn("Unauthorized");
-            if (confirm("Authorization failed. Do you want to reauthorize?")) {
+            if (confirm("Authorization failed. Do you want to reauthorize?"))
                 window.location.replace('/auth.html');
-            }
         }
         else if (!resp.success && resp.err_code === 6) { //FORBIDDEN
             console.warn("Forbidden");
@@ -54,8 +53,8 @@ const initSocket = (opened) => {
                 makeMention(author, message, curChannel)
             };
             createMessage(resp.data, undefined, t_mention).then((msg) => {
-                document.getElementById("chat_flow").innerHTML += msg;
-                document.getElementById("chat_flow").scrollTop = 9999;
+                doc_chat_flow.appendChild(msg);
+                doc_chat_flow.scrollTop = 99999;
             });
         }
         else if (resp.success) {
