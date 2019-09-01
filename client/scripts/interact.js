@@ -108,7 +108,7 @@ const selectChannel = async (id) => {
     }
     socketSelectChannel(0); //Exit to the neutral channel
     currentChannelId = 0;
-    document.getElementById("chat_flow").innerHTML = "Loading";
+    document.getElementById("chat_flow").innerHTML = "<div class='loadingStr'>Loading</div>";
     document.getElementById("chat_flow").innerHTML = await loadMessages(id);
     document.getElementById("chat_flow").scrollTop = 99999;
     socketSelectChannel(id);
