@@ -15,7 +15,6 @@
 <body>
     <div>
         <h1>BMSTU-C</h1>
-        
     </div>
     <div id=curChat></div>
     <div id="chat_wrapper">
@@ -28,7 +27,9 @@
             </div>
         </div>
         <div id="chat_box">
-            <div id="chat_flow"></div>
+            <div id="chat_flow">
+                <div id='msgsLoadingStr'>Loading</div>
+            </div>
             <div id="chat_input">
                 <div id="input_box">
                     <textarea id="text" placeholder="Введите сообщение..."></textarea>
@@ -37,6 +38,17 @@
             </div>
         </div>
     </div>
+    <div id="cur_user_info">
+        <img id="cur_user_img">
+        <span id="cur_user_name"></span>
+        <span id="cur_user_id"></span>
+    </div>
+    <footer>
+        <button id="changeAvatarBtn">Change avatar</button>
+        <button id="exitBtn">Exit</button>
+        <button id="exitAllBtn">Exit from all devices</button>
+        <button id="siteMapBtn">Site map</button>
+    </footer>
     <script src="/scripts/util.js"></script>
     <script src="/scripts/api_methods.js"></script>
     <script src="/scripts/interact.js"></script>

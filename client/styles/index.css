@@ -213,7 +213,7 @@ textarea {
     display: inline;
     margin: 6px 5px 6px 15px;
 	font-weight: 700;
-    
+    cursor: pointer;
 }
 
 .msg_box .msg_time {
@@ -287,4 +287,48 @@ textarea {
 	color: white;
 	border: 1px solid white;
 	transition-duration: 0.4s;
+}
+
+.colored_nickname {
+	color: greenyellow;
+	font-weight: bold;
+}
+
+footer {
+	margin-top: 30px;
+}
+
+#cur_user_info {
+	margin-top: 10px;
+	width: 250px;
+	border: solid darkblue 1px;
+}
+
+#cur_user_img {
+	margin: 7px 10px 7px 7px;
+	width: 50px;
+	height: 50px;
+	border: solid 1px gray;
+}
+
+#cur_user_name {
+	color: white;
+}
+
+#cur_user_id {
+	margin-left: 5px;
+	color: gray;
+}
+
+.mention {
+	color: lightgreen;
+}
+
+#msgsLoadingStr {
+	color: gray;
+	margin-top: 17px;
+	width: 100%;
+	text-align: center;
+	font-family: 'Raleway', sans-serif;
+	font-size: 1.4em;
 }

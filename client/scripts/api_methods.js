@@ -17,13 +17,13 @@ const API_request = (path, params) => {
 }
 
 const apiExitSession = () => {
-    const params = { token: getCookie("accessToken"), };
+    const params = { token: getCookie("accessToken") };
     return API_request("api/exit_session", params);
 }
 
 const apiExitAllSessions = () => {
-    const params = { token: getCookie("accessToken"), };
-    return API_request("api/exit_all_session", params);
+    const params = { token: getCookie("accessToken") };
+    return API_request("api/exit_all_sessions", params);
 }
 
 const apiGetUser = (id) => {
@@ -78,6 +78,12 @@ const apiDeleteChannel = (ch_id) => {
     };
     return API_request("api/delete_channel", params);
 }
+
+const apiGetAllChannels = () => {
+    const params = { token: getCookie("accessToken") };
+    return API_request("api/get_all_channels", params);
+}
+
 
 const apiGetMessages = (ch_id, offset, count) => {
     const params = {

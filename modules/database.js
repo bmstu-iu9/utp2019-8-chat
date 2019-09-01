@@ -101,15 +101,24 @@ module.exports.channels_delete = (channel_id) => {
 	return { success: true };
 }
 
+module.exports.get_all_channels = () => {
+	const t = JSON.stringify(Array.from(channels.values()));
+	return { success: true, channels: Array.from(channels.values()) };
+}
+
 
 module.exports.chat_history = (channel_id, offset, count) => {
 	const channel = channels.get(+channel_id);
 	if (channel === undefined)
 		return ERR_CHANNEL_NO_EXIST;
 	const msgMap = messages.get(+channel_id);
-	let curCount = 0;
+	let curCount = 0, curOffset = offset;
 	let msgs = [];
-	for (let i of Array.from(msgMap.keys()).sort().reverse()) {
+	for (let i of Array.from(msgMap.keys()).sort((a, b) => a - b).reverse()) {
+		if (curOffset > 0) {
+			curOffset--;
+			continue;
+		}
 		if (curCount >= count)
 			break;
 		msgs.push(msgMap.get(i));
