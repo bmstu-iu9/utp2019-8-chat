@@ -74,9 +74,7 @@ const reload = (callback) => {
                     callback();
             });
         })
-        .catch((err) => {
-            console.error(err);
-        });
+        .catch(err => console.error(err));
 }
 reload(() => { selectChannel(1); });
 
@@ -120,22 +118,14 @@ document.getElementById("changeAvatarBtn").addEventListener('click', (sender) =>
 
 document.getElementById("exitBtn").addEventListener('click', (sender) => {
     apiExitSession()
-        .then(res => {
-            location.reload();
-        })
-        .catch(err => {
-            alert(err.err_cause);
-        });
+        .then(res => { location.reload(); })
+        .catch(err => { alert(err.err_cause); });
 });
 
 document.getElementById("exitAllBtn").addEventListener('click', (sender) => {
     apiExitAllSessions()
-        .then(res => {
-            location.reload();
-        })
-        .catch(err => {
-            alert(err.err_cause);
-        });
+        .then(res => { location.reload(); })
+        .catch(err => { alert(err.err_cause); });
 });
 
 document.getElementById("siteMapBtn").addEventListener('click', (sender) => {
