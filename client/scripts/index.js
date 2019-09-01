@@ -94,9 +94,9 @@ document.getElementById("text").addEventListener("keyup", (sender) => {
     if (!sender.shiftKey && sender.keyCode == 13)
         sendMessage();
     else if (sender.key == "ArrowUp") {
-        const msgTextbox = document.getElementById("input_msg");
+        const msgTextbox = document.getElementById("text");
         if (msgTextbox.value === "")
-            msgTextbox.value = lastMsg;
+            msgTextbox.value = lastMsg.trim();
     }
 });
 
