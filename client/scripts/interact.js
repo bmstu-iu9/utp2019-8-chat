@@ -2,6 +2,8 @@
 
 let currentChannelId, currentChannelName;
 
+const doc_chat_flow = document.getElementById("chat_flow");
+
 //Load and return data about the user and his channels
 const init = () => {
     return new Promise((resolve, reject) => {
@@ -106,13 +108,12 @@ const selectChannel = async (id) => {
                 });
         });
     }
-    const chat_flow = document.getElementById("chat_flow");
     socketSelectChannel(0); //Exit to the neutral channel
     currentChannelId = 0;
-    chat_flow.innerHTML = "<div id='msgsLoadingStr'>Loading</div>";
-    await loadMessages(id, chat_flow);
-    chat_flow.removeChild(chat_flow.childNodes[0]);
-    chat_flow.scrollTop = 99999;
+    doc_chat_flow.innerHTML = "<div id='msgsLoadingStr'>Loading</div>";
+    await loadMessages(id, doc_chat_flow);
+    doc_chat_flow.removeChild(doc_chat_flow.childNodes[0]);
+    doc_chat_flow.scrollTop = 99999;
     socketSelectChannel(id);
     currentChannelId = id;
     apiGetChannel(id)
