@@ -213,7 +213,7 @@ textarea {
     display: inline;
     margin: 6px 5px 6px 15px;
 	font-weight: 700;
-    
+    cursor: pointer;
 }
 
 .msg_box .msg_time {
