@@ -20,10 +20,8 @@ document.getElementById("send_btn").addEventListener('click', (sender) => {
             params[name] = document.getElementById(`param_val_${i}`).value;
     }
     request(dest, params)
-        .then((res) => {
+        .then(res => {
             document.getElementById("response_area").innerHTML = res.response;
         })
-        .catch((err) => {
-            console.warn(err);
-        });
+        .catch(err => { console.warn(err); });
 });
