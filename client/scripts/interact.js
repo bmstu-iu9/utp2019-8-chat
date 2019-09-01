@@ -1,5 +1,7 @@
 'use strict'
 
+let currentChannelId, currentChannelName;
+
 //Load and return data about the user and his channels
 const init = () => {
     return new Promise((resolve, reject) => {
@@ -74,6 +76,7 @@ const createMessage = (message, cache, mention) => {
         const msgID = `${message.channel_id}_${message.time}`;
         const text = prepareText(message.message);
         const colored = (author.permissions & 4) !== 0 ? "colored_nickname" : "common_nickname";
+        const ment = `document.getElementById('text').value += ' @${author.nickname}';`;
         const node =
             `<div class="msg_box" id=${msgID}>
                 <div class="msg_info_zone">
@@ -82,7 +85,7 @@ const createMessage = (message, cache, mention) => {
                     </div>
                 </div>
                 <div class="msg_message_zone">
-                    <span class=${colored}><div class="name">${author.nickname}</div></span>
+                    <span class=${colored}><div class="name" onclick="${ment}">${author.nickname}</div></span>
                     <div class="msg_time">${d.getHours()}:${(d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}</div>
                     <div class="msg">${text}</div>
                 </div>
@@ -112,22 +115,23 @@ const selectChannel = async (id) => {
         });
     }
     socketSelectChannel(0); //Exit to the neutral channel
+    currentChannelId = 0;
     document.getElementById("chat_flow").innerHTML = "Loading";
     document.getElementById("chat_flow").innerHTML = await loadMessages(id);
     document.getElementById("chat_flow").scrollTop = 9999;
     socketSelectChannel(id);
+    currentChannelId = id;
     apiGetChannel(id)
         .then(res => {
             document.getElementById("curChat").innerHTML =
                 `<div class="curChatN">Current chat: ${res.channel.name}</div>`
-        }
-        )
+        })
         .catch(err => {
             document.getElementById("curChat").innerHTML =
                 `<div class="curChatN">No such chat</div>`
-        }
-        )
+        });
 }
+
 const createChat = (ch_name) => {
     return new Promise(async (resolve, reject) => {
         const res = await apiCreateChannel(ch_name);
@@ -152,11 +156,12 @@ const addToChannel = (ch_id) => {
             alert(err.cause);
         });
 }
+
 const createChannelDiv = (id, name) => {
     document.getElementById("chat_names").innerHTML +=
-        `<div class="chaneel_pan">
+        `<div class="chaneel_pan" id="chpan_${id}">
             <span class="channel_pan_holder"></span>
-            <button class="channel_select" id="chdiv_${id}" onclick="selectChannel(${id});">
+            <button class="channel_select" id="chdiv_${id}" onclick="selectChannel(${id}); curChannelName = ${name};">
                 ${name}
             </button>
             <button class="channel_addu" id="chaddu_${id}" onclick="addToChannel(${id});">
@@ -165,4 +170,28 @@ const createChannelDiv = (id, name) => {
             <br>
             <span class="channel_pan_holder"></span>
         </div>`;
+}
+
+const deleteChannel = (id, name) => {
+    return new Promise(async (resolve, reject) => {
+        if (id > 0) {
+            if (confirm(`Вы действительно хотите удалить (НАВСЕГДА) канал ${name} с ID ${id}`) &&
+                confirm(`Последнее предупреждение!`)) {
+                apiDeleteChannel(id)
+                    .then(res => {
+                        if (res.success)
+                            return resolve(true);
+                        else
+                            return reject(res.err_cause);
+                    })
+                    .catch(err => {
+                        return reject(err);
+                    });
+            }
+            return resolve(false);
+        }
+        else {
+            return reject("Cannot delete channel with not valid ID");
+        }
+    });
 }
