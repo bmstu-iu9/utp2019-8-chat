@@ -316,3 +316,12 @@ footer {
 .mention {
 	color: lightgreen;
 }
+
+.loadingStr {
+	color: gray;
+	margin-top: 17px;
+	width: 100%;
+	text-align: center;
+	font-family: 'Raleway', sans-serif;
+	font-size: 1.4em;
+}
