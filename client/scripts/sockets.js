@@ -54,7 +54,7 @@ const initSocket = (opened) => {
                 makeMention(author, message, curChannel)
             };
             createMessage(resp.data, undefined, t_mention).then((msg) => {
-                document.getElementById("chat_flow").innerHTML += msg;
+                document.getElementById("chat_flow").appendChild(msg);
                 document.getElementById("chat_flow").scrollTop = 9999;
             });
         }

@@ -69,19 +69,20 @@ const createMessage = (message, cache, mention) => {
         const text = prepareText(message.message);
         const colored = (author.permissions & 4) !== 0 ? "colored_nickname" : "common_nickname";
         const ment = `document.getElementById('text').value += ' @${author.nickname}';`;
-        const node =
-            `<div class="msg_box" id="${message.channel_id}_${message.time}">
-                <div class="msg_info_zone">
-                    <div class="msg_icon">
-                        <img src="${author.avatar}">
-                    </div>
+        let node = document.createElement("div");
+        node.className = "msg_box";
+        node.id = `${message.channel_id}_${message.time}`;
+        node.innerHTML =
+            `<div class="msg_info_zone">
+                <div class="msg_icon">
+                    <img src="${author.avatar}">
                 </div>
-                <div class="msg_message_zone">
-                    <span class=${colored}><div class="name" onclick="${ment}">${author.nickname}</div></span>
-                    <div class="msg_time">${d.getHours()}:${(d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}</div>
-                    <div class="msg">${text}</div>
-                </div>
-            </div>`;
+            </div>
+            <div class="msg_message_zone">
+                <span class=${colored}><div class="name" onclick="${ment}">${author.nickname}</div></span>
+                <div class="msg_time">${d.getHours()}:${(d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}</div>
+                <div class="msg">${text}</div>
+            </div>`
         if (mention !== undefined && text.indexOf(`@${current_user.nickname}`) >= 0)
             mention(author.nickname, message.message);
         return resolve(node);
@@ -90,15 +91,14 @@ const createMessage = (message, cache, mention) => {
 
 //Change channel
 const selectChannel = async (id) => {
-    const loadMessages = (id) => {
+    const loadMessages = (id, chat_flow) => {
         return new Promise((resolve, reject) => {
             apiGetMessages(id, 0, 500) //Show last 500 messages
                 .then(async (res) => {
                     let usersCache = new Map();
-                    let builder = "";
                     for (let i = 0; i < res.count; i++)
-                        builder += await createMessage(res.messages[i], usersCache);
-                    return resolve(builder);
+                        chat_flow.appendChild(await createMessage(res.messages[i], usersCache));
+                    return resolve();
                 })
                 .catch((err) => {
                     console.warn(err);
@@ -106,11 +106,13 @@ const selectChannel = async (id) => {
                 });
         });
     }
+    const chat_flow = document.getElementById("chat_flow");
     socketSelectChannel(0); //Exit to the neutral channel
     currentChannelId = 0;
-    document.getElementById("chat_flow").innerHTML = "<div class='loadingStr'>Loading</div>";
-    document.getElementById("chat_flow").innerHTML = await loadMessages(id);
-    document.getElementById("chat_flow").scrollTop = 99999;
+    chat_flow.innerHTML = "<div id='msgsLoadingStr'>Loading</div>";
+    await loadMessages(id, chat_flow);
+    chat_flow.removeChild(chat_flow.childNodes[0]);
+    chat_flow.scrollTop = 99999;
     socketSelectChannel(id);
     currentChannelId = id;
     apiGetChannel(id)
