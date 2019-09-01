@@ -221,3 +221,11 @@ textarea {
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
+.cht_nm {
+	color:white;
+	width:10;
+	height:10;
+	background-color: #42373B;
+	border: 1px solid #4F4247;
+	border-radius: 25px;
+}

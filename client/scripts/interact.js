@@ -76,6 +76,7 @@ const createMessage = (message, cache) => {
     });
 }
 
+
 //Change channel
 const selectChannel = async (id) => {
     const loadMessages = (id) => {
@@ -104,9 +105,8 @@ const selectChannel = async (id) => {
 const createChat = (ch_name) => {
     return new Promise(async (resolve, reject) => {
         const res = await apiCreateChannel(ch_name);
-        if (res.success)
-            return resolve();
-        else
-            return reject(res.err_cause);
-    });
+        const node =
+            `<div class="cht_nm">${res.channel_name}</div>`
+        return resolve(node);
+        });
 }
