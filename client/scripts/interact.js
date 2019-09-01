@@ -51,24 +51,32 @@ const createMessage = (message, cache) => {
             }
         });
     }
+
+    const prepareText = (raw) => {
+      raw = raw.trim();
+      raw = raw.replace(/^(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+(.*)(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+$/gmi, '$2');
+      raw = raw.replace(/</g, "&lt;");
+      raw = raw.replace(/>/g, "&gt;");
+      raw = raw.replace(/"/g, "&quot;");
+      return raw;
+
+    }
+
     return new Promise(async (resolve, reject) => {
         const author = await getAuthor();
         const d = new Date(message.time);
         const msgID = `${message.channel_id}_${message.time}`;
-        const text = message.message.
-            replace(/</g, "&lt;").
-            replace(/>/g, "&gt;").
-            replace(/"/g, "&quot;");
+        const text = prepareText(message.message);
         const node =
             `<div class="msg_box" id=${msgID}>
                 <div class="msg_info_zone">
                     <div class="msg_icon">
                         <img src="${author.avatar}">
-                    </div>            
+                    </div>
                 </div>
                 <div class="msg_message_zone">
                     <div class="name">${author.nickname}</div>
-                     <div class="msg_time">${d.getHours()}:${(d.getMinutes()<10?'0':'') + d.getMinutes()}</div>
+                     <div class="msg_time">${d.getHours()}:${(d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}</div>
                     <div class="msg">${text}</div>
                 </div>
             </div>`
@@ -100,8 +108,18 @@ const selectChannel = async (id) => {
     document.getElementById("chat_flow").innerHTML = await loadMessages(id);
     document.getElementById("chat_flow").scrollTop = 9999;
     socketSelectChannel(id);
+    apiGetChannel(id)
+        .then(res => {
+        document.getElementById("curChat").innerHTML = 
+            `<div class="curChatN">Current chat: ${res.channel.name}</div>`
+        }
+        )
+        .catch(err => {
+            document.getElementById("curChat").innerHTML = 
+            `<div class="curChatN">No such chat</div>`
+        }
+        )
 }
-
 const createChat = (ch_name) => {
     return new Promise(async (resolve, reject) => {
         const res = await apiCreateChannel(ch_name);
@@ -109,4 +127,39 @@ const createChat = (ch_name) => {
             `<div class="cht_nm">${res.channel_name}</div>`
         return resolve(node);
         });
+}
+        if (res.success)
+            return resolve();
+        else
+            return reject(res.err_cause);
+    });
+}
+
+const addToChannel = (ch_id) => {
+    const us_id = prompt("Введите id пользователя");
+    if (us_id === "" || +us_id === NaN) {
+        alert("Неверный id");
+        return;
+    }
+    apiAddToChannel(us_id, ch_id)
+        .then(res => {
+            console.log("Success");
+        })
+        .catch(err => {
+            alert(err.cause);
+        });
+}
+const createChannelDiv = (id, name) => {
+    document.getElementById("chat_names").innerHTML +=
+        `<div class="chaneel_pan">
+            <span class="channel_pan_holder"></span>
+            <button class="channel_select" id="chdiv_${id}" onclick="selectChannel(${id});">
+                ${name}
+            </button>
+            <button class="channel_addu" id="chaddu_${id}" onclick="addToChannel(${id});">
+                +
+            </button>
+            <br>
+            <span class="channel_pan_holder"></span>
+        </div>`;
 }
