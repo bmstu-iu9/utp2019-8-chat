@@ -4,7 +4,7 @@ const fs = require("fs");
 const process = require("process");
 const minimist = require("minimist");
 
-const VERSION = "v1.3.0";
+const VERSION = "v1.3.1";
 const CONFIG_PATH = "./config.json";
 
 const defaultConfig = {
