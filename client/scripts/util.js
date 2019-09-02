@@ -12,22 +12,54 @@ const setCookie = (name, value, options = {}) => {
         path: '/',
         ...options
     };
-    if (options.expires && options.expires.toUTCString) {
+    if (options.expires && options.expires.toUTCString)
         options.expires = options.expires.toUTCString();
-    }
     let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
     for (let optionKey in options) {
         updatedCookie += "; " + optionKey;
         let optionValue = options[optionKey];
-        if (optionValue !== true) {
+        if (optionValue !== true)
             updatedCookie += "=" + optionValue;
-        }
     }
     document.cookie = updatedCookie;
 }
 
 const deleteCookie = (name) => {
     setCookie(name, "", { 'max-age': -1 });
+}
+
+const checkLogin = (login) => {
+    const len = login.length;
+    if (len < 1 && len > 20)
+        return false;
+    for (let i = 0; i < len; i++) {
+        if ((login[i] < 'A' || login[i] > 'Z') &&
+            (login[i] < 'a' || login[i] > 'z') &&
+            (login[i] < '0' || login[i] > '9') &&
+            login[i] != '_' && login[i] != '.' &&
+            login[i] != '-' && login[i] != ' ') {
+            return false;
+        }
+    }
+    return true;
+}
+
+const checkPassword = (password) => {
+    let b1 = false;
+    let b2 = false;
+    const len = password.length;
+    if (len > 5) {
+        for (let i = 0; (!b1 || !b2) && i < len; i++) {
+            if (!b1 && (password[i] >= 'A' && password[i] <= 'Z' ||
+                password[i] >= 'a' && password[i] <= 'z')) {
+                b1 = true;
+            }
+            else if (!b2 && password[i] >= '0' && password[i] <= '9') {
+                b2 = true;
+            }
+        }
+    }
+    return b1 && b2;
 }
 
 const request = (dest, params) => {
@@ -47,16 +79,14 @@ const request = (dest, params) => {
         }
         let xhr = new XMLHttpRequest();
         xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
+            if (xhr.readyState === 4)
                 return resolve({ response: xhr.responseText, status: xhr.status });
-            }
         }
         xhr.open('POST', dest, true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         let paramStr = [];
-        for (let key in params) {
+        for (let key in params)
             paramStr.push(`${key}=${encodeMessage(params[key])}`);
-        }
         xhr.send(paramStr.join('&'));
     });
 }
@@ -64,55 +94,20 @@ const request = (dest, params) => {
 const apiCheckToken = () => {
     return new Promise((resolve, reject) => {
         const accessToken = getCookie("accessToken");
-        if (accessToken === undefined) {
+        if (accessToken === undefined)
             return reject("Access token did not found");
-        }
         request("api/check_token", { token: accessToken })
-            .then((res) => {
+            .then(res => {
                 const response = JSON.parse(res.response);
                 if (response.success)
                     return resolve(response.userID);
                 else
                     return reject(`Wrong access token: ${response.err_cause}`);
             })
-            .catch((err) => {
-                return reject(err);
-            });
+            .catch(err => reject(err));
     });
 }
 
-const checkLogin = (login) => {
-    const len = login.length;
-    if (len < 1 && len > 20) {
-        return false;
-    }
-    for (let i = 0; i < len; i++) {
-        if ((login[i] < 'A' || login[i] > 'Z') &&
-            (login[i] < 'a' || login[i] > 'z') &&
-            (login[i] < '0' || login[i] > '9') &&
-            login[i] != '_' && login[i] != '.' &&
-            login[i] != '-' && login[i] != ' ') {
-            return false;
-        }
-    }
-    return true;
-}
-
-const checkPassword = (password) => {
-    let b1 = false;
-    let b2 = false;
-    const len = password.length;
-    if (len > 5) {  
-        let i = 0;
-        for (let i = 0; (!b1 || !b2) && i < len; i++) {
-            if (!b1 && (password[i] >= 'A' && password[i] <= 'Z' ||
-             password[i] >= 'a' && password[i] <= 'z')) {
-                b1 = true;
-            }
-            else if (!b2 && password[i] >= '0' && password[i] <= '9') {
-                b2 = true;
-            }
-        }
-    }
-    return b1 && b2;
-}
+let isTabActive = true;
+window.onfocus = () => { isTabActive = true; }
+window.onblur = () => { isTabActive = false; }

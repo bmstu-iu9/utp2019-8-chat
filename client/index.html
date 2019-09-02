@@ -13,26 +13,39 @@
 </head>
 
 <body>
-    <h1>BMSTU-C</h1>
+    <div>
+        <h1 id=bm>BMSTU-C
+        <div id="cur_user_info">
+            <button title="Смена автара" id="changeAvatarBtn"><img id="cur_user_img"></button>
+            <span id="cur_user_name"></span>
+            <span id="cur_user_id"></span>
+            <button id="exitBtn"><img id=ex src="styles/exit.png"></img></button>
+        </div></h1>
+    </div>
+    <div id=curChat></div>
     <div id="chat_wrapper">
         <div id="chat_list">
             <div id="chat_names"></div>
             <div id="chat_panel">
                 <button id="chat_create">+</button>
-                <!-- <button id="chat_leave">-</button> -->
-                <!-- <button id="chat_more">...</button> -->
             </div>
         </div>
         <div id="chat_box">
-            <div id="chat_flow"></div>
+            <div id="chat_flow">
+                <div id='msgsLoadingStr'>Loading</div>
+            </div>
             <div id="chat_input">
                 <div id="input_box">
                     <textarea id="text" placeholder="Введите сообщение..."></textarea>
                 </div>
-                <button id="send_btn"><img src="styles/button.png"></button>
+                <button id="send_btn"><img id=im src="styles/button.png"></button>
             </div>
         </div>
     </div>
+    <footer>
+        <button id="exitAllBtn">Exit from all devices</button>
+        <button id="siteMapBtn">Site map</button>
+    </footer>
     <script src="/scripts/util.js"></script>
     <script src="/scripts/api_methods.js"></script>
     <script src="/scripts/interact.js"></script>

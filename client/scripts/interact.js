@@ -1,5 +1,9 @@
 'use strict'
 
+let currentChannelId, currentChannelName;
+
+const doc_chat_flow = document.getElementById("chat_flow");
+
 //Load and return data about the user and his channels
 const init = () => {
     return new Promise((resolve, reject) => {
@@ -7,14 +11,19 @@ const init = () => {
             .then(async (userID) => {
                 const userInfo = await apiGetUser(userID);
                 let channels = [];
-                for (let i in userInfo.user.channels)
-                    if (userInfo.user.channels[i])
-                        channels.push(await apiGetChannel(userInfo.user.channels[i]));
+                if ((userInfo.user.permissions & 2) == 0) {
+                    for (let i of userInfo.user.channels)
+                        channels.push(await apiGetChannel(i));
+                }
+                else {
+                    for (let i of (await apiGetAllChannels()).channels)
+                        channels.push(await apiGetChannel(i));
+                }
+                channels = channels.map(e => e.channel);
                 return resolve({ success: true, user: userInfo.user, channels: channels });
             })
             .catch((err) => {
-                console.error(`Authorization failed (${err})`);
-                console.log("Redirect");
+                console.error(`Authorization failed (${err.cause})`);
                 window.location.replace('/auth.html');
                 return reject("Unauthorized");
             });
@@ -22,17 +31,13 @@ const init = () => {
 }
 
 //Create new message div
-const createMessage = (message, cache) => {
+const createMessage = (message, cache, mention) => {
     const getAuthor = () => {
         return new Promise((resolve, reject) => {
             if (cache === undefined) {
                 apiGetUser(message.author_id)
-                    .then(res => {
-                        return resolve(res.user);
-                    })
-                    .catch(err => {
-                        return reject(err);
-                    })
+                    .then(res => resolve(res.user))
+                    .catch(err => reject(err));
             }
             else {
                 let saved = cache.get(message.author_id);
@@ -44,49 +49,61 @@ const createMessage = (message, cache) => {
                             cache.set(message.author_id, res.user);
                             return resolve(res.user);
                         })
-                        .catch(err => {
-                            return reject(err);
-                        });
+                        .catch(err => reject(err));
                 }
             }
         });
     }
+
+    const prepareText = (raw) => {
+        raw = raw.trim();
+        raw = raw.replace(/^(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+(.*)(<span>|<div>|<br \/>|<br\/>|<span\/>|<\/div>)+$/gmi, '$2');
+        raw = raw.replace(/</g, "&lt;");
+        raw = raw.replace(/>/g, "&gt;");
+        raw = raw.replace(/"/g, "&quot;");
+        raw = raw.replace(/(?:\r\n|\r|\n)/g, '<br />');
+        raw = raw.replace(/((http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?)/g, '<a href="$1">$1</a>');
+        raw = raw.replace(new RegExp(`@${current_user.nickname}`, 'g'), `<span class="mention">@${current_user.nickname}</span>`);
+        return raw;
+    }
+
     return new Promise(async (resolve, reject) => {
         const author = await getAuthor();
         const d = new Date(message.time);
-        const msgID = `${message.channel_id}_${message.time}`;
-        const text = message.message.
-            replace(/</g, "&lt;").
-            replace(/>/g, "&gt;").
-            replace(/"/g, "&quot;");
-        const node =
-            `<div class="msg_box" id=${msgID}>
-                <div class="msg_info_zone">
-                    <div class="msg_icon">
-                        <img src="${author.avatar}">
-                    </div>            
+        const text = prepareText(message.message);
+        const colored = (author.permissions & 4) !== 0 ? "colored_nickname" : "common_nickname";
+        const ment = `document.getElementById('text').value += ' @${author.nickname}';`;
+        let node = document.createElement("div");
+        node.className = "msg_box";
+        node.id = `${message.channel_id}_${message.time}`;
+        node.innerHTML =
+            `<div class="msg_info_zone">
+                <div class="msg_icon">
+                    <img src="${author.avatar}">
                 </div>
-                <div class="msg_message_zone">
-                    <div class="name">${author.nickname}</div>
-                     <div class="msg_time">${d.getHours()}:${(d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}</div>
-                    <div class="msg">${text}</div>
-                </div>
+            </div>
+            <div class="msg_message_zone">
+                <span class=${colored}><div class="name" onclick="${ment}">${author.nickname}</div></span>
+                <div class="msg_time">${d.getHours()}:${(d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}</div>
+                <div class="msg">${text}</div>
             </div>`
+        if (mention !== undefined && text.indexOf(`@${current_user.nickname}`) >= 0)
+            mention(author.nickname, message.message);
         return resolve(node);
     });
 }
 
 //Change channel
 const selectChannel = async (id) => {
-    const loadMessages = (id) => {
+    const loadMessages = (id, chat_flow) => {
         return new Promise((resolve, reject) => {
-            apiGetMessages(id, 0, 250)
+            apiGetMessages(id, 0, 500) //Show last 500 messages
                 .then(async (res) => {
+                    res.messages = res.messages.reverse();
                     let usersCache = new Map();
-                    let builder = "";
                     for (let i = 0; i < res.count; i++)
-                        builder += await createMessage(res.messages[i], usersCache);
-                    return resolve(builder);
+                        chat_flow.appendChild(await createMessage(res.messages[i], usersCache));
+                    return resolve();
                 })
                 .catch((err) => {
                     console.warn(err);
@@ -95,10 +112,22 @@ const selectChannel = async (id) => {
         });
     }
     socketSelectChannel(0); //Exit to the neutral channel
-    document.getElementById("chat_flow").innerHTML = "Loading";
-    document.getElementById("chat_flow").innerHTML = await loadMessages(id);
-    document.getElementById("chat_flow").scrollTop = 9999;
+    currentChannelId = 0;
+    doc_chat_flow.innerHTML = "<div id='msgsLoadingStr'>Loading</div>";
+    await loadMessages(id, doc_chat_flow);
+    doc_chat_flow.removeChild(doc_chat_flow.childNodes[0]);
+    doc_chat_flow.scrollTop = 99999;
     socketSelectChannel(id);
+    currentChannelId = id;
+    apiGetChannel(id)
+        .then(res => {
+            document.getElementById("curChat").innerHTML =
+                `<div class="curChatN">Current chat: ${res.channel.name}</div>`
+        })
+        .catch(err => {
+            document.getElementById("curChat").innerHTML =
+                `<div class="curChatN">No such chat</div>`
+        });
 }
 
 const createChat = (ch_name) => {
@@ -119,7 +148,7 @@ const addToChannel = (ch_id) => {
     }
     apiAddToChannel(us_id, ch_id)
         .then(res => {
-            console.log("Success");
+            console.log("Пользователь успешно добавден к каналу");
         })
         .catch(err => {
             alert(err.cause);
@@ -128,9 +157,9 @@ const addToChannel = (ch_id) => {
 
 const createChannelDiv = (id, name) => {
     document.getElementById("chat_names").innerHTML +=
-        `<div class="chaneel_pan">
+        `<div class="chaneel_pan" id="chpan_${id}">
             <span class="channel_pan_holder"></span>
-            <button class="channel_select" id="chdiv_${id}" onclick="selectChannel(${id});">
+            <button class="channel_select" id="chdiv_${id}" onclick="selectChannel(${id}); curChannelName = '${name}';">
                 ${name}
             </button>
             <button class="channel_addu" id="chaddu_${id}" onclick="addToChannel(${id});">
@@ -139,4 +168,26 @@ const createChannelDiv = (id, name) => {
             <br>
             <span class="channel_pan_holder"></span>
         </div>`;
+}
+
+const deleteChannel = (id, name) => {
+    return new Promise(async (resolve, reject) => {
+        if (id > 0) {
+            if (confirm(`Вы действительно хотите удалить (НАВСЕГДА) канал ${name} с ID ${id}`) &&
+                confirm(`Последнее предупреждение!`)) {
+                apiDeleteChannel(id)
+                    .then(res => {
+                        if (res.success)
+                            return resolve(true);
+                        else
+                            return reject(res.err_cause);
+                    })
+                    .catch(err => reject(err));
+            }
+            return resolve(false);
+        }
+        else {
+            return reject("Cannot delete channel with not valid ID");
+        }
+    });
 }

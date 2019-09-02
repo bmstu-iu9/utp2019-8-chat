@@ -3,6 +3,17 @@
 let socket = undefined;
 let curChannel = 0;
 
+const makeMention = (author, message, channel_id) => {
+    if (makeNotification !== undefined && !isTabActive) {
+        makeNotification(`Вас упомянул ${author} в канале с ID ${channel_id}`, {
+            body: message,
+            icon: '/styles/mention.png',
+            dir: 'auto',
+            lang: 'RU'
+        });
+    }
+}
+
 const socketSelectChannel = (id) => {
     socket.send(JSON.stringify({ type: "set_channel", token: getCookie("accessToken"), channel_id: id }));
     curChannel = id;
@@ -18,8 +29,9 @@ const socketSendMessage = (msg) => {
 }
 
 const initSocket = (opened) => {
+    if (socket !== undefined)
+        socket.close();
     socket = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/chatSocket`);
-
     socket.onopen = (e) => {
         console.log("Web socket connected");
         opened();
@@ -29,18 +41,20 @@ const initSocket = (opened) => {
         let resp = JSON.parse(event.data);
         if (!resp.success && resp.err_code === 5) { //UNAUTHODRIZED
             console.warn("Unauthorized");
-            if (confirm("Authorization failed. Do you want to reauthorize?")) {
+            if (confirm("Authorization failed. Do you want to reauthorize?"))
                 window.location.replace('/auth.html');
-            }
         }
         else if (!resp.success && resp.err_code === 6) { //FORBIDDEN
             console.warn("Forbidden");
             alert("You don't have permissions to do that");
         }
         else if (resp.success && resp.type === "new_message") {
-            createMessage(resp.data).then((msg) => {
-                document.getElementById("chat_flow").innerHTML += msg;
-                document.getElementById("chat_flow").scrollTop = 9999;
+            const t_mention = (author, message) => {
+                makeMention(author, message, curChannel)
+            };
+            createMessage(resp.data, undefined, t_mention).then((msg) => {
+                doc_chat_flow.appendChild(msg);
+                doc_chat_flow.scrollTop = 99999;
             });
         }
         else if (resp.success) {

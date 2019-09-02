@@ -10,9 +10,7 @@ const registration = async (login, password) => {
                 else
                     return reject(response.err_cause);
             })
-            .catch((err) => {
-                return reject(err);
-            });
+            .catch(err => reject(err));
     });
 }
 
@@ -21,12 +19,8 @@ const process = () => {
     const password = document.getElementById("password").value;
     if (checkLogin(login) && checkPassword(password)) {
         registration(login, password)
-            .then((res) => {
-                window.location.replace('/auth.html');
-            })
-            .catch((err) => {
-                alert(err);
-            });
+            .then(res => { window.location.replace('/auth.html'); })
+            .catch(err => { alert(err); });
     }
     else {
         alert("Логин или пароль не соответствуют внутренней политике");
@@ -34,11 +28,16 @@ const process = () => {
 };
 
 document.getElementById("btnSend").addEventListener('click', process);
-document.getElementById("login").addEventListener('keyup', (e) => {
-    if (e.key === 'Enter')
-        process();
+document.getElementById("login").addEventListener('keyup', e => {
+    if (e.key === 'Enter') {
+        const pass_box = document.getElementById("password");
+        if (pass_box.value !== "")
+            pass_box.focus();
+        else
+            process();
+    }
 });
-document.getElementById("password").addEventListener('keyup', (e) => {
+document.getElementById("password").addEventListener('keyup', e => {
     if (e.key === 'Enter')
         process();
 });

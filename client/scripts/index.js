@@ -1,5 +1,7 @@
 'use strict'
 
+let current_user = undefined;
+
 let observe;
 if (window.attachEvent) {
     observe = (element, event, handler) => {
@@ -32,27 +34,49 @@ const start = () => { //Раньше называлась init
     resize();
 }
 
-const reload = () => {
+let makeNotification = undefined;
+const initNotifications = () => {
+    if (!("Notification" in window)) {
+        console.warn("Notifications is unsupported");
+        return;
+    }
+    else if (Notification.permission === "granted") {
+        makeNotification = (title, options) => {
+            let notification = new Notification(title, options);
+            notification.onclick = () => { window.parent.parent.focus(); };
+        };
+    }
+    else if (Notification.permission !== 'denied') {
+        Notification.requestPermission((permission) => {
+            if (permission === "granted")
+                initNotifications();
+        });
+    }
+}
+
+const reload = (callback) => {
     init()
         .then((res) => {
             initSocket(() => {
-                console.log(`User with ID=${res.user.id} and name=${res.user.nickname}`);
+                current_user = res.user;
+                document.getElementById("cur_user_img").src = res.user.avatar;
+                document.getElementById("cur_user_name").innerText = res.user.nickname;
+                document.getElementById("cur_user_id").innerText = "id " + res.user.id;
                 document.getElementById("chat_names").innerHTML = "";
                 for (let i in res.channels) {
-                    // console.log(`Channel with ID=${res.channels[i].channel.id} and name=${res.channels[i].channel.name}`)
-                    const id = res.channels[i].channel.id;
-                    const name = res.channels[i].channel.name;
+                    const id = res.channels[i].id;
+                    const name = res.channels[i].name;
                     createChannelDiv(id, name);
                 }
-                selectChannel(1); //TEMP (NOT???)
+                initNotifications();
                 start();
+                if (callback !== undefined)
+                    callback();
             });
         })
-        .catch((err) => {
-            console.error(err);
-        });
+        .catch(err => console.error(err));
 }
-reload();
+reload(() => { selectChannel(1); });
 
 let lastMsg = "";
 const sendMessage = () => {
@@ -70,9 +94,9 @@ document.getElementById("text").addEventListener("keyup", (sender) => {
     if (!sender.shiftKey && sender.keyCode == 13)
         sendMessage();
     else if (sender.key == "ArrowUp") {
-        const msgTextbox = document.getElementById("input_msg");
+        const msgTextbox = document.getElementById("text");
         if (msgTextbox.value === "")
-            msgTextbox.value = lastMsg;
+            msgTextbox.value = lastMsg.trim();
     }
 });
 
@@ -86,4 +110,24 @@ document.getElementById("chat_create").addEventListener("click", (sender) => {
     else {
         alert("Следует ввести название для нового чата");
     }
+});
+
+document.getElementById("changeAvatarBtn").addEventListener('click', (sender) => {
+    window.location.replace("/avatar_upload.html");
+});
+
+document.getElementById("exitBtn").addEventListener('click', (sender) => {
+    apiExitSession()
+        .then(res => { location.reload(); })
+        .catch(err => { alert(err.err_cause); });
+});
+
+document.getElementById("exitAllBtn").addEventListener('click', (sender) => {
+    apiExitAllSessions()
+        .then(res => { location.reload(); })
+        .catch(err => { alert(err.err_cause); });
+});
+
+document.getElementById("siteMapBtn").addEventListener('click', (sender) => {
+    window.location.replace("/site_map.html");
 });

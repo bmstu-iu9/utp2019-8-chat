@@ -9,6 +9,12 @@
 	background-color: #313138;
 	
 }
+#changeAvatarBtn{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+}
 #chat_list{
 	display: flex;
 	float: right;
@@ -27,19 +33,24 @@
 }
 #chat_panel{
 	border-top: 1px solid black; 
-	height:10%;
+	height:48px;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
 	justify-content: center; 
 	
 }
+#curChat{
+	width:500px;
+	color:white;
+	margin-left:5%;
+	font-family: 'Open-sans', sans-serif;
+	font-size:15px;
+}
 
 #chat_create{
-	text-align: top;
-	font-size: 300%;
-	margin-right: 15%;
-	font-family: 'Permanent marker';
+	font-size: 48px;
+	font-family: 'Raleway', sans-serif;
 	color: white;
 	background-color: transparent;
 	border: none;
@@ -47,28 +58,8 @@
 	cursor: pointer;
 }
 
-#chat_leave{
-	font-size: 300%;
-	font-family: 'Permanent marker';
-	color: white;
-	border: none;
-	background-color: transparent;
-	outline: none;
-	cursor: pointer;
-}
-
-#chat_more{
-	font-size: 300%;
-	font-family: 'Permanent marker';
-	margin-left: 15%;
-	color: white;
-	background-color: transparent;
-	border: none;
-	outline: none;
-	cursor: pointer;
-}
-
-h1{
+#bm{ 
+	margin-left: 20%;
 	color: white;
 	text-align: center;
 	font-family: 'Raleway', sans-serif;
@@ -115,9 +106,10 @@ body {
 
 
 
-img {
+#im {
 	width: 20px;
 	height: 20px;
+	transform: rotate(270deg);
 }
 
 
@@ -158,7 +150,7 @@ textarea {
 	margin-left:3px;
 	margin-top:3.5px;
 	width: 100%;
-	height: 100%;
+	height: 49px;
 	max-height: 100px;
 	outline: none;
 	resize: none;
@@ -206,7 +198,7 @@ textarea {
     display: inline;
     margin: 6px 5px 6px 15px;
 	font-weight: 700;
-    
+    cursor: pointer;
 }
 
 .msg_box .msg_time {
@@ -225,10 +217,10 @@ textarea {
 }
 
 .chaneel_pan {
+	justify-content:center;
 	width: 100%;
 	display: flex;
 	flex-direction: row;
-	justify-content: flex-end;
 }
 
 .channel_pan_holder {
@@ -236,9 +228,137 @@ textarea {
 }
 
 .channel_addu {
-	width: 40px;
+	margin-top: 7px;
+	max-width:80px;
+	min-width:80px;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 45px;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+.channel_addu:hover{
+	background-color: white;
+	color: black;
+}
+.channel_select:hover{
+	background-color: white;
+	color: black;
+}
+.channel_select {
+	margin-top: 7px;
+	height: 60px;
+	width:80%;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 20px;
+	white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
 }
 
-.channel_select {
+.colored_nickname {
+	color: greenyellow;
+	font-weight: bold;
+}
+
+footer {
+	margin-top: 30px;
+	float: right;
+	margin-right: 5%;
+}
+#exitAllBtn{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 16px;
+	white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+#siteMapBtn{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 16px;
+	white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+#exitAllBtn:hover{
+	background-color: white;
+	color: black;
+}
+#siteMapBtn:hover{
+	background-color: white;
+	color: black;
+}
+#exitBtn{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+}
+#ex{
+	width: 50px;
+	height: 50px;
+}
+#cur_user_info {
+	margin-right: 5%;
+	float: right;
+	width: 350px;
+	height: 50px;
+}
+
+#cur_user_img {
+	width: 50px;
+	height: 50px;
+	border: solid 1px gray;
+}
+
+#cur_user_name {
+	font-family: 'Open-sans', sans-serif;
+	font-size: 15px;
+	vertical-align:top;
+	color: white;
+}
+
+#cur_user_id {
+	font-family: 'Open-sans', sans-serif;
+	font-size: 15px;
+	color: gray;
+	vertical-align:top;
+}
+
+.mention {
+	color: lightgreen;
+}
+
+#msgsLoadingStr {
+	color: gray;
+	margin-top: 17px;
 	width: 100%;
+	text-align: center;
+	font-family: 'Raleway', sans-serif;
+	font-size: 1.4em;
 }

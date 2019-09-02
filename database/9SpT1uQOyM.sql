@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Авг 27 2019 г., 13:02
+-- Время создания: Авг 31 2019 г., 12:08
 -- Версия сервера: 8.0.13-4
 -- Версия PHP: 7.2.19-0ubuntu0.18.04.2
 
@@ -25,16 +25,61 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `channels`
+-- Структура таблицы `chat`
 --
 
-CREATE TABLE `channels` (
-  `id` int(11) NOT NULL,
-  `name` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
-  `owner_id` int(11) NOT NULL,
-  `listeners_id` json DEFAULT NULL,
-  `meta` json DEFAULT NULL
+CREATE TABLE `chat` (
+  `chat_id` bigint(20) NOT NULL COMMENT 'id канала',
+  `name` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'имя канала',
+  `user_id` int(11) NOT NULL COMMENT 'id пользователя, создавшего этот канал',
+  `meta` json DEFAULT NULL COMMENT 'информация о чате'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Дамп данных таблицы `chat`
+--
+
+INSERT INTO `chat` (`chat_id`, `name`, `user_id`, `meta`) VALUES
+(1, 'Global chat', 1, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `messages`
+--
+
+CREATE TABLE `messages` (
+  `message_id` bigint(20) NOT NULL COMMENT 'id сообщения',
+  `chat_id` bigint(20) NOT NULL COMMENT 'id канала',
+  `user_id` int(11) NOT NULL COMMENT 'id пользователя, отправившего это сообщение',
+  `content` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'содержание сообщения',
+  `date_create` datetime NOT NULL COMMENT 'дата отправки сообщения'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Дамп данных таблицы `messages`
+--
+
+INSERT INTO `messages` (`message_id`, `chat_id`, `user_id`, `content`, `date_create`) VALUES
+(1, 1, 1, 'The first message in the world', '2019-08-31 10:55:23');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `party`
+--
+
+CREATE TABLE `party` (
+  `chat_id` bigint(20) NOT NULL COMMENT 'id канала',
+  `user_id` int(11) NOT NULL COMMENT 'id участника этого канала'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Дамп данных таблицы `party`
+--
+
+INSERT INTO `party` (`chat_id`, `user_id`) VALUES
+(1, 1);
 
 -- --------------------------------------------------------
 
@@ -43,10 +88,10 @@ CREATE TABLE `channels` (
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `login` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `hash` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `salt` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL
+  `id` int(11) NOT NULL COMMENT 'id пользователя',
+  `login` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'логин пользователя',
+  `hash` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'хэш-пароль пользователя',
+  `salt` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'соль'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -54,8 +99,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `login`, `hash`, `salt`) VALUES
-(1, 'lol', '123', '123'),
-(2, 'kek', '567', '567');
+(1, 'admin', 'fOmngcsrhgmCITJhU6aLA7kWQ1/HwiU+ZMtnC6F5qnssE9sJFD5Bf04aTw/nKWrKXZ9WC6eexHifdpbJzCL4lQ==', 'HOImvA9jBnyU36uuex2QNIhtRoOPnpr5Bv+S65Qb8CE=');
 
 -- --------------------------------------------------------
 
@@ -64,32 +108,45 @@ INSERT INTO `users` (`id`, `login`, `hash`, `salt`) VALUES
 --
 
 CREATE TABLE `users_data` (
-  `id` int(11) NOT NULL,
-  `nickname` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `permissions` tinyint(4) NOT NULL DEFAULT '0',
-  `avatar` text COLLATE utf8_unicode_ci,
-  `channels` json DEFAULT NULL,
-  `meta` json DEFAULT NULL
+  `id` int(11) NOT NULL COMMENT 'id пользователя',
+  `nickname` varchar(20) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'ник пользователя',
+  `permissions` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'привелегии польщователя',
+  `avatar` varchar(100) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT 'avatars/default.png' COMMENT 'путь к аватару пользователя',
+  `meta` json DEFAULT NULL COMMENT 'информация о пользователе'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Дамп данных таблицы `users_data`
 --
 
-INSERT INTO `users_data` (`id`, `nickname`, `permissions`, `avatar`, `channels`, `meta`) VALUES
-(2, 'kek', 0, NULL, NULL, NULL),
-(1, 'lol', 0, NULL, NULL, NULL);
+INSERT INTO `users_data` (`id`, `nickname`, `permissions`, `avatar`, `meta`) VALUES
+(1, 'admin', 1, 'avatars/default.png', NULL);
 
 --
 -- Индексы сохранённых таблиц
 --
 
 --
--- Индексы таблицы `channels`
+-- Индексы таблицы `chat`
 --
-ALTER TABLE `channels`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `owner_id` (`owner_id`);
+ALTER TABLE `chat`
+  ADD PRIMARY KEY (`chat_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Индексы таблицы `messages`
+--
+ALTER TABLE `messages`
+  ADD PRIMARY KEY (`message_id`),
+  ADD KEY `chat_id` (`chat_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Индексы таблицы `party`
+--
+ALTER TABLE `party`
+  ADD KEY `chat_id` (`chat_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Индексы таблицы `users`
@@ -109,26 +166,46 @@ ALTER TABLE `users_data`
 --
 
 --
--- AUTO_INCREMENT для таблицы `channels`
+-- AUTO_INCREMENT для таблицы `chat`
 --
-ALTER TABLE `channels`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `chat`
+  MODIFY `chat_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id канала', AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT для таблицы `messages`
+--
+ALTER TABLE `messages`
+  MODIFY `message_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id сообщения', AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT для таблицы `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id пользователя', AUTO_INCREMENT=34;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --
 
 --
--- Ограничения внешнего ключа таблицы `channels`
+-- Ограничения внешнего ключа таблицы `chat`
 --
-ALTER TABLE `channels`
-  ADD CONSTRAINT `channels_ibfk_1` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`);
+ALTER TABLE `chat`
+  ADD CONSTRAINT `chat_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Ограничения внешнего ключа таблицы `messages`
+--
+ALTER TABLE `messages`
+  ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`chat_id`) REFERENCES `chat` (`chat_id`),
+  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Ограничения внешнего ключа таблицы `party`
+--
+ALTER TABLE `party`
+  ADD CONSTRAINT `party_ibfk_1` FOREIGN KEY (`chat_id`) REFERENCES `chat` (`chat_id`),
+  ADD CONSTRAINT `party_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Ограничения внешнего ключа таблицы `users_data`

@@ -1,185 +1,432 @@
 'use strict'
 
-const fs = require("fs");
+const mysql = require("mysql");
 
-const ERR_USER_NO_EXIST = { success: false, err_code: 7, err_cause: "User doesn't exist" };
-const ERR_CHANNEL_NO_EXIST = { success: false, err_code: 7, err_cause: "Channel doesn't exist" };
-
-let users = new Map();
-let channels = new Map();
-let messages = new Map(); //channel_id -> map
-
-module.exports.create_user = (id, nickname) => {
-	const newUser = {
-		id: +id,
-		nickname: nickname,
-		permissions: 0,
-		avatar: "avatars/default.png",
-		channels: [],
-		meta: {}
-	};
-	users.set(id, newUser);
-}
-
-module.exports.get_user = (id) => {
-	const cur = users.get(+id);
-	if (cur === undefined)
-		return ERR_USER_NO_EXIST;
-	return { success: true, user: cur };
-}
-
-module.exports.change_avatar = (user_id, avatar) => {
-	const cur = users.get(+user_id);
-	if (cur === undefined)
-		return ERR_USER_NO_EXIST;
-	cur.avatar = avatar;
-	return { success: true };
-}
-
-module.exports.add_to_channel = (user_id, channel_id) => {
-	const user = users.get(+user_id);
-	if (user === undefined)
-		return ERR_USER_NO_EXIST;
-	const channel = channels.get(+channel_id);
-	if (channel === undefined)
-		return ERR_CHANNEL_NO_EXIST;
-
-	if (!user.channels.includes(+channel_id))
-		user.channels.push(+channel_id);
-	if (!channel.listeners_ids.includes(+user_id))
-		channel.listeners_ids.push(+user_id);
-	return { success: true };
-}
-
-module.exports.remove_from_channel = (user_id, channel_id) => {
-	const user = users.get(+user_id);
-	if (user === undefined)
-		return ERR_USER_NO_EXIST;
-	const channel = channels.get(+channel_id);
-	if (channel === undefined)
-		return ERR_CHANNEL_NO_EXIST;
-
-	user.channels = user.channels.filter(e => e !== +channel_id);
-	channel.listeners_ids = channel.listeners_ids.filter(e => e !== +user_id);
-	return { success: true };
-}
-
-
-module.exports.get_channel = (id) => {
-	const cur = channels.get(+id);
-	if (cur === undefined) {
-		return ERR_CHANNEL_NO_EXIST;
+module.exports.init = (config) => {
+	const sql_config = {
+		host: config.mysql_host,
+		user: config.mysql_user,
+		password: config.mysql_pass,
+		database: config.mysql_database
 	}
-	return { success: true, channel: cur };
-}
-
-module.exports.create_channel = (user_id, channel_name) => {
-	for (let ch of channels.values()) {
-		if (channel_name === ch.name)
-			return { success: false, err_code: 3, err_cause: "Channel with this name already exists" };
+	const handleDisconnect = () => {
+		this.db = mysql.createConnection(sql_config);
+		this.db.connect(err => {
+			if (err) {
+				console.log(`Mysql connection error:`, err);
+				setTimeout(handleDisconnect, 2000);
+			}
+			else {
+				console.log("Connected to mysql");
+			}
+		});
+		this.db.on('error', err => {
+			console.log('Mysql error', err);
+			if (err.code === 'PROTOCOL_CONNECTION_LOST')
+				handleDisconnect();
+			else
+				throw err;
+		});
 	}
-	const newChannel = {
-		id: channels.size + 1,
-		name: channel_name,
-		owner_id: user_id,
-		listeners_ids: [user_id],
-		meta: {}
-	};
-	channels.set(newChannel.id, newChannel);
-	messages.set(newChannel.id, new Map());
-	users.get(user_id).channels.push(newChannel.id);
-	return { success: true };
+	handleDisconnect();
 }
 
-module.exports.channels_delete = (channel_id) => {
-	const channel = channels.get(+channel_id);
-	if (channel === undefined)
-		return ERR_CHANNEL_NO_EXIST;
-	for (let e of channel.listeners_ids)
-		users.get(e).channels.filter(e => e !== +channel_id);
-	channels.delete(+channel_id);
-	return { success: true };
+const loadUsersData = () => {
+	let sql = "select * from users";
+	this.db.query(sql, (err, results) => {
+		if (err)
+			throw err;
+		console.log(results);
+		return results;
+	});
 }
 
-
-module.exports.chat_history = (channel_id, offset, count) => {
-	const channel = channels.get(+channel_id);
-	if (channel === undefined)
-		return ERR_CHANNEL_NO_EXIST;
-	const msgMap = messages.get(+channel_id);
-	let curCount = 0;
-	let msgs = [];
-	for (let i of Array.from(msgMap.keys()).sort().reverse()) {
-		if (curCount >= count)
-			break;
-		msgs.push(msgMap.get(i));
-		curCount++;
-	}
-	return { success: true, count: curCount, messages: msgs.reverse() };
-}
-
-module.exports.send_message = (channel_id, message, author_id, broadcast) => {
-	const channel = channels.get(+channel_id);
-	if (channel === undefined)
-		return ERR_CHANNEL_NO_EXIST;
-	let newMsg = {
-		message_id: messages.get(+channel_id).size,
-		author_id: +author_id,
-		author_name: this.get_user(+author_id).user.nickname,
-		message: message,
-		time: new Date().getTime(),
-		channel_id: +channel_id
-	};
-	messages.get(+channel_id).set(newMsg.message_id, newMsg);
-	broadcast(+channel_id, newMsg);
-	return { success: true };
-}
-
-
-//Information inside UsersData and UsersChannels, which accumulates during server's session,
-//saves into UsersData.json and UsersChannels.json accordingly
-module.exports.save = async () => {
+const getUserName = (id) => {
 	return new Promise((resolve, reject) => {
-		fs.writeFile("./Data/users.json", JSON.stringify(Array.from(users.entries())), {}, (err) => {
+		let sql = "select * from users_data where id = ?";
+		let params = [id];
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
-			fs.writeFile("./Data/channels.json", JSON.stringify(Array.from(channels.entries())), (err) => {
+			return resolve(result[0][`nickname`]);
+		});
+	});
+}
+
+module.exports.getChannels = () => {
+	return new Promise((resolve, reject) => {
+		let sql = "select * from chat";
+		this.db.query(sql, (err, result) => {
+			if (err)
+				return reject(err);
+			let channels = [];
+			for (let i = 0; i < result.length; i++)
+				channels.push(result[i][`chat_id`]);
+			return resolve(channels);
+		});
+	});
+}
+
+module.exports.getUser = (login) => {
+	return new Promise((resolve, reject) => {
+		let params = [login];
+		let sql = "select * from users where login = ?";
+		this.db.query(sql, params, (err, result) => {
+			if (err)
+				return reject(err);
+			return resolve(result[0]);
+		});
+	});
+}
+
+module.exports.getUsersMeta = (id) => {
+	return new Promise((resolve, reject) => {
+		let user_id = -1, nickname = "", permission = -1, avatar = "", channels = [], meta = {};
+		let params = [id];
+		let sql = "select * from users_data where id = ?";
+		this.db.query(sql, params, (err, result) => {
+			if (err)
+				return reject(err);
+			user_id = result[0][`id`];
+			nickname = result[0][`nickname`];
+			permission = result[0][`permissions`];
+			avatar = result[0][`avatar`];
+			meta = result[0][`meta`];
+
+			sql = "select * from party where user_id = ?";
+			this.db.query(sql, params, (err, result) => {
 				if (err)
 					return reject(err);
-				for (let e of channels.values()) {
-					fs.writeFileSync(`./Data/messages/${e.id}.json`,
-						JSON.stringify(Array.from(messages.get(+e.id).entries())));
-				}
-				return resolve();
+				for (let i = 0; i < result.length; i++)
+					channels[i] = result[i][`chat_id`];
+
+				const user = {
+					id: user_id,
+					nickname: nickname,
+					permissions: permission,
+					avatar: avatar,
+					channels: channels,
+					meta: meta
+				};
+				return resolve(user);
 			});
 		});
 	});
 }
 
-//Loading information, that had been recording during previous server's sessions,
-//from UsersData.json and UsersChannels.json to UsersData and UsersChannels respectively
-module.exports.load = async () => {
+module.exports.getChannelMeta = (id) => {
 	return new Promise((resolve, reject) => {
-		fs.readFile("./Data/users.json", (err, raw) => {
+		let channel_id = -1, channel_name = "", owner_id = -1, listeners = [], meta = {};
+		let sql = "select * from chat where chat_id = ?";
+		let params = [id];
+		this.db.query(sql, params, (err, result) => {
 			if (err)
 				return reject(err);
-			if (raw.length === 0)
-				return resolve();
-			users = new Map(JSON.parse(raw));
-			fs.readFile("./Data/channels.json", (err, raw) => {
-				if (raw.length === 0)
-					return resolve();
-				channels = new Map(JSON.parse(raw));
-				messages = new Map();
-				for (let e of channels.values()) {
-					let raw = fs.readFileSync(`./Data/messages/${e.id}.json`);
-					if (raw.length === 0)
-						continue;
-					else
-						messages.set(+e.id, new Map(JSON.parse(raw)));
-				}
-				return resolve();
+			channel_id = result[0][`chat_id`];
+			channel_name = result[0][`name`];
+			owner_id = result[0][`user_id`];
+			meta = result[0][`meta`];
+
+			sql = "select * from party where chat_id = ?";
+			this.db.query(sql, params, (err, result) => {
+				if (err)
+					return reject(err);
+				for (let i = 0; i < result.length; i++)
+					listeners[i] = result[i][`user_id`];
+				const channel = {
+					id: channel_id,
+					name: channel_name,
+					owner_id: owner_id,
+					listeners_ids: listeners,
+					meta: meta
+				};
+				return resolve(channel);
 			});
+		});
+	});
+}
+
+module.exports.getMessagesHistory = (channel_id, offset, count) => {
+	return new Promise((resolve, reject) => {
+		let history = [];
+		let params = [channel_id];
+		let sql = "select * from messages where chat_id = ? ORDER BY `messages`.`date_create` DESC";
+		this.db.query(sql, params, async (err, result) => {
+			if (err)
+				return reject(err);
+			for (let i = offset; history.length < count && i < result.length; i++) {
+				let msg = {
+					message_id: result[i][`message_id`],
+					chat_id: channel_id,
+					author_id: result[i][`user_id`],
+					message: result[i][`content`],
+					time: result[i][`date_create`],
+					author_name: await getUserName(result[i][`user_id`])
+				};
+				history.push(msg);
+			}
+			return resolve(history);
+		});
+	});
+}
+
+module.exports.addUser = (login, hash, salt) => {
+	return new Promise((resolve, reject) => {
+		let post = { login: login, hash: hash, salt: salt };
+		let sql = "insert into users set ?";
+		let id = -1;
+		this.db.query(sql, post, (err, result) => {
+			if (err)
+				return reject(err);
+			sql = "select LAST_INSERT_ID()";
+			let query1 = this.db.query(sql, (err, result) => {
+				if (err)
+					return reject(err);
+				for (let key in result[0]) {
+					id = result[0][key];
+					break;
+				}
+				post = { id: id, nickname: login };
+				sql = "insert into users_data set ?";
+				let query2 = this.db.query(sql, post, (err, result) => {
+					if (err)
+						return reject(err);
+					else
+						return resolve(id);
+				});
+			});
+		});
+	});
+}
+
+module.exports.addChannel = (user_id, name) => {
+	return new Promise((resolve, reject) => {
+		let post = { name: name, user_id: user_id };
+		let sql = "insert into chat set ?";
+		this.db.query(sql, post, (err, result) => {
+			if (err)
+				return reject(err);
+			let chat_id = -1;
+			sql = "select LAST_INSERT_ID()";
+			this.db.query(sql, (err, result) => {
+				if (err)
+					return reject(err);
+				for (let key in result[0]) {
+					chat_id = result[0][key];
+					break;
+				}
+				post = { chat_id: chat_id, user_id: user_id };
+				sql = "insert into party set ?";
+				this.db.query(sql, post, (err, result) => {
+					if (err)
+						return reject(err);
+					return resolve();
+				});
+			});
+		});
+	});
+}
+
+module.exports.addMessage = (channel_id, author_id, message) => {
+	return new Promise(async (resolve, reject) => {
+		let message_id = -1, author_name = await getUserName(author_id), time = new Date();
+		let post = { chat_id: channel_id, user_id: author_id, content: message, date_create: time };
+		let sql = "insert into messages set ?";
+		this.db.query(sql, post, (err, result) => {
+			if (err)
+				return reject(err);
+			sql = "select LAST_INSERT_ID()";
+			this.db.query(sql, (err, result) => {
+				if (err)
+					return reject(err);
+				for (let key in result[0]) {
+					message_id = result[0][key];
+					break;
+				}
+				let msg = {
+					message_id: message_id,
+					author_id: author_id,
+					author_name: author_name,
+					message: message,
+					time: time,
+					channel_id: channel_id
+				};
+				return resolve(msg);
+			});
+		});
+	});
+}
+
+module.exports.updateAvatar = (id, avatar) => {
+	return new Promise((resolve, reject) => {
+		let params = [avatar, id];
+		let sql = "update users_data set avatar = ? where id = ?";
+		this.db.query(sql, params, (err, result) => {
+			if (err)
+				return reject(err);
+			return resolve();
+		});
+	});
+}
+
+module.exports.addUserToChannel = (user_id, channel_id) => {
+	return new Promise((resolve, reject) => {
+		let post = { chat_id: channel_id, user_id: user_id };
+		let sql = "insert into party set ?";
+		this.db.query(sql, post, (err, result) => {
+			if (err)
+				return reject(err);
+			return resolve();
+		});
+	});
+}
+
+module.exports.removeUserFromChannel = (user_id, channel_id) => {
+	return new Promise((resolve, reject) => {
+		let sql = "delete from party where chat_id = ? and user_id = ?";
+		let params = [channel_id, user_id];
+		this.db.query(sql, params, (err, result) => {
+			if (err)
+				return reject(err);
+			return resolve();
+		});
+	});
+}
+
+module.exports.removeChannel = (channel_id) => {
+	return new Promise((resolve, reject) => {
+		let sql = "delete from party where chat_id = ?";
+		let params = [channel_id];
+		this.db.query(sql, params, (err, result) => {
+			if (err)
+				return reject(err);
+			sql = "delete from messages where chat_id = ?";
+			this.db.query(sql, params, (err, result) => {
+				if (err)
+					return reject(err);
+				sql = "delete from chat where chat_id = ?";
+				let query2 = this.db.query(sql, params, (err, result) => {
+					if (err)
+						return reject(err);
+					return resolve();
+				});
+			});
+
+		});
+	});
+}
+
+module.exports.isUserOwner = (user_id, channel_id) => {
+	return new Promise((resolve, reject) => {
+		let sql = "select * from chat where chat_id = ? and user_id = ?";
+		let params = [channel_id, user_id];
+		this.db.query(sql, params, (err, result) => {
+			if (err)
+				return reject(err);
+			if (result.length == 0)
+				return resolve(false);
+			else
+				return resolve(true);
+		});
+	});
+}
+
+const updateLogin = (id, login) => {
+	let sql = "update users set login = " + "'" + login + "'" + " where id = " + id;
+	this.db.query(sql, (err, result) => {
+		if (err)
+			throw err;
+	});
+}
+
+const updateHash = (id, hash) => {
+	let sql = "update users set hash = " + "'" + hash + "'" + " where id = " + id;
+	this.db.query(sql, (err, result) => {
+		if (err)
+			throw err;
+	});
+}
+
+const updateSalt = (id, salt) => {
+	let sql = "update users set salt = " + "'" + salt + "'" + " where id = " + id;
+	this.db.query(sql, (err, result) => {
+		if (err)
+			throw err;
+	});
+}
+
+const updateNickname = (id, nickname) => {
+	let sql = "update users_data set nickname = " + "'" + nickname + "'" + " where id = " + id;
+	this.db.query(sql, (err, result) => {
+		if (err)
+			throw err;
+	});
+}
+
+const updatePremission = (id, permission) => {
+	let sql = "update users_data set permission = " + permission + " where id = " + id;
+	this.db.query(sql, (err, result) => {
+		if (err)
+			throw err;
+	});
+}
+
+module.exports.doesChannelIdExist = (id) => {
+	return new Promise((resolve, reject) => {
+		let sql = "select * from chat where chat_id = ?";
+		let params = [id];
+		this.db.query(sql, params, (err, result) => {
+			if (err)
+				return reject(err);
+			if (result.length == 0)
+				return resolve(false);
+			else
+				return resolve(true);
+		});
+	});
+}
+
+module.exports.doesUserIdExist = (id) => {
+	return new Promise((resolve, reject) => {
+		let sql = "select * from users where id = ?";
+		let params = [id];
+		this.db.query(sql, params, (err, result) => {
+			if (err)
+				return reject(err);
+			if (result.length == 0)
+				return resolve(false);
+			else
+				return resolve(true);
+		});
+	});
+}
+
+module.exports.doesUserExist = (login) => {
+	return new Promise((resolve, reject) => {
+		let sql = "select * from users where login = ?";
+		let params = [login];
+		this.db.query(sql, params, (err, result) => {
+			if (err)
+				return reject(err);
+			if (result.length == 0)
+				return resolve(false);
+			else
+				return resolve(true);
+		});
+	});
+}
+
+module.exports.doesChannelNameExist = (name) => {
+	return new Promise((resolve, reject) => {
+		let sql = "select * from chat where name = ?";
+		let params = [name];
+		this.db.query(sql, params, (err, result) => {
+			if (err)
+				return reject(err);
+			if (result.length == 0)
+				return resolve(false);
+			else
+				return resolve(true);
 		});
 	});
 }

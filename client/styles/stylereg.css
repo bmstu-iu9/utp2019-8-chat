@@ -1,6 +1,7 @@
 .container {
 	margin: auto;
-	width: 180px;
+	width: 250px;
+	align-items: center;
 }
 h3{
 	margin-top: 10%;
@@ -14,6 +15,7 @@ body {
 	background-color: #26262b;
 }
 #btnSend {
+	margin-left:35%;
 	background-color: transparent;
 	border: none;
 	outline: none;
@@ -23,7 +25,6 @@ body {
 	color: white;
 	border: 1px solid white;
 	transition-duration: 0.4s;
-	margin-left: 28%;
 }
 #btnSend:hover {
 	background-color: white;
@@ -31,7 +32,7 @@ body {
 }
 a {
 	color: white;
-	margin-left: 13%;
+	margin-left: 25%;
 }
 label {
 	font-family: 'Raleway', sans-serif;
@@ -40,4 +41,5 @@ label {
 }
 input{
 	outline: none;
+	width: 100%;
 }
