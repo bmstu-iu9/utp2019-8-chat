@@ -9,6 +9,12 @@
 	background-color: #313138;
 	
 }
+#changeAvatarBtn{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+}
 #chat_list{
 	display: flex;
 	float: right;
@@ -44,7 +50,6 @@
 
 #chat_create{
 	font-size: 48px;
-	margin-right: 15%;
 	font-family: 'Raleway', sans-serif;
 	color: white;
 	background-color: transparent;
@@ -53,28 +58,8 @@
 	cursor: pointer;
 }
 
-#chat_leave{
-	font-size: 48px;
-	font-family: 'Raleway', sans-serif;
-	color: white;
-	border: none;
-	background-color: transparent;
-	outline: none;
-	cursor: pointer;
-}
-
-#chat_more{
-	font-size: 48px;
-	font-family: 'Raleway', sans-serif;
-	margin-left: 15%;
-	color: white;
-	background-color: transparent;
-	border: none;
-	outline: none;
-	cursor: pointer;
-}
-
-h1{
+#bm{ 
+	margin-left: 20%;
 	color: white;
 	text-align: center;
 	font-family: 'Raleway', sans-serif;
@@ -289,28 +274,80 @@ textarea {
 
 footer {
 	margin-top: 30px;
+	float: right;
+	margin-right: 5%;
 }
-
+#exitAllBtn{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 16px;
+	white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+#siteMapBtn{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 16px;
+	white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+#exitAllBtn:hover{
+	background-color: white;
+	color: black;
+}
+#siteMapBtn:hover{
+	background-color: white;
+	color: black;
+}
+#exitBtn{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+}
+#ex{
+	width: 50px;
+	height: 50px;
+}
 #cur_user_info {
-	margin-top: 10px;
-	width: 250px;
-	border: solid darkblue 1px;
+	margin-right: 5%;
+	float: right;
+	width: 350px;
+	height: 50px;
 }
 
 #cur_user_img {
-	margin: 7px 10px 7px 7px;
 	width: 50px;
 	height: 50px;
 	border: solid 1px gray;
 }
 
 #cur_user_name {
+	font-family: 'Open-sans', sans-serif;
+	font-size: 15px;
+	vertical-align:top;
 	color: white;
 }
 
 #cur_user_id {
-	margin-left: 5px;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 15px;
 	color: gray;
+	vertical-align:top;
 }
 
 .mention {

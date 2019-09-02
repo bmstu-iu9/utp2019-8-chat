@@ -62,6 +62,7 @@ const createMessage = (message, cache, mention) => {
         raw = raw.replace(/>/g, "&gt;");
         raw = raw.replace(/"/g, "&quot;");
         raw = raw.replace(/(?:\r\n|\r|\n)/g, '<br />');
+        raw = raw.replace(/((http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?)/g, '<a href="$1">$1</a>');
         raw = raw.replace(new RegExp(`@${current_user.nickname}`, 'g'), `<span class="mention">@${current_user.nickname}</span>`);
         return raw;
     }
