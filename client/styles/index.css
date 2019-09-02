@@ -1,3 +1,9 @@
+body {
+	background-color: #26262b;
+}
+
+/* ============== Chat box ===================== */
+
 #chat_wrapper { /*This style used for change outer chat properties (like sizes)*/
     display: block;
 	width: 90%;
@@ -47,7 +53,6 @@
 	font-family: 'Open-sans', sans-serif;
 	font-size:15px;
 }
-
 #chat_create{
 	font-size: 48px;
 	font-family: 'Raleway', sans-serif;
@@ -57,7 +62,6 @@
 	outline: none;
 	cursor: pointer;
 }
-
 #bm{ 
 	margin-left: 20%;
 	color: white;
@@ -65,11 +69,6 @@
 	font-family: 'Raleway', sans-serif;
 	font-weight: 300;
 }
-
-body {
-	background-color: #26262b;
-}
-
 #chat_box {
     width: 70%;
     height: 100%;
@@ -77,8 +76,6 @@ body {
     flex-direction: column;
     justify-content: flex-end;
 }
-
-
 #chat_input {
 	max-height:40%;
     display: flex;
@@ -86,16 +83,13 @@ body {
     justify-content: flex-end;
 	border-right: 1px solid black; 
 }
-
 #input_box {
     width: 100%;
     margin-right: 10px;
 }
-
 #input_msg {
     width: 100%;
 }
-
 #send_btn {
     margin-right:0.6%;
 	background-color: transparent;
@@ -103,23 +97,19 @@ body {
 	outline: none;
 	cursor: pointer;
 }
-
-
-
 #im {
 	width: 20px;
 	height: 20px;
 	transform: rotate(270deg);
 }
-
-
-
 #chat_flow {
     height: 100%;
     overflow-y: auto;
 	border-bottom: 1px solid black; 
 	border-right: 1px solid black;
 }
+
+/* ============== Messages ===================== */
 
 .msg_box {
     display: flex;
@@ -135,7 +125,6 @@ body {
 	font-family: 'Open-sans', sans-serif;
 	color: white;
 }
-
 .msg_box .msg_info_zone {
 	min-width: 80px;
     width: 80px;
@@ -145,7 +134,6 @@ body {
 	border: 1px solid #42373B;
 	border-radius: 25px;
 }
-
 textarea {
 	margin-left:3px;
 	margin-top:3.5px;
@@ -155,13 +143,11 @@ textarea {
 	outline: none;
 	resize: none;
 }
-
 .msg_box {
 	background-color: #42373B;
 	border: 1px solid #4F4247;
 	border-radius: 25px;
 }
-
 .msg_box .msg_info_zone .msg_icon {
     margin: 3px 10px 5px 13px;
     border: solid 1px #873a3a;
@@ -169,7 +155,6 @@ textarea {
     width: 50px;
     height: 50px;
 }
-
 .msg_box .msg_info_zone .msg_icon {
     margin: 3px 10px 5px 13px;
     border: solid 1px gray;
@@ -177,12 +162,10 @@ textarea {
     width: 50px;
     height: 50px;
 }
-
 .msg_box .msg_info_zone .msg_icon img {
     width: inherit;
     height: inherit;
 }
-
 .msg_box .msg_message_zone {
     padding-right: 15px;
     width: 100%;
@@ -193,14 +176,12 @@ textarea {
 	overflow: hidden;
 	padding-right: 15px;
 }
-
 .msg_box .name {
     display: inline;
     margin: 6px 5px 6px 15px;
 	font-weight: 700;
     cursor: pointer;
 }
-
 .msg_box .msg_time {
     display: inline;
     margin: 5px 5px 6px 0x; 
@@ -208,13 +189,20 @@ textarea {
     font-size: 0.9em;
     font-style: italic;
 }
-
 .msg_box .msg {
     margin: 6px 5px 6px 15px;
     width: 100%;
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
+.msg_box .msg a {
+	color: #ade6e3;
+}
+.msg_box .msg a:visited {
+	color: #ccade6;
+}
+
+/* ============== Channels ===================== */
 
 .chaneel_pan {
 	justify-content:center;
@@ -222,11 +210,9 @@ textarea {
 	display: flex;
 	flex-direction: row;
 }
-
 .channel_pan_holder {
 	width: 5px;
 }
-
 .channel_addu {
 	margin-top: 7px;
 	max-width:80px;
@@ -267,10 +253,7 @@ textarea {
 	transition-duration: 0.4s;
 }
 
-.colored_nickname {
-	color: greenyellow;
-	font-weight: bold;
-}
+/* ============== Footer ===================== */
 
 footer {
 	margin-top: 30px;
@@ -313,6 +296,9 @@ footer {
 	background-color: white;
 	color: black;
 }
+
+/* ============== User panel ===================== */
+
 #exitBtn{
 	background-color: transparent;
 	border: none;
@@ -329,20 +315,17 @@ footer {
 	width: 350px;
 	height: 50px;
 }
-
 #cur_user_img {
 	width: 50px;
 	height: 50px;
 	border: solid 1px gray;
-}
-
+}		
 #cur_user_name {
 	font-family: 'Open-sans', sans-serif;
 	font-size: 15px;
 	vertical-align:top;
 	color: white;
 }
-
 #cur_user_id {
 	font-family: 'Open-sans', sans-serif;
 	font-size: 15px;
@@ -350,10 +333,15 @@ footer {
 	vertical-align:top;
 }
 
+/* ============== Other ===================== */
+
+.colored_nickname {
+	color: greenyellow;
+	font-weight: bold;
+}
 .mention {
 	color: lightgreen;
 }
-
 #msgsLoadingStr {
 	color: gray;
 	margin-top: 17px;
