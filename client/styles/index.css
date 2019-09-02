@@ -276,8 +276,42 @@ footer {
 	margin-top: 30px;
 	float: right;
 	margin-right: 5%;
+}
+#exitAllBtn{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
 	font-family: 'Open-sans', sans-serif;
-	color: gray;
+	font-size: 16px;
+	white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+#siteMapBtn{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 16px;
+	white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+#exitAllBtn:hover{
+	background-color: white;
+	color: black;
+}
+#siteMapBtn:hover{
+	background-color: white;
+	color: black;
 }
 #exitBtn{
 	background-color: transparent;
