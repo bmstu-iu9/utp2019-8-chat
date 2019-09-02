@@ -7,7 +7,7 @@ const makeMention = (author, message, channel_id) => {
     if (makeNotification !== undefined && !isTabActive) {
         makeNotification(`Вас упомянул ${author} в канале с ID ${channel_id}`, {
             body: message,
-            icon: '/styles/favicon.ico',
+            icon: '/styles/mention.png',
             dir: 'auto',
             lang: 'RU'
         });
