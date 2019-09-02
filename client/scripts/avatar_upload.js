@@ -11,6 +11,18 @@ const sendFile = (path, formData) => {
         xhr.send(formData);
     });
 }
+
+document.getElementById("file_input").onchange = (evt) => {
+    const tgt = evt.target || window.event.srcElement, files = tgt.files;
+    if (FileReader && files && files.length) {
+        var fr = new FileReader();
+        fr.onload = () => {
+            document.getElementById("avatar_preview").src = fr.result;
+        }
+        fr.readAsDataURL(files[0]);
+    }
+}
+
 document.getElementById("send_btn").addEventListener('click', (sender) => {
     const path = "api/change_avatar";
     const file = document.getElementById("file_input").files[0];
