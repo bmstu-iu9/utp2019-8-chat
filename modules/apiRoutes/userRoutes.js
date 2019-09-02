@@ -30,15 +30,20 @@ module.exports.init = (app, modules) => {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        const user = dataModule.get_user(auth.userID).user;
-        if (util.checkPerm(user, 1) || channel.listeners_ids.includes(user.id)) {
-            dataModule.add_to_channel(req.user_id, req.channel_id).then(resp => {
-                response.status(200).send(JSON.stringify(resp));
+        dataModule.get_user(auth.userID).then(res => {
+            const user = res.user;
+            dataModule.get_channel(req.channel_id).then(res => {
+                const channel = res.channel;
+                if (util.checkPerm(user, 1) || channel.listeners_ids.includes(user.id)) {
+                    dataModule.add_to_channel(req.user_id, req.channel_id).then(resp => {
+                        response.status(200).send(JSON.stringify(resp));
+                    });
+                }
+                else {
+                    response.status(200).send(JSON.stringify(util.ERR_NO_PERMISSIONS));
+                }
             });
-        }
-        else {
-            response.status(200).send(JSON.stringify(util.ERR_NO_PERMISSIONS));
-        }
+        });
     });
 
     app.post("/api/remove_from_channel", urlencodedParser, (request, response) => {
@@ -51,14 +56,19 @@ module.exports.init = (app, modules) => {
             response.status(200).send(JSON.stringify(auth));
             return;
         }
-        const user = dataModule.get_user(auth.userID).user;
-        if (util.checkPerm(user, 1) || user.id === channel.owner_id) {
-            dataModule.remove_from_channel(req.user_id, req.channel_id).then(resp => {
-                response.status(200).send(JSON.stringify(resp));
+        dataModule.get_user(auth.userID).then(res => {
+            const user = res.user;
+            dataModule.get_channel(req.channel_id).then(res => {
+                const channel = res.channel;
+                if (util.checkPerm(user, 1) || user.id === channel.owner_id) {
+                    dataModule.remove_from_channel(req.user_id, req.channel_id).then(resp => {
+                        response.status(200).send(JSON.stringify(resp));
+                    });
+                }
+                else {
+                    response.status(200).send(JSON.stringify(util.ERR_NO_PERMISSIONS));
+                }
             });
-        }
-        else {
-            response.status(200).send(JSON.stringify(util.ERR_NO_PERMISSIONS));
-        }
+        });
     });
 }
