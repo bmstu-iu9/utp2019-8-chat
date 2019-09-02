@@ -2,17 +2,42 @@ body {
     background-color: #26262b;
     color: white;
     font-family: 'Raleway', sans-serif;
+    margin: auto;
+    margin-top:10%;
+    width: 200px;
+    text-align: center;
 }
 
 h1{
+    margin-top: 10%;
 	text-align: center;
-	font-weight: 300;
+    font-weight: 300;
 }
 
 .links {
     font-size: 1.3em;
 }
 
+img {
+	width: 100px;
+	height: 100px;
+	border: solid 1px gray;
+}
+#send_btn{
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	font-family: 'Open-sans', sans-serif;
+	font-size: 16px;
+	color: white;
+	border: 1px solid white;
+	transition-duration: 0.4s;
+}
+#send_btn:hover{
+    background-color: white;
+	color: black;
+}
 a {
     color: white;
 }

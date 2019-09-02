@@ -11,7 +11,6 @@ const sendFile = (path, formData) => {
         xhr.send(formData);
     });
 }
-
 document.getElementById("send_btn").addEventListener('click', (sender) => {
     const path = "api/change_avatar";
     const file = document.getElementById("file_input").files[0];
