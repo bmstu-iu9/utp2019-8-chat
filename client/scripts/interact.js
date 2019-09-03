@@ -12,17 +12,18 @@ const init = () => {
                 const userInfo = await apiGetUser(userID);
                 let channels = [];
                 if ((userInfo.user.permissions & 2) == 0) {
-                    for (let i in userInfo.user.channels)
-                        if (userInfo.user.channels[i])
-                            channels.push(await apiGetChannel(userInfo.user.channels[i]));
-                    channels = channels.map(e => e.channel);
+                    for (let i of userInfo.user.channels)
+                        channels.push(await apiGetChannel(i));
                 }
-                else
-                    channels = (await apiGetAllChannels()).channels;
+                else {
+                    for (let i of (await apiGetAllChannels()).channels)
+                        channels.push(await apiGetChannel(i));
+                }
+                channels = channels.map(e => e.channel);
                 return resolve({ success: true, user: userInfo.user, channels: channels });
             })
             .catch((err) => {
-                console.error(`Authorization failed (${err})`);
+                console.error(`Authorization failed (${err.cause})`);
                 window.location.replace('/auth.html');
                 return reject("Unauthorized");
             });
@@ -61,6 +62,7 @@ const createMessage = (message, cache, mention) => {
         raw = raw.replace(/>/g, "&gt;");
         raw = raw.replace(/"/g, "&quot;");
         raw = raw.replace(/(?:\r\n|\r|\n)/g, '<br />');
+        raw = raw.replace(/((http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?)/g, '<a href="$1">$1</a>');
         raw = raw.replace(new RegExp(`@${current_user.nickname}`, 'g'), `<span class="mention">@${current_user.nickname}</span>`);
         return raw;
     }
@@ -97,6 +99,7 @@ const selectChannel = async (id) => {
         return new Promise((resolve, reject) => {
             apiGetMessages(id, 0, 500) //Show last 500 messages
                 .then(async (res) => {
+                    res.messages = res.messages.reverse();
                     let usersCache = new Map();
                     for (let i = 0; i < res.count; i++)
                         chat_flow.appendChild(await createMessage(res.messages[i], usersCache));
