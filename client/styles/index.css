@@ -1,6 +1,13 @@
 body {
 	background-color: #26262b;
 }
+#bm{ 
+	margin-left: 20%;
+	color: white;
+	text-align: center;
+	font-family: 'Raleway', sans-serif;
+	font-weight: 300;
+}
 
 /* ============== Chat box ===================== */
 
@@ -61,13 +68,6 @@ body {
 	border: none;
 	outline: none;
 	cursor: pointer;
-}
-#bm{ 
-	margin-left: 20%;
-	color: white;
-	text-align: center;
-	font-family: 'Raleway', sans-serif;
-	font-weight: 300;
 }
 #chat_box {
     width: 70%;
