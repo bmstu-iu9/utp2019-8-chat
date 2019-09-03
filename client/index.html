@@ -31,7 +31,10 @@
         </div>
         <div id="chat_box">
             <div id='msgsLoadingStr'>Loading</div>
-            <div id="chat_flow">
+            <div id="chat_flow" class="scrollable">
+                <div class="content-wrapper" id="messages_wrapper">
+                    <div class="content" id="messages_zone"></div>
+                </div>
             </div>
             <div id="chat_input">
                 <div id="input_box">
@@ -45,6 +48,7 @@
         <button id="exitAllBtn">Exit from all devices</button>
         <button id="siteMapBtn">Site map</button>
     </footer>
+    <script src="/scripts/scrollbar.js"></script>
     <script src="/scripts/util.js"></script>
     <script src="/scripts/api_methods.js"></script>
     <script src="/scripts/interact.js"></script>

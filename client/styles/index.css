@@ -97,11 +97,54 @@ body {
 	height: 20px;
 	transform: rotate(270deg);
 }
-#chat_flow {
-    height: 100%;
-    overflow-y: auto;
+
+/* ============== Scroll ===================== */
+
+.scrollable {
+	height: 100%;
+	position: relative;
+	overflow: hidden;
+    /* overflow-y: auto; */
 	border-bottom: 1px solid black; 
 	border-right: 1px solid black;
+}
+.scrollable .showScroll::after {
+    position: absolute;
+    content: '';
+    top: 5%;
+    right: 7px;
+    height: 90%;
+    width: 3px;
+    background: rgba(224, 224, 255, .3);
+}
+.scrollable .content-wrapper {
+    width: 100%;
+    height: 100%;
+    padding-right: 50%;
+    overflow-y: scroll;
+}
+.scroller {
+    z-index: 5;
+    cursor: pointer;
+    position: absolute;
+    width: 10px;
+    border-radius: 5px;
+    background: rgb(111, 111, 190);
+    top: 0px;
+    right: 3px;
+    -webkit-transition: top .08s;
+    -moz-transition: top .08s;
+    -ms-transition: top .08s;
+    -o-transition: top .08s;
+    transition: top .08s;
+}
+.content {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 /* ============== Messages ===================== */

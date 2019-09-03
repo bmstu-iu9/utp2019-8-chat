@@ -2,7 +2,7 @@
 
 let currentChannelId, currentChannelName;
 
-const doc_chat_flow = document.getElementById("chat_flow");
+const doc_chat_flow = document.getElementById("messages_zone");
 
 //Load and return data about the user and his channels
 const init = () => {
@@ -115,9 +115,11 @@ const selectChannel = async (id) => {
     currentChannelId = 0;
     doc_chat_flow.innerHTML = "";
     document.getElementById("msgsLoadingStr").hidden = false;
+    updateScroller();
     await loadMessages(id, doc_chat_flow);
     document.getElementById("msgsLoadingStr").hidden = true;
-    doc_chat_flow.scrollTop = 99999;
+    updateScroller();
+    document.getElementById("messages_wrapper").scrollTop = 99999;
     socketSelectChannel(id);
     currentChannelId = id;
     apiGetChannel(id)
