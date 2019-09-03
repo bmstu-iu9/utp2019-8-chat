@@ -1,3 +1,5 @@
+// https://stackoverflow.com/questions/27322881/how-can-i-create-a-simple-page-vertical-scroll-bar-without-using-jquery
+
 let updateScroller = () => { };
 
 const initScroller = () => {
@@ -27,7 +29,7 @@ const initScroller = () => {
         scrollerBeingDragged = true;
     }
 
-    const stopDrag = (evt) => {
+    const stopDrag = () => {
         scrollerBeingDragged = false;
     }
 
@@ -63,12 +65,11 @@ const initScroller = () => {
             if (scrollerHeight / scrollContainer.offsetHeight < 1) {
                 scroller.style.height = scrollerHeight + 'px';
                 topPosition = 100 * (scrollContainer.offsetHeight - 5)
-                scroller.style.top = topPosition + 'px'; //TODO
+                scroller.style.top = topPosition + 'px';
                 scroller.hidden = false;
             }
-            else {
+            else
                 scroller.hidden = true;
-            }
         }
     }
 
