@@ -102,7 +102,6 @@ body {
     overflow-y: auto;
 	border-bottom: 1px solid black; 
 	border-right: 1px solid black;
-	padding-top: 13px;
 }
 
 /* ============== Messages ===================== */
@@ -346,9 +345,9 @@ footer {
 }
 #msgsLoadingStr {
 	color: gray;
-	margin-top: 17px;
-	width: 100%;
+	padding-top: 17px;
 	text-align: center;
 	font-family: 'Raleway', sans-serif;
 	font-size: 1.4em;
+	border-right: 1px solid black;
 }
