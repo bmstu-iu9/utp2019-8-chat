@@ -104,7 +104,6 @@ body {
 	height: 100%;
 	position: relative;
 	overflow: hidden;
-    /* overflow-y: auto; */
 	border-bottom: 1px solid black; 
 	border-right: 1px solid black;
 }
@@ -293,12 +292,17 @@ textarea {
 
 /* ============== Footer ===================== */
 
+#li{
+	margin-left: 5%;
+	color: white;
+	float: left;
+}
 footer {
 	margin-top: 30px;
-	float: right;
 	margin-right: 5%;
 }
 #exitAllBtn{
+	float: right;
 	background-color: transparent;
 	border: none;
 	outline: none;
@@ -313,6 +317,8 @@ footer {
 	transition-duration: 0.4s;
 }
 #siteMapBtn{
+	margin-right: 5px;
+	float: right;
 	background-color: transparent;
 	border: none;
 	outline: none;
