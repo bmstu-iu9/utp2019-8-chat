@@ -67,9 +67,6 @@ const my_contains = (arr, key) => {
 
 const parseArgv = (arr) => {
     let argv = {
-        help: 0,
-        version: 0,
-        port: 443,
         config: CONFIG_PATH
     }
     var k = 0, t = 0;
@@ -167,7 +164,7 @@ module.exports.loadConfig = (path) => {
     }
     catch (err) {
         console.error("Failed to load config: " + err);
-        return defaultConfig;
+        process.exit(0);
     }
     return config;
 }
