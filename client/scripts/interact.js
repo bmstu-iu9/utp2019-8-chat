@@ -2,7 +2,7 @@
 
 let currentChannelId, currentChannelName;
 
-const doc_chat_flow = document.getElementById("chat_flow");
+const doc_chat_flow = document.getElementById("messages_zone");
 
 //Load and return data about the user and his channels
 const init = () => {
@@ -113,10 +113,13 @@ const selectChannel = async (id) => {
     }
     socketSelectChannel(0); //Exit to the neutral channel
     currentChannelId = 0;
-    doc_chat_flow.innerHTML = "<div id='msgsLoadingStr'>Loading</div>";
+    doc_chat_flow.innerHTML = "";
+    document.getElementById("msgsLoadingStr").hidden = false;
+    updateScroller();
     await loadMessages(id, doc_chat_flow);
-    doc_chat_flow.removeChild(doc_chat_flow.childNodes[0]);
-    doc_chat_flow.scrollTop = 99999;
+    document.getElementById("msgsLoadingStr").hidden = true;
+    updateScroller();
+    document.getElementById("messages_wrapper").scrollTop = 99999;
     socketSelectChannel(id);
     currentChannelId = id;
     apiGetChannel(id)

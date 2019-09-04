@@ -2,14 +2,22 @@ body {
     background-color: #26262b;
     color: white;
     font-family: 'Raleway', sans-serif;
+    margin: auto;
+    margin-top:10%;
+    width: 200px;
+    text-align: center;
 }
-h1 {
+
+h1{
+    margin-top: 10%;
 	text-align: center;
     font-weight: 300;
 }
+
 .links {
     font-size: 1.3em;
 }
+
 img {
 	width: 100px;
 	height: 100px;
@@ -33,6 +41,7 @@ img {
 a {
     color: white;
 }
+
 .text_field {
     background-color: lightgrey;
 }

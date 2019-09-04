@@ -54,7 +54,8 @@ const initSocket = (opened) => {
             };
             createMessage(resp.data, undefined, t_mention).then((msg) => {
                 doc_chat_flow.appendChild(msg);
-                doc_chat_flow.scrollTop = 99999;
+                updateScroller();
+                document.getElementById("messages_wrapper").scrollTop = 99999;
             });
         }
         else if (resp.success) {
