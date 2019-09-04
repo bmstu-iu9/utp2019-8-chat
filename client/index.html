@@ -6,9 +6,8 @@
     <title>Chats</title>
     <link rel="SHORTCUT ICON" href="styles/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/styles/index.css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700|Raleway:300,400,700|Permanent+Marker&display=swap"
-        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700|Raleway:300,400,700|Permanent+Marker&display=swap">
 
 </head>
 
@@ -31,14 +30,17 @@
             </div>
         </div>
         <div id="chat_box">
-            <div id="chat_flow">
-                <div id='msgsLoadingStr'>Loading</div>
+            <div id='msgsLoadingStr'>Loading</div>
+            <div id="chat_flow" class="scrollable">
+                <div class="content-wrapper" id="messages_wrapper">
+                    <div class="content" id="messages_zone"></div>
+                </div>
             </div>
             <div id="chat_input">
                 <div id="input_box">
                     <textarea id="text" placeholder="Введите сообщение..."></textarea>
                 </div>
-                <button id="send_btn"><img id=im src="styles/button.png"></button>
+                <button id="send_btn"><img id="im" src="styles/button.png"></button>
             </div>
         </div>
     </div>
@@ -47,6 +49,7 @@
         <button id="exitAllBtn">Exit from all devices</button>
         <button id="siteMapBtn">Site map</button>
     </footer>
+    <script src="/scripts/scrollbar.js"></script>
     <script src="/scripts/util.js"></script>
     <script src="/scripts/api_methods.js"></script>
     <script src="/scripts/interact.js"></script>
