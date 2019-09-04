@@ -2,7 +2,6 @@
 
 const fs = require("fs");
 const process = require("process");
-const minimist = require("minimist");
 
 const VERSION = "v1.3.1";
 const CONFIG_PATH = "./config.json";
@@ -119,19 +118,6 @@ const parseArgv = (arr) => {
 }
 
 module.exports.getArgv = () => {
-    // const argv = minimist(process.argv.slice(2), {
-    //     alias: {
-    //         'h': 'help',
-    //         'v': 'version',
-    //         'p': 'port',
-    //         'c': 'config',
-    //     },
-    //     default: { 'c': CONFIG_PATH },
-    //     unknown: (arg) => {
-    //         console.error('Unknown option: ', arg)
-    //         process.exit(-1);
-    //     }
-    // }); 
     const argv = parseArgv(process.argv.slice(2));
     if (argv.help) {
         console.log(clHelpPage);
@@ -159,7 +145,7 @@ module.exports.loadConfig = (path) => {
         }
         else {
             console.error(`File "${path}" does not exist`);
-            return defaultConfig;
+            process.exit(0);
         }
     }
     catch (err) {
