@@ -3,7 +3,7 @@
 const fs = require("fs");
 const process = require("process");
 
-const VERSION = "v1.3.1";
+const VERSION = "v1.4.0";
 const CONFIG_PATH = "./config.json";
 
 const defaultConfig = {
