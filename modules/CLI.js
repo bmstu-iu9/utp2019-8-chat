@@ -16,10 +16,10 @@ const defaultConfig = {
     "ssl_cert": "./ssl/crt.pem",
     "ssl_key": "./ssl/key.pem",
 
-    "mysql_host": "54.93.122.236",
-    "mysql_user": "utp2019public",
-    "mysql_pass": "utp2019public",
-    "mysql_database": "utp2019public"
+    "mysql_host": "",
+    "mysql_user": "",
+    "mysql_pass": "",
+    "mysql_database": ""
 }
 
 const clHelpPage =
